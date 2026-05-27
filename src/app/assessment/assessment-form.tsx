@@ -374,7 +374,7 @@ export default function AssessmentFormClient() {
                               onChange={() =>
                                 handleCheckboxChange(option.id, "currentSystems")
                               }
-                              className="w-5 h-5 rounded border-neutral-300"
+                              className="w-5 h-5 rounded border border-neutral-300 checked:bg-primary checked:border-primary cursor-pointer"
                             />
                             <label htmlFor={`system-${option.id}`} className="text-sm text-neutral-700 cursor-pointer">
                               {option.label}
@@ -408,7 +408,7 @@ export default function AssessmentFormClient() {
                                   "primaryPainPoints"
                                 )
                               }
-                              className="w-5 h-5 rounded border-neutral-300"
+                              className="w-5 h-5 rounded border border-neutral-300 checked:bg-primary checked:border-primary cursor-pointer"
                             />
                             <label htmlFor={`pain-${option.id}`} className="text-sm text-neutral-700 cursor-pointer">
                               {option.label}
