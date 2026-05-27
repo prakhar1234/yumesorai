@@ -11,6 +11,7 @@ interface FormData {
   email: string;
   company: string;
   industry: string;
+  phone?: string;
   message: string;
 }
 
@@ -24,6 +25,7 @@ export default function ContactFormClient() {
     email: "",
     company: "",
     industry: "",
+    phone: "",
     message: "",
   });
 
@@ -120,6 +122,7 @@ export default function ContactFormClient() {
         email: "",
         company: "",
         industry: "",
+        phone: "",
         message: "",
       });
 
@@ -203,11 +206,21 @@ export default function ContactFormClient() {
               required
             />
 
+            {/* Phone Field */}
+            <Input
+              label="Phone Number (Optional)"
+              name="phone"
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              value={formData.phone || ""}
+              onChange={handleChange}
+              error={errors.phone}
+            />
+
             {/* Industry Field */}
             <Select
               label="Industry"
               options={[
-                { value: "", label: "Select your industry..." },
                 { value: "healthcare", label: "Healthcare" },
                 { value: "airlines", label: "Airlines & Travel" },
                 { value: "banking", label: "Banking & Financial Services" },
