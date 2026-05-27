@@ -12,8 +12,10 @@ interface FormData {
   company: string;
   industry: string;
   jobTitle: string;
+  phone: string;
   preferredDate: string;
   preferredTime: string;
+  message: string;
 }
 
 interface FormErrors {
@@ -45,8 +47,10 @@ export default function DemoFormClient() {
     company: "",
     industry: "",
     jobTitle: "",
+    phone: "",
     preferredDate: "",
     preferredTime: "",
+    message: "",
   });
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -91,7 +95,7 @@ export default function DemoFormClient() {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -158,8 +162,10 @@ export default function DemoFormClient() {
         company: "",
         industry: "",
         jobTitle: "",
+        phone: "",
         preferredDate: "",
         preferredTime: "",
+        message: "",
       });
 
       setTimeout(() => {
@@ -260,7 +266,6 @@ export default function DemoFormClient() {
                 <Select
                   label="Industry"
                   options={[
-                    { value: "", label: "Select your industry..." },
                     { value: "healthcare", label: "Healthcare" },
                     { value: "airlines", label: "Airlines & Travel" },
                     { value: "banking", label: "Banking & Financial Services" },
@@ -279,7 +284,6 @@ export default function DemoFormClient() {
                 <Select
                   label="Your Role"
                   options={[
-                    { value: "", label: "Select your role..." },
                     { value: "cto", label: "CTO / Chief Technology Officer" },
                     { value: "cio", label: "CIO / Chief Information Officer" },
                     { value: "vp-engineering", label: "VP of Engineering" },
@@ -296,13 +300,36 @@ export default function DemoFormClient() {
                   required
                 />
 
+                {/* Phone */}
+                <Input
+                  label="Phone Number"
+                  name="phone"
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  error={errors.phone}
+                />
+
+                {/* Message */}
+                <div>
+                  <label className="block text-sm font-medium text-indigo-950 mb-2">
+                    Additional Notes
+                  </label>
+                  <textarea
+                    name="message"
+                    placeholder="Any specific topics you'd like to cover during the briefing?"
+                    value={formData.message}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full px-4 py-3 rounded-lg border border-indigo-950/10 bg-white text-indigo-950 placeholder:text-indigo-950/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/10 transition-all"
+                  />
+                </div>
+
                 {/* Preferred Date */}
                 <Select
                   label="Preferred Date"
-                  options={[
-                    { value: "", label: "Select a date..." },
-                    ...dateOptions,
-                  ]}
+                  options={dateOptions}
                   value={formData.preferredDate}
                   onValueChange={(value) =>
                     handleSelectChange(value, "preferredDate")
@@ -315,10 +342,7 @@ export default function DemoFormClient() {
                 {/* Preferred Time */}
                 <Select
                   label="Preferred Time (EST)"
-                  options={[
-                    { value: "", label: "Select a time..." },
-                    ...timeSlots,
-                  ]}
+                  options={timeSlots}
                   value={formData.preferredTime}
                   onValueChange={(value) =>
                     handleSelectChange(value, "preferredTime")
