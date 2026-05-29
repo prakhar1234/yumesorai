@@ -141,7 +141,7 @@ export default function Home() {
               Perfect for SMEs and Medium-Sized Companies
             </h2>
             <p className="mt-4 text-lg text-indigo-950/60">
-              You don't need to be a Fortune 500 company to modernize your legacy systems. We work with growing businesses that need enterprise-grade solutions.
+              You don&apos;t need to be a Fortune 500 company to modernize your legacy systems. We work with growing businesses that need enterprise-grade solutions.
             </p>
           </div>
 
@@ -201,7 +201,7 @@ export default function Home() {
 
           <div className="mt-12 text-center">
             <p className="text-base text-indigo-950/60 mb-6">
-              Whether you're a 50-person startup or a 5,000-person growth company, we have solutions that fit your scale and budget.
+              Whether you&apos;re a 50-person startup or a 5,000-person growth company, we have solutions that fit your scale and budget.
             </p>
             <Link
               href="/assessment"
