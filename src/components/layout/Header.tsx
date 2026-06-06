@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState } from "react";
 
 const navLinks = [
@@ -29,7 +30,30 @@ export function Header() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-          <span className="text-xl font-bold tracking-tight text-indigo-950">
+          <div className="w-10 h-10">
+            <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+              <defs>
+                <linearGradient id="yGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#FF6B35',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#0066FF',stopOpacity:1}} />
+                </linearGradient>
+                <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style={{stopColor:'#FFA500',stopOpacity:1}} />
+                  <stop offset="100%" style={{stopColor:'#00D4FF',stopOpacity:1}} />
+                </linearGradient>
+              </defs>
+              <g id="y-shape">
+                <path d="M 70 60 Q 60 85 100 110" stroke="url(#yGradient)" strokeWidth="16" fill="none" strokeLinecap="round"/>
+                <path d="M 130 60 Q 140 85 100 110" stroke="url(#yGradient)" strokeWidth="16" fill="none" strokeLinecap="round"/>
+                <path d="M 100 110 L 100 160" stroke="url(#yGradient)" strokeWidth="16" fill="none" strokeLinecap="round"/>
+              </g>
+              <path d="M 50 100 Q 100 60 150 100" stroke="url(#arcGradient)" strokeWidth="8" fill="none" strokeLinecap="round" opacity="0.8"/>
+              <g id="arrow">
+                <path d="M 140 40 L 160 35 L 155 55" fill="url(#arcGradient)" stroke="none"/>
+              </g>
+            </svg>
+          </div>
+          <span className="text-lg font-bold tracking-tight text-indigo-950">
             Yumesorai
           </span>
         </Link>

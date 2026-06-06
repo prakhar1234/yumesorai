@@ -21,6 +21,9 @@ const siteUrl = "https://www.yumesorai.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: "/images/logos/yumesorai-logo.svg",
+  },
   title: {
     default: "Yumesorai | AI-Driven Legacy Modernization",
     template: "%s | Yumesorai",
