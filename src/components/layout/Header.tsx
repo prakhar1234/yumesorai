@@ -31,11 +31,11 @@ export function Header() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
           <Image
-            src="/images/logos/logos-options-1.jpeg"
+            src="/images/logos/yumesorai-logo-main.jpeg"
             alt="Yumesorai"
-            width={120}
-            height={80}
-            className="h-12 w-auto"
+            width={180}
+            height={60}
+            className="h-10 w-auto"
             priority
           />
         </Link>
