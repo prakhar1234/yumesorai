@@ -29,14 +29,14 @@ export function Header() {
         aria-label="Primary navigation"
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-          <div className="rounded-lg bg-white p-2 shadow-sm border border-indigo-950/5">
+        <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity" onClick={() => setIsOpen(false)}>
+          <div className="rounded-xl bg-gradient-to-br from-white to-indigo-50/50 p-2 shadow-lg shadow-coral/20 border-2 border-coral/20 hover:shadow-xl hover:shadow-coral/30 transition-all">
             <Image
               src="/images/logos/yumesorai-logo-main.jpeg"
               alt="Yumesorai"
               width={240}
               height={80}
-              className="h-16 w-auto"
+              className="h-16 w-auto drop-shadow-sm"
               priority
             />
           </div>
