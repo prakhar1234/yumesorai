@@ -37,10 +37,10 @@ const industryCards = [
 ];
 
 const proofMetrics = [
+  { value: "50%", label: "Cheaper than competitors" },
   { value: "40%", label: "Average cost reduction" },
   { value: "10x", label: "Faster deployments" },
   { value: "99.99%", label: "Migration accuracy" },
-  { value: "200+", label: "Enterprise systems modernized" },
 ];
 
 const trustedBy = [
@@ -322,6 +322,72 @@ export default function Home() {
                 </span>
               </Link>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Cost Advantage Section */}
+      <section className="py-16 sm:py-24 bg-gradient-to-r from-emerald-50 to-teal-50">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-indigo-950 mb-4">
+              50% Cheaper Than Traditional Solutions
+            </h2>
+            <p className="text-lg text-indigo-950/70">
+              Don't pay legacy prices for legacy problems. Yumesorai delivers enterprise-grade modernization at half the cost of traditional consulting firms.
+            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="mx-auto w-full max-w-2xl">
+              <thead>
+                <tr className="border-b-2 border-indigo-950/20">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-indigo-950"></th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-indigo-950">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-1 border-2 border-coral">
+                      <span>Yumesorai</span>
+                      <span className="text-xs font-bold text-coral">✓</span>
+                    </span>
+                  </th>
+                  <th className="px-4 py-3 text-center text-sm font-semibold text-indigo-950/60">
+                    Traditional Firms
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-indigo-950/10">
+                <tr>
+                  <td className="px-4 py-4 text-sm font-medium text-indigo-950">Total Migration Cost</td>
+                  <td className="px-4 py-4 text-center text-lg font-bold text-coral">$2-5M</td>
+                  <td className="px-4 py-4 text-center text-lg font-semibold text-indigo-950/60">$5-15M</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-4 text-sm font-medium text-indigo-950">Timeline</td>
+                  <td className="px-4 py-4 text-center font-semibold text-emerald-700">6-12 months</td>
+                  <td className="px-4 py-4 text-center font-semibold text-indigo-950/60">3-5 years</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-4 text-sm font-medium text-indigo-950">AI-Powered Automation</td>
+                  <td className="px-4 py-4 text-center text-lg text-emerald-600">✓</td>
+                  <td className="px-4 py-4 text-center text-lg text-indigo-950/30">✗</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-4 text-sm font-medium text-indigo-950">Migration Accuracy</td>
+                  <td className="px-4 py-4 text-center font-semibold text-emerald-700">99.99%</td>
+                  <td className="px-4 py-4 text-center font-semibold text-indigo-950/60">95-98%</td>
+                </tr>
+                <tr>
+                  <td className="px-4 py-4 text-sm font-medium text-indigo-950">Post-Migration Support</td>
+                  <td className="px-4 py-4 text-center text-lg text-emerald-600">✓ Included</td>
+                  <td className="px-4 py-4 text-center text-lg text-indigo-950/30">Extra Cost</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-base text-indigo-950/70 mb-6">
+              <span className="font-semibold">The math is simple:</span> Get the same or better results for half the price with Yumesorai's AI-driven approach.
+            </p>
           </div>
         </div>
       </section>
