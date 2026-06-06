@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Hero3DBackground } from "@/components/Hero3DBackground";
 
 const industryCards = [
   {
@@ -55,6 +56,10 @@ export default function Home() {
     <>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
+        {/* 3D Background */}
+        <div className="absolute inset-0 -z-20">
+          <Hero3DBackground />
+        </div>
         {/* Subtle gradient background */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-indigo-950/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pt-32">
