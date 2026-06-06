@@ -30,14 +30,16 @@ export function Header() {
       >
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-          <Image
-            src="/images/logos/yumesorai-logo-main.jpeg"
-            alt="Yumesorai"
-            width={240}
-            height={80}
-            className="h-16 w-auto"
-            priority
-          />
+          <div className="rounded-lg bg-white p-2 shadow-sm border border-indigo-950/5">
+            <Image
+              src="/images/logos/yumesorai-logo-main.jpeg"
+              alt="Yumesorai"
+              width={240}
+              height={80}
+              className="h-16 w-auto"
+              priority
+            />
+          </div>
         </Link>
 
         {/* Desktop nav */}
