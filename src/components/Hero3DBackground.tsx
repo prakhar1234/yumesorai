@@ -22,23 +22,21 @@ export function Hero3DBackground() {
     const cubes = containerRef.current?.querySelectorAll('[data-cube]');
     if (!cubes) return;
 
+    let animationId: number;
     const animate = () => {
       cubes.forEach((cube, index) => {
         const rotationX = mouseRef.current.y * 30;
         const rotationY = mouseRef.current.x * 30;
         const offsetZ = Math.sin(Date.now() / 2000 + index) * 50;
 
-        (cube as HTMLElement).style.transform = `
-          perspective(1000px)
-          rotateX(${rotationX + index * 15}deg)
-          rotateY(${rotationY + index * 15}deg)
-          translateZ(${offsetZ}px)
-        `;
+        (cube as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotationX + index * 15}deg) rotateY(${rotationY + index * 15}deg) translateZ(${offsetZ}px)`;
       });
-      requestAnimationFrame(animate);
+      animationId = requestAnimationFrame(animate);
     };
 
     animate();
+
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
   return (
