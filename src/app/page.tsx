@@ -167,7 +167,6 @@ export default function Home() {
 
           <div className="grid gap-8 sm:grid-cols-3">
             <div className="rounded-xl border border-red-200/30 bg-red-50/50 p-6 hover:shadow-lg transition-all">
-              <div className="text-4xl mb-4">🚨</div>
               <h3 className="text-lg font-semibold text-indigo-950 mb-3">
                 Cybersecurity Risk
               </h3>
@@ -177,7 +176,6 @@ export default function Home() {
             </div>
 
             <div className="rounded-xl border border-orange-200/30 bg-orange-50/50 p-6 hover:shadow-lg transition-all">
-              <div className="text-4xl mb-4">⏰</div>
               <h3 className="text-lg font-semibold text-indigo-950 mb-3">
                 Skills Gap
               </h3>
@@ -187,7 +185,6 @@ export default function Home() {
             </div>
 
             <div className="rounded-xl border border-yellow-200/30 bg-yellow-50/50 p-6 hover:shadow-lg transition-all">
-              <div className="text-4xl mb-4">💸</div>
               <h3 className="text-lg font-semibold text-indigo-950 mb-3">
                 Rising Costs
               </h3>
