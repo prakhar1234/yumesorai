@@ -68,7 +68,7 @@ export default function Home() {
             {/* Trust signal */}
             <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-950/10 bg-white px-4 py-1.5 text-xs font-medium text-indigo-950/60 shadow-sm">
               <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-500" />
-              Team of engineers who have migrated big systems in Fortune 100 companies
+              Founded by Fortune 100 engineers with decades of legacy modernization experience
             </p>
 
             {/* Headline */}
