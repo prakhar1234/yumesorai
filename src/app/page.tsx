@@ -63,7 +63,7 @@ export default function Home() {
         </div>
         {/* Subtle gradient background */}
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-indigo-950/[0.03] to-transparent" />
-        <div className="mx-auto max-w-7xl px-4 pb-20 pt-24 sm:px-6 sm:pb-28 sm:pt-32 lg:px-8 lg:pt-40">
+        <div className="mx-auto max-w-7xl px-4 pb-12 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pt-28">
           <div className="mx-auto max-w-5xl text-center">
             {/* Trust signal */}
             <p className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-950/10 bg-white px-5 py-2.5 text-sm font-medium text-indigo-950/70 shadow-sm">
