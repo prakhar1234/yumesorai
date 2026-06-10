@@ -138,10 +138,10 @@ export default function Home() {
       <section className="py-12 sm:py-16 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-2xl sm:text-3xl font-bold text-indigo-950 mb-3">
+            <h2 className="text-3xl sm:text-4xl font-bold text-indigo-950 mb-4">
               Focused on SME & MSME Legacy Code Migration
             </h2>
-            <p className="text-indigo-950/70 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="text-indigo-950/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
               Enterprise-grade legacy modernization designed for SMEs and MSMEs at prices that fit their budgets.
             </p>
           </div>
