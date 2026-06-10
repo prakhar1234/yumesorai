@@ -117,14 +117,14 @@ export default function Home() {
 
           {/* Trusted by logos placeholder */}
           <div className="mt-10 border-t border-indigo-950/5 pt-8">
-            <p className="mb-6 text-center text-xs font-medium uppercase tracking-widest text-indigo-950/30">
+            <p className="mb-6 text-center text-sm font-medium uppercase tracking-widest text-indigo-950/50">
               Trusted by industry leaders
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-4">
               {trustedBy.map((name) => (
                 <span
                   key={name}
-                  className="text-sm font-medium text-indigo-950/20"
+                  className="text-base font-semibold text-indigo-950/60"
                 >
                   {name}
                 </span>
