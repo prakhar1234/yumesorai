@@ -60,42 +60,20 @@ export function Hero3DBackground() {
         perspective: '1000px',
       }}
     >
-      {/* 3D Floating Cubes - Flying to Infinity */}
-      {[...Array(5)].map((_, i) => {
-        const size = i % 3 === 0 ? 'w-20 h-20' : i % 2 === 0 ? 'w-16 h-16' : 'w-12 h-12';
-        const opacity = i % 3 === 0 ? 'opacity-8' : i % 2 === 0 ? 'opacity-10' : 'opacity-12';
-        return (
-          <div
-            key={i}
-            data-cube
-            className={`absolute ${size} ${opacity} transition-transform duration-100`}
-            style={{
-              left: `${(i * 8.3) % 100}%`,
-              top: `${(10 + (i % 4) * 18 + (i % 2) * 8) % 90}%`,
-              transformStyle: 'preserve-3d',
-              transform: `rotateX(${i * 30}deg) rotateY(${i * 45}deg)`,
-            }}
-          >
-            {/* Cube faces */}
-            {[...Array(6)].map((_, face) => (
-              <div
-                key={face}
-                className="absolute w-full h-full border-2 border-coral/30 bg-gradient-to-br from-coral/5 to-indigo-950/5 backdrop-blur-sm"
-                style={{
-                  transform: [
-                    'translateZ(32px)',
-                    'rotateY(180deg) translateZ(32px)',
-                    'rotateY(90deg) translateZ(32px)',
-                    'rotateY(-90deg) translateZ(32px)',
-                    'rotateX(90deg) translateZ(32px)',
-                    'rotateX(-90deg) translateZ(32px)',
-                  ][face],
-                }}
-              />
-            ))}
-          </div>
-        );
-      })}
+      {/* Floating Dots - Flying to Infinity */}
+      {[...Array(5)].map((_, i) => (
+        <div
+          key={i}
+          data-cube
+          className="absolute w-3 h-3 rounded-full bg-coral opacity-20 transition-transform duration-100"
+          style={{
+            left: `${(i * 8.3) % 100}%`,
+            top: `${(10 + (i % 4) * 18 + (i % 2) * 8) % 90}%`,
+            transformStyle: 'preserve-3d',
+            transform: `rotateX(${i * 30}deg) rotateY(${i * 45}deg)`,
+          }}
+        />
+      ))}
 
       {/* Gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/5" />
