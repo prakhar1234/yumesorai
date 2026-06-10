@@ -61,7 +61,7 @@ export function Hero3DBackground() {
       }}
     >
       {/* 3D Floating Cubes - Flying to Infinity */}
-      {[...Array(18)].map((_, i) => {
+      {[...Array(5)].map((_, i) => {
         const size = i % 3 === 0 ? 'w-20 h-20' : i % 2 === 0 ? 'w-16 h-16' : 'w-12 h-12';
         const opacity = i % 3 === 0 ? 'opacity-8' : i % 2 === 0 ? 'opacity-10' : 'opacity-12';
         return (
