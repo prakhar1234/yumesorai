@@ -183,21 +183,6 @@ export default function Home() {
                 description:
                   "Your team gets direct access to engineers and architects. We succeed when your business succeeds.",
               },
-              {
-                title: "Scalable Approach",
-                description:
-                  "Start small with one system, scale to your entire legacy portfolio as you grow. No lock-in, total flexibility.",
-              },
-              {
-                title: "Reduced Risk",
-                description:
-                  "AI-driven testing and zero-downtime migration mean less operational disruption to your business.",
-              },
-              {
-                title: "Knowledge Transfer",
-                description:
-                  "We do not just modernize—we upskill your team so you own the outcome and can maintain it independently.",
-              },
             ].map((item) => (
               <Card3DEffect key={item.title}>
                 <div
