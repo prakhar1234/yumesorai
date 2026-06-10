@@ -27,9 +27,10 @@ export function Hero3DBackground() {
       cubes.forEach((cube, index) => {
         const rotationX = mouseRef.current.y * 30;
         const rotationY = mouseRef.current.x * 30;
-        const offsetZ = Math.sin(Date.now() / 2000 + index) * 50;
+        const offsetZ = Math.sin(Date.now() / 2000 + index) * 80;
+        const floatY = Math.sin(Date.now() / 3000 + index) * 30;
 
-        (cube as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotationX + index * 15}deg) rotateY(${rotationY + index * 15}deg) translateZ(${offsetZ}px)`;
+        (cube as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotationX + index * 12}deg) rotateY(${rotationY + index * 20}deg) translateZ(${offsetZ}px) translateY(${floatY}px)`;
       });
       animationId = requestAnimationFrame(animate);
     };
@@ -48,18 +49,21 @@ export function Hero3DBackground() {
       }}
     >
       {/* 3D Floating Cubes */}
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          data-cube
-          className="absolute w-16 h-16 opacity-10 transition-transform duration-100"
-          style={{
-            left: `${20 + i * 15}%`,
-            top: `${10 + (i % 3) * 20}%`,
-            transformStyle: 'preserve-3d',
-            transform: `rotateX(${i * 30}deg) rotateY(${i * 45}deg)`,
-          }}
-        >
+      {[...Array(12)].map((_, i) => {
+        const size = i % 3 === 0 ? 'w-20 h-20' : i % 2 === 0 ? 'w-16 h-16' : 'w-12 h-12';
+        const opacity = i % 3 === 0 ? 'opacity-8' : i % 2 === 0 ? 'opacity-10' : 'opacity-12';
+        return (
+          <div
+            key={i}
+            data-cube
+            className={`absolute ${size} ${opacity} transition-transform duration-100`}
+            style={{
+              left: `${(i * 8.3) % 100}%`,
+              top: `${(10 + (i % 4) * 18 + (i % 2) * 8) % 90}%`,
+              transformStyle: 'preserve-3d',
+              transform: `rotateX(${i * 30}deg) rotateY(${i * 45}deg)`,
+            }}
+          >
           {/* Cube faces */}
           {[...Array(6)].map((_, face) => (
             <div
@@ -77,8 +81,9 @@ export function Hero3DBackground() {
               }}
             />
           ))}
-        </div>
-      ))}
+            </div>
+          );
+        })}
 
       {/* Gradient overlay for depth */}
       <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/5" />
