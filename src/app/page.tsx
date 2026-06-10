@@ -142,7 +142,7 @@ export default function Home() {
               Focused on SME & MSME Legacy Code Migration
             </h2>
             <p className="text-white/80 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-              Enterprise-grade legacy modernization designed for SMEs and MSMEs at prices Fortune 500 companies cannot match.
+              Enterprise-grade legacy modernization designed for SMEs and MSMEs at prices that fit their budgets.
             </p>
           </div>
         </div>
