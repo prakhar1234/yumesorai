@@ -25,12 +25,24 @@ export function Hero3DBackground() {
     let animationId: number;
     const animate = () => {
       cubes.forEach((cube, index) => {
+        const time = Date.now();
         const rotationX = mouseRef.current.y * 30;
         const rotationY = mouseRef.current.x * 30;
-        const offsetZ = Math.sin(Date.now() / 2000 + index) * 80;
-        const floatY = Math.sin(Date.now() / 3000 + index) * 30;
 
-        (cube as HTMLElement).style.transform = `perspective(1000px) rotateX(${rotationX + index * 12}deg) rotateY(${rotationY + index * 20}deg) translateZ(${offsetZ}px) translateY(${floatY}px)`;
+        // Flying to infinity effect - continuous Z-axis movement
+        const cycleTime = 8000; // 8 second cycle
+        const progress = ((time + index * 1000) % cycleTime) / cycleTime;
+
+        // Cubes fly towards camera then reset
+        const flyingZ = (progress * 1000) - 500;
+        const offsetZ = Math.sin(time / 2500 + index) * 150;
+        const floatY = Math.sin(time / 3000 + index) * 40;
+        const floatX = Math.cos(time / 3500 + index) * 50;
+
+        // Scale effect - larger when closer
+        const scale = 1 + (progress * 0.3);
+
+        (cube as HTMLElement).style.transform = `perspective(800px) rotateX(${rotationX + index * 12}deg) rotateY(${rotationY + index * 20}deg) translateZ(${flyingZ + offsetZ}px) translateY(${floatY}px) translateX(${floatX}px) scale(${scale})`;
       });
       animationId = requestAnimationFrame(animate);
     };
@@ -48,8 +60,8 @@ export function Hero3DBackground() {
         perspective: '1000px',
       }}
     >
-      {/* 3D Floating Cubes */}
-      {[...Array(12)].map((_, i) => {
+      {/* 3D Floating Cubes - Flying to Infinity */}
+      {[...Array(18)].map((_, i) => {
         const size = i % 3 === 0 ? 'w-20 h-20' : i % 2 === 0 ? 'w-16 h-16' : 'w-12 h-12';
         const opacity = i % 3 === 0 ? 'opacity-8' : i % 2 === 0 ? 'opacity-10' : 'opacity-12';
         return (
