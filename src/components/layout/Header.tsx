@@ -36,7 +36,7 @@ export function Header() {
               alt="Yumesorai"
               width={180}
               height={60}
-              className="h-12 w-auto drop-shadow-sm"
+              className="h-16 w-auto drop-shadow-sm"
               priority
             />
           </div>
