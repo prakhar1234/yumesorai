@@ -115,8 +115,8 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Trusted by logos placeholder */}
-          <div className="mt-10 border-t border-indigo-950/5 pt-8">
+          {/* Trusted by logos placeholder - Hidden for now */}
+          {/* <div className="mt-10 border-t border-indigo-950/5 pt-8">
             <p className="mb-8 text-center text-base font-bold uppercase tracking-widest text-indigo-950/70">
               Trusted by industry leaders
             </p>
@@ -132,7 +132,7 @@ export default function Home() {
                 </div>
               ))}
             </div>
-          </div>
+          </div> */
         </div>
       </section>
 
