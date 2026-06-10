@@ -128,6 +128,9 @@ export default function Home() {
             <p className="text-xl text-indigo-950/70">
               Your COBOL-based processes were never more vulnerable and COBOL developers are only reducing in the market.
             </p>
+            <p className="text-lg font-semibold text-red-600 mt-6">
+              New age AI models can now attack your infrastructure with precision you've never seen before.
+            </p>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-3">
