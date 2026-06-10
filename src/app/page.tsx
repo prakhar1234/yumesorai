@@ -119,41 +119,41 @@ export default function Home() {
       </section>
 
       {/* Why Modernize Now Section */}
-      <section className="py-16 sm:py-24 bg-white">
+      <section className="py-20 sm:py-28 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight text-indigo-950 sm:text-4xl">
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            <h2 className="text-4xl font-bold tracking-tight text-indigo-950 sm:text-5xl mb-6">
               Why Modernize Now
             </h2>
-            <p className="mt-4 text-lg text-indigo-950/60">
+            <p className="text-xl text-indigo-950/70">
               The pressure to modernize has never been higher. Legacy systems face mounting risks you cannot ignore.
             </p>
           </div>
 
-          <div className="grid gap-8 sm:grid-cols-3">
-            <div className="rounded-xl border border-red-200/30 bg-red-50/50 p-6 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-indigo-950 mb-3">
+          <div className="grid gap-10 sm:grid-cols-3">
+            <div className="rounded-xl border border-red-200/40 bg-red-50/60 p-8 hover:shadow-lg transition-all">
+              <h3 className="text-xl font-bold text-indigo-950 mb-4">
                 Cybersecurity Risk
               </h3>
-              <p className="text-sm text-indigo-950/70 leading-relaxed">
+              <p className="text-base text-indigo-950/80 leading-relaxed">
                 Legacy systems are prime targets. They cannot be patched fast enough to keep up with modern threats. Every day they stay in production is another day exposed to attackers.
               </p>
             </div>
 
-            <div className="rounded-xl border border-orange-200/30 bg-orange-50/50 p-6 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-indigo-950 mb-3">
+            <div className="rounded-xl border border-orange-200/40 bg-orange-50/60 p-8 hover:shadow-lg transition-all">
+              <h3 className="text-xl font-bold text-indigo-950 mb-4">
                 Skills Gap
               </h3>
-              <p className="text-sm text-indigo-950/70 leading-relaxed">
+              <p className="text-base text-indigo-950/80 leading-relaxed">
                 COBOL and mainframe engineers are retiring. Your institutional knowledge is walking out the door. Modernizing now preserves that expertise before it is lost forever.
               </p>
             </div>
 
-            <div className="rounded-xl border border-yellow-200/30 bg-yellow-50/50 p-6 hover:shadow-lg transition-all">
-              <h3 className="text-lg font-semibold text-indigo-950 mb-3">
+            <div className="rounded-xl border border-yellow-200/40 bg-yellow-50/60 p-8 hover:shadow-lg transition-all">
+              <h3 className="text-xl font-bold text-indigo-950 mb-4">
                 Rising Costs
               </h3>
-              <p className="text-sm text-indigo-950/70 leading-relaxed">
+              <p className="text-base text-indigo-950/80 leading-relaxed">
                 Maintenance and support for legacy systems grows every year. Cloud-native alternatives cost less to operate and scale automatically with your business.
               </p>
             </div>
@@ -162,13 +162,13 @@ export default function Home() {
       </section>
 
       {/* SME & MSME Focus Banner */}
-      <section className="py-12 sm:py-16 bg-white">
+      <section className="py-16 sm:py-28 bg-white">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold text-indigo-950 mb-4">
+            <h2 className="text-4xl sm:text-5xl font-bold text-indigo-950 mb-6">
               Focused on SME & MSME Legacy Code Migration
             </h2>
-            <p className="text-indigo-950/80 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+            <p className="text-indigo-950/85 text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
               Enterprise-grade legacy modernization designed for SMEs and MSMEs at prices that fit their budgets.
             </p>
           </div>
