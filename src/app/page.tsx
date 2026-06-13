@@ -297,19 +297,19 @@ export default function Home() {
                 icon: "🤖",
                 title: "Code Conversion Engine",
                 description:
-                  "Automatically convert COBOL code to Java with enterprise-grade precision. Our intelligent engine analyzes, transforms, and validates your legacy systems, accelerating migration while maintaining business logic integrity.",
+                  "Automatically convert COBOL to Java with precision. Analyze, transform, and validate your legacy systems instantly.",
               },
               {
                 icon: "🛡️",
                 title: "Vulnerability Detection & Remediation",
                 description:
-                  "Identify and fix security vulnerabilities in quick time. Our advanced scanning detects dormant risks and automatically remediates them before they become exploitable threats.",
+                  "Detect and fix security vulnerabilities fast. Identify dormant risks and remediate them automatically.",
               },
               {
                 icon: "🤖",
                 title: "Post-Migration Code Management Agent",
                 description:
-                  "After migration, our intelligent agent takes over to manage, optimize, and maintain your modernized code. Continuous monitoring, performance tuning, and automated updates ensure your systems stay efficient and secure.",
+                  "Manage and optimize your code post-migration. Continuous monitoring, performance tuning, and automated updates.",
               },
             ].map((item, index) => (
               <div
