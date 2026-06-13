@@ -308,10 +308,10 @@ export default function Home() {
                   "Identify and fix security vulnerabilities in quick time. Our advanced scanning detects dormant risks and automatically remediates them before they become exploitable threats.",
               },
               {
-                icon: "🔧",
-                title: "Lifecycle Management & Maintenance",
+                icon: "🤖",
+                title: "Post-Migration Code Management Agent",
                 description:
-                  "We do not just migrate—we maintain. Ongoing support, performance optimization, feature updates, and continuous improvement to keep your modernized systems running flawlessly.",
+                  "After migration, our intelligent agent takes over to manage, optimize, and maintain your modernized code. Continuous monitoring, performance tuning, and automated updates ensure your systems stay efficient and secure.",
               },
             ].map((item) => (
               <div
