@@ -392,20 +392,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* The Reality Check Section */}
-      <section className="py-16 sm:py-24 bg-red-50/30">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-indigo-950 mb-6">
-              The Hard Truth
-            </h2>
-            <p className="text-lg sm:text-xl text-indigo-950/85">
-              Most vendors ignore SMEs and MSMEs. Traditional modernization costs <span className="font-semibold">$5-15M and takes 3-5 years</span>. That is why Yumesorai exists — to make enterprise-grade modernization <span className="font-semibold text-coral">affordable and fast</span> for companies of all sizes.
-            </p>
-          </div>
-        </div>
-      </section>
-
       {/* Cost Advantage Section */}
       <section className="py-16 sm:py-24 bg-gradient-to-r from-emerald-50 to-teal-50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
