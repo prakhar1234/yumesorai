@@ -47,6 +47,38 @@ const proofMetrics = [
 export default function Home() {
   return (
     <>
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            animation-timing-function: ease-in;
+          }
+          to {
+            opacity: 1;
+          }
+        }
+        @keyframes fadeOut {
+          from {
+            opacity: 1;
+          }
+          to {
+            opacity: 0;
+            animation-timing-function: ease-out;
+          }
+        }
+        .card-fade-in {
+          animation: fadeIn 0.4s ease-in forwards;
+        }
+        .card-fade-out {
+          animation: fadeOut 0.4s ease-out forwards;
+        }
+        .card-interactive {
+          transition: opacity 0.3s ease-in-out;
+        }
+        .card-interactive:hover {
+          animation: none;
+        }
+      `}</style>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Subtle gradient background */}
@@ -279,10 +311,11 @@ export default function Home() {
                 description:
                   "After migration, our intelligent agent takes over to manage, optimize, and maintain your modernized code. Continuous monitoring, performance tuning, and automated updates ensure your systems stay efficient and secure.",
               },
-            ].map((item) => (
+            ].map((item, index) => (
               <div
                 key={item.title}
-                className="rounded-xl border-2 border-indigo-950/30 bg-gradient-to-br from-white to-indigo-50/30 p-8 hover:border-coral hover:shadow-lg transition-all"
+                className="card-fade-in card-interactive rounded-xl border-2 border-indigo-950/30 bg-gradient-to-br from-white to-indigo-50/30 p-8 hover:border-coral hover:shadow-lg transition-all"
+                style={{ animationDelay: `${index * 0.15}s` }}
               >
                 <div className="text-4xl mb-4">{item.icon}</div>
                 <h3 className="text-xl font-bold text-indigo-950 mb-3">
@@ -332,10 +365,11 @@ export default function Home() {
                 stat: "24/7",
                 label: "Available Support",
               },
-            ].map((item) => (
+            ].map((item, index) => (
               <Card3DEffect key={item.title}>
                 <div
-                  className="group rounded-xl border-2 border-indigo-950/40 bg-white p-6 hover:border-coral hover:shadow-lg transition-all cursor-pointer"
+                  className={`group card-fade-in card-interactive rounded-xl border-2 border-indigo-950/40 bg-white p-6 hover:border-coral hover:shadow-lg transition-all cursor-pointer`}
+                  style={{ animationDelay: `${index * 0.15}s` }}
                 >
                   <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-coral/10 to-coral/5 group-hover:from-coral/20 group-hover:to-coral/10 transition-all">
                     <div className="text-3xl font-bold text-coral mb-1">
@@ -451,11 +485,12 @@ export default function Home() {
           </div>
 
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {industryCards.map((card) => (
+            {industryCards.map((card, index) => (
               <Card3DEffect key={card.title}>
                 <Link
                   href={card.href}
-                  className="group relative rounded-2xl border border-indigo-950/10 bg-gradient-to-br from-white to-indigo-50/40 p-8 shadow-md transition-all hover:border-coral/30 hover:shadow-xl"
+                  className="card-fade-in card-interactive group relative rounded-2xl border border-indigo-950/10 bg-gradient-to-br from-white to-indigo-50/40 p-8 shadow-md transition-all hover:border-coral/30 hover:shadow-xl"
+                  style={{ animationDelay: `${index * 0.15}s` }}
                 >
                   <div className="mb-4 inline-flex rounded-xl bg-indigo-950/5 p-3 text-indigo-950 transition-colors group-hover:bg-coral/10 group-hover:text-coral">
                     {card.icon}
