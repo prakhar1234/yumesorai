@@ -297,9 +297,9 @@ export default function Home() {
             {[
               {
                 icon: "🤖",
-                title: "Mythos AI Agent",
+                title: "Code Conversion Engine",
                 description:
-                  "Our intelligent agent accelerates legacy code migration by automatically analyzing, transforming, and validating your COBOL and mainframe systems with enterprise-grade precision.",
+                  "Automatically convert COBOL code to Java with enterprise-grade precision. Our intelligent engine analyzes, transforms, and validates your legacy systems, accelerating migration while maintaining business logic integrity.",
               },
               {
                 icon: "🛡️",
