@@ -135,8 +135,8 @@ export default function Home() {
                 animation: pulse-glow 1.5s infinite;
               }
             `}</style>
-            <div className="mt-8 pt-8 border-t border-indigo-950/10">
-              <p className="text-center text-sm font-semibold text-indigo-950/60 mb-6 animate-pulse">
+            <div className="mt-4 pt-4 border-t border-indigo-950/10">
+              <p className="text-center text-sm font-semibold text-indigo-950/60 mb-4 animate-pulse">
                 SERVING MAJOR SECTORS
               </p>
               <div className="grid grid-cols-3 gap-8 sm:gap-12 max-w-2xl mx-auto">
