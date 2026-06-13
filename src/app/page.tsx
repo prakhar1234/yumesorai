@@ -281,6 +281,56 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Products & Services Section */}
+      <section className="py-16 sm:py-24 bg-white">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold tracking-tight text-indigo-950 mb-4">
+              Our Products & Services
+            </h2>
+            <p className="text-lg text-indigo-950/60">
+              Comprehensive solutions designed to transform your legacy systems completely
+            </p>
+          </div>
+
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {[
+              {
+                icon: "🤖",
+                title: "Mythos AI Agent",
+                description:
+                  "Our intelligent agent accelerates legacy code migration by automatically analyzing, transforming, and validating your COBOL and mainframe systems with enterprise-grade precision.",
+              },
+              {
+                icon: "🛡️",
+                title: "Vulnerability Detection & Remediation",
+                description:
+                  "Identify and fix security vulnerabilities in quick time. Our advanced scanning detects dormant risks and automatically remediates them before they become exploitable threats.",
+              },
+              {
+                icon: "🔧",
+                title: "Lifecycle Management & Maintenance",
+                description:
+                  "We do not just migrate—we maintain. Ongoing support, performance optimization, feature updates, and continuous improvement to keep your modernized systems running flawlessly.",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="rounded-xl border-2 border-indigo-950/30 bg-gradient-to-br from-white to-indigo-50/30 p-8 hover:border-coral hover:shadow-lg transition-all"
+              >
+                <div className="text-4xl mb-4">{item.icon}</div>
+                <h3 className="text-xl font-bold text-indigo-950 mb-3">
+                  {item.title}
+                </h3>
+                <p className="text-base text-indigo-950/70 leading-relaxed">
+                  {item.description}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Industry Solutions */}
       <section className="py-16 sm:py-24 bg-gradient-to-b from-white to-indigo-50/30">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
