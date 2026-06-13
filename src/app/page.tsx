@@ -228,26 +228,40 @@ export default function Home() {
                 title: "Budget-Friendly Solutions",
                 description:
                   "Flexible engagement models designed for companies of all sizes. Only pay for what you need, when you need it.",
+                stat: "60-70%",
+                label: "Cost Reduction",
               },
               {
                 title: "Faster Time to Value",
                 description:
                   "Our proven methodology gets your systems modernized in months, not years. Competitive advantage when you need it most.",
+                stat: "6-12",
+                label: "Months to Deploy",
               },
               {
                 title: "Dedicated Support",
                 description:
                   "Your team gets direct access to engineers and architects. We succeed when your business succeeds.",
+                stat: "24/7",
+                label: "Available Support",
               },
             ].map((item) => (
               <Card3DEffect key={item.title}>
                 <div
-                  className="rounded-xl border-2 border-indigo-950/40 bg-white p-6 hover:border-coral hover:shadow-lg transition-all"
+                  className="group rounded-xl border-2 border-indigo-950/40 bg-white p-6 hover:border-coral hover:shadow-lg transition-all cursor-pointer"
                 >
+                  <div className="mb-4 p-4 rounded-lg bg-gradient-to-r from-coral/10 to-coral/5 group-hover:from-coral/20 group-hover:to-coral/10 transition-all">
+                    <div className="text-3xl font-bold text-coral mb-1">
+                      {item.stat}
+                    </div>
+                    <p className="text-xs font-semibold text-indigo-950/60 group-hover:text-indigo-950 transition-all">
+                      {item.label}
+                    </p>
+                  </div>
                   <h3 className="text-lg font-semibold text-indigo-950">
                     {item.title}
                   </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-indigo-950/60">
+                  <p className="mt-2 text-sm leading-relaxed text-indigo-950/60 group-hover:text-indigo-950/75 transition-all">
                     {item.description}
                   </p>
                 </div>
