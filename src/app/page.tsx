@@ -89,8 +89,54 @@ export default function Home() {
             </div>
 
             {/* Sectors We Serve */}
+            <style>{`
+              @keyframes fadeInUp {
+                from {
+                  opacity: 0;
+                  transform: translateY(20px);
+                }
+                to {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              @keyframes float {
+                0%, 100% {
+                  transform: translateY(0px);
+                }
+                50% {
+                  transform: translateY(-8px);
+                }
+              }
+              @keyframes pulse-glow {
+                0%, 100% {
+                  box-shadow: 0 0 0 0 rgba(255, 89, 64, 0.7);
+                }
+                50% {
+                  box-shadow: 0 0 0 10px rgba(255, 89, 64, 0);
+                }
+              }
+              .sector-card {
+                animation: fadeInUp 0.6s ease-out backwards;
+              }
+              .sector-card:nth-child(1) {
+                animation-delay: 0.1s;
+              }
+              .sector-card:nth-child(2) {
+                animation-delay: 0.3s;
+              }
+              .sector-card:nth-child(3) {
+                animation-delay: 0.5s;
+              }
+              .sector-icon {
+                animation: float 3s ease-in-out infinite;
+              }
+              .sector-icon:hover {
+                animation: pulse-glow 1.5s infinite;
+              }
+            `}</style>
             <div className="mt-16 pt-12 border-t border-indigo-950/10">
-              <p className="text-center text-sm font-semibold text-indigo-950/60 mb-8">
+              <p className="text-center text-sm font-semibold text-indigo-950/60 mb-8 animate-pulse">
                 SERVING MAJOR SECTORS
               </p>
               <div className="grid grid-cols-3 gap-8 sm:gap-12 max-w-2xl mx-auto">
@@ -113,9 +159,9 @@ export default function Home() {
                 ].map((sector) => (
                   <div
                     key={sector.name}
-                    className="text-center group hover:scale-110 transition-transform"
+                    className="sector-card text-center group hover:scale-110 transition-transform"
                   >
-                    <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-coral/20 to-coral/10 group-hover:from-coral/30 group-hover:to-coral/20 transition-all mb-3">
+                    <div className="sector-icon inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-coral/20 to-coral/10 group-hover:from-coral/40 group-hover:to-coral/30 transition-all mb-3">
                       <span className="text-3xl">{sector.icon}</span>
                     </div>
                     <h4 className="text-base font-bold text-indigo-950">
