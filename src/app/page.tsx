@@ -125,29 +125,35 @@ export default function Home() {
 
           <div className="grid gap-10 sm:grid-cols-3">
             <div className="rounded-xl border border-red-200/40 bg-red-50/60 p-8 hover:shadow-lg transition-all">
-              <h3 className="text-xl font-bold text-indigo-950 mb-4">
+              <div className="text-5xl font-bold text-red-600 mb-2">60%</div>
+              <p className="text-sm text-indigo-950/60 mb-4">of data breaches involve legacy systems</p>
+              <h3 className="text-lg font-bold text-indigo-950 mb-3">
                 Cybersecurity Risk
               </h3>
-              <p className="text-base text-indigo-950/80 leading-relaxed">
-                Legacy systems are prime targets. They cannot be patched fast enough to keep up with modern threats. Every day they stay in production is another day exposed to attackers.
+              <p className="text-sm text-indigo-950/70">
+                Legacy systems cannot patch vulnerabilities fast enough for modern threats.
               </p>
             </div>
 
             <div className="rounded-xl border border-orange-200/40 bg-orange-50/60 p-8 hover:shadow-lg transition-all">
-              <h3 className="text-xl font-bold text-indigo-950 mb-4">
+              <div className="text-5xl font-bold text-orange-600 mb-2">45%</div>
+              <p className="text-sm text-indigo-950/60 mb-4">of COBOL developers retiring by 2030</p>
+              <h3 className="text-lg font-bold text-indigo-950 mb-3">
                 Skills Gap
               </h3>
-              <p className="text-base text-indigo-950/80 leading-relaxed">
-                COBOL and mainframe engineers are retiring. Your institutional knowledge is walking out the door. Modernizing now preserves that expertise before it is lost forever.
+              <p className="text-sm text-indigo-950/70">
+                Critical expertise is leaving your organization permanently.
               </p>
             </div>
 
             <div className="rounded-xl border border-yellow-200/40 bg-yellow-50/60 p-8 hover:shadow-lg transition-all">
-              <h3 className="text-xl font-bold text-indigo-950 mb-4">
+              <div className="text-5xl font-bold text-yellow-600 mb-2">30%</div>
+              <p className="text-sm text-indigo-950/60 mb-4">annual increase in legacy system costs</p>
+              <h3 className="text-lg font-bold text-indigo-950 mb-3">
                 Rising Costs
               </h3>
-              <p className="text-base text-indigo-950/80 leading-relaxed">
-                Maintenance and support for legacy systems grows every year. Cloud-native alternatives cost less to operate and scale automatically with your business.
+              <p className="text-sm text-indigo-950/70">
+                Maintenance budgets grow every year while ROI shrinks.
               </p>
             </div>
           </div>
