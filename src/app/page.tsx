@@ -231,7 +231,64 @@ export default function Home() {
       </section>
 
       {/* Industries We Serve Section */}
-      <section className="py-20 sm:py-28 bg-gradient-to-b from-indigo-50/40 to-white">
+      <section className="py-20 sm:py-28 bg-gradient-to-b from-indigo-50/40 to-white overflow-hidden">
+        <style>{`
+          @keyframes slideInUp {
+            from {
+              opacity: 0;
+              transform: translateY(30px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+
+          @keyframes iconFloat {
+            0%, 100% {
+              transform: translateY(0px);
+            }
+            50% {
+              transform: translateY(-8px);
+            }
+          }
+
+          @keyframes shimmer {
+            0% {
+              background-position: -1000px 0;
+            }
+            100% {
+              background-position: 1000px 0;
+            }
+          }
+
+          .industry-card {
+            animation: slideInUp 0.6s ease-out forwards;
+            opacity: 0;
+          }
+
+          .industry-card:hover {
+            transform: translateY(-12px) scale(1.05);
+          }
+
+          .industry-icon {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+          }
+
+          .industry-card:hover .industry-icon {
+            animation: iconFloat 0.8s ease-in-out infinite;
+          }
+
+          .size-card {
+            animation: slideInUp 0.6s ease-out forwards;
+            opacity: 0;
+          }
+
+          .size-card:hover {
+            transform: translateY(-8px);
+          }
+        `}</style>
+
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center mb-16">
             <h2 className="text-4xl font-bold tracking-tight text-indigo-950 sm:text-5xl mb-6">
@@ -256,36 +313,47 @@ export default function Home() {
               { name: 'Energy & Utilities', icon: '⚡' },
               { name: 'Education', icon: '🎓' },
               { name: 'Media & Publishing', icon: '📰' },
-            ].map((industry) => (
-              <div key={industry.name} className="card-fade-in rounded-xl border border-indigo-950/10 bg-gradient-to-br from-white to-indigo-50/30 p-6 text-center hover:border-coral/30 hover:shadow-lg transition-all">
-                <div className="text-4xl mb-3">{industry.icon}</div>
-                <h3 className="font-semibold text-indigo-950">{industry.name}</h3>
+            ].map((industry, index) => (
+              <div
+                key={industry.name}
+                className="industry-card relative rounded-2xl border border-indigo-200/60 bg-gradient-to-br from-white via-indigo-50/40 to-indigo-100/30 p-8 text-center cursor-pointer shadow-sm hover:shadow-2xl transition-all duration-300 group"
+                style={{ animationDelay: `${index * 0.08}s` }}
+              >
+                {/* Gradient background on hover */}
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-coral/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                <div className="relative z-10">
+                  <div className="industry-icon text-5xl mb-4 inline-block">{industry.icon}</div>
+                  <h3 className="font-semibold text-lg text-indigo-950 group-hover:text-coral transition-colors duration-300">{industry.name}</h3>
+                </div>
               </div>
             ))}
           </div>
 
           {/* Business Sizes */}
           <div className="mt-16 pt-16 border-t border-indigo-950/10">
-            <h3 className="text-2xl font-bold tracking-tight text-indigo-950 text-center mb-8">
+            <h3 className="text-2xl font-bold tracking-tight text-indigo-950 text-center mb-12">
               All Business Sizes
             </h3>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <div className="rounded-lg border border-indigo-950/10 bg-white px-4 py-6 text-center hover:shadow-md transition-all">
-                <p className="text-sm font-semibold uppercase tracking-wide text-coral mb-2">Startups</p>
-                <p className="font-medium text-indigo-950">10-50 employees</p>
-              </div>
-              <div className="rounded-lg border border-indigo-950/10 bg-white px-4 py-6 text-center hover:shadow-md transition-all">
-                <p className="text-sm font-semibold uppercase tracking-wide text-coral mb-2">SMEs</p>
-                <p className="font-medium text-indigo-950">50-500 employees</p>
-              </div>
-              <div className="rounded-lg border border-indigo-950/10 bg-white px-4 py-6 text-center hover:shadow-md transition-all">
-                <p className="text-sm font-semibold uppercase tracking-wide text-coral mb-2">Mid-Market</p>
-                <p className="font-medium text-indigo-950">500-2,500 employees</p>
-              </div>
-              <div className="rounded-lg border border-indigo-950/10 bg-white px-4 py-6 text-center hover:shadow-md transition-all">
-                <p className="text-sm font-semibold uppercase tracking-wide text-coral mb-2">Enterprise</p>
-                <p className="font-medium text-indigo-950">2,500+ employees</p>
-              </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { label: 'Startups', range: '10-50 employees' },
+                { label: 'SMEs', range: '50-500 employees' },
+                { label: 'Mid-Market', range: '500-2,500 employees' },
+                { label: 'Enterprise', range: '2,500+ employees' },
+              ].map((size, index) => (
+                <div
+                  key={size.label}
+                  className="size-card relative rounded-xl border border-indigo-200/50 bg-gradient-to-br from-white to-indigo-50/40 px-6 py-8 text-center shadow-sm hover:shadow-xl transition-all duration-300 group overflow-hidden"
+                  style={{ animationDelay: `${0.4 + index * 0.1}s` }}
+                >
+                  {/* Animated accent line on hover */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-coral via-orange-400 to-coral scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+
+                  <p className="text-sm font-bold uppercase tracking-widest text-coral mb-3 group-hover:scale-110 transition-transform duration-300">{size.label}</p>
+                  <p className="font-semibold text-indigo-950 text-lg">{size.range}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
