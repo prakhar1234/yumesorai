@@ -23,6 +23,9 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
+# Copy prisma schema (needed for runtime)
+COPY prisma ./prisma
+
 # Install production dependencies only with legacy peer deps flag
 RUN npm ci --omit=dev --legacy-peer-deps
 
@@ -30,6 +33,7 @@ RUN npm ci --omit=dev --legacy-peer-deps
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/src ./src
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Expose port
 EXPOSE 3000
