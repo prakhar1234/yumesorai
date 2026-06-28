@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
 
 interface ROICalculatorData {
   email?: string;
@@ -51,34 +50,20 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Save to database
-    const calculation = await prisma.rOICalculation.create({
-      data: {
-        email: body.email?.trim(),
-        company: body.company?.trim(),
-        currentCost: body.currentCost,
-        migrationMethod: body.migrationMethod,
-        timelineMonths: body.timelineMonths,
-        estimatedSavings: body.estimatedSavings,
-        roiPercentage: body.roiPercentage,
-        breakEvenMonths: body.breakEvenMonths,
-      },
-    });
+    // Log calculation
+    console.log(`[ROI Calculator API] Calculation received${body.email ? ` from ${body.email}` : ""}`);
 
     // TODO: Send ROI calculation summary to email if provided
     // TODO: Store for analytics and reporting
 
-    console.log(`[ROI Calculator API] Calculation received${body.email ? ` from ${body.email}` : ""}`);
-
     return NextResponse.json(
       {
         success: true,
-        id: calculation.id,
         message: "Your ROI calculation has been saved successfully.",
         calculation: {
-          estimatedSavings: calculation.estimatedSavings,
-          roiPercentage: calculation.roiPercentage,
-          breakEvenMonths: calculation.breakEvenMonths,
+          estimatedSavings: body.estimatedSavings,
+          roiPercentage: body.roiPercentage,
+          breakEvenMonths: body.breakEvenMonths,
         },
       },
       { status: 201 }

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
 
 interface DemoFormData {
   name: string;
@@ -62,19 +61,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Save to database
-    const demoRequest = await prisma.demoRequest.create({
-      data: {
-        name: body.name.trim(),
-        email: body.email.trim(),
-        company: body.company.trim(),
-        industry: body.industry,
-        jobTitle: body.jobTitle,
-        phone: body.phone.trim(),
-        preferredDate: requestedDate,
-        timezone: body.timezone,
-        message: body.message?.trim(),
-      },
-    });
 
     // TODO: Send confirmation email to user
     // TODO: Send notification to admin/sales team
@@ -95,7 +81,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        id: demoRequest.id,
         message: "Your demo has been booked successfully. Check your email for confirmation details.",
         demoDate: formattedDate,
       },

@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
 
 interface AssessmentFormData {
   name: string;
@@ -41,29 +40,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to database
-    const assessment = await prisma.freeAssessment.create({
-      data: {
-        name: body.name.trim(),
-        email: body.email.trim(),
-        company: body.company.trim(),
-        industry: body.industry,
-        systemType: body.systemType,
-        cobolLines: body.cobolLines || null,
-        challenges: body.challenges?.trim(),
-      },
-    });
+    // Log submission
+    console.log(`[Assessment API] Submission received from ${body.email}`);
 
     // TODO: Send confirmation email to user
     // TODO: Send notification to assessment team
     // TODO: Trigger automated assessment report generation
 
-    console.log(`[Assessment API] Submission received from ${body.email}`);
-
     return NextResponse.json(
       {
         success: true,
-        id: assessment.id,
         message: "Your assessment has been submitted successfully",
       },
       { status: 201 }

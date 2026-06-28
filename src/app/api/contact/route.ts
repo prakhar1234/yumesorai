@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
 
 interface ContactFormData {
   name: string;
@@ -40,27 +39,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Save to database
-    const submission = await prisma.contactSubmission.create({
-      data: {
-        name: body.name.trim(),
-        email: body.email.trim(),
-        company: body.company.trim(),
-        industry: body.industry,
-        phone: body.phone?.trim(),
-        message: body.message.trim(),
-      },
-    });
+    // Log submission
+    console.log(`[Contact API] Submission received from ${body.email}`);
 
     // TODO: Send email notification to admin and user
     // TODO: Integrate with CRM/email service (SendGrid, Mailchimp, etc.)
 
-    console.log(`[Contact API] Submission received from ${body.email}`);
-
     return NextResponse.json(
       {
         success: true,
-        id: submission.id,
         message: "Your message has been sent successfully",
       },
       { status: 201 }

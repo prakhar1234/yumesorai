@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import prisma from "@/lib/db";
 
 interface RiskBriefingFormData {
   name: string;
@@ -65,18 +64,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Save to database
-    const briefing = await prisma.riskBriefing.create({
-      data: {
-        name: body.name.trim(),
-        email: body.email.trim(),
-        company: body.company.trim(),
-        industry: body.industry,
-        phone: body.phone?.trim(),
-        preferredDate: datetime,
-        timezone: body.timezone,
-        message: body.message?.trim(),
-      },
-    });
 
     // TODO: Send confirmation email to user
     // TODO: Send notification to briefing team
@@ -97,7 +84,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        id: briefing.id,
         message: "Your risk briefing has been scheduled successfully. Check your email for confirmation details.",
         briefingDate: formattedDate,
       },
