@@ -43,4 +43,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=5 \
   CMD node -e "require('http').get('http://localhost:3000', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
 
 # Start Next.js app
-CMD ["npm", "start"]
+CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3000"]
