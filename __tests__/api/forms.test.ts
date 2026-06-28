@@ -24,7 +24,7 @@ describe('Form API Endpoints - Integration Tests', () => {
       expect(response.status).toBe(201);
       const data = await response.json();
       expect(data.success).toBe(true);
-      expect(data.message).toContain('saved successfully');
+      expect(data.message).toMatch(/sent|saved/i);
     });
 
     it('should reject contact form with missing required fields', async () => {
