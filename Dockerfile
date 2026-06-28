@@ -29,6 +29,7 @@ RUN npm ci --omit=dev --legacy-peer-deps
 # Copy built app from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY prisma ./prisma
 
 # Expose port
 EXPOSE 3000
