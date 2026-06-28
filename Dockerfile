@@ -31,6 +31,9 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY prisma ./prisma
 
+# Set dummy DATABASE_URL for Prisma schema validation (not actually used)
+ENV DATABASE_URL="postgresql://user:password@localhost:5432/dummy"
+
 # Expose port
 EXPOSE 3000
 

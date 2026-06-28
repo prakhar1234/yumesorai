@@ -1,4 +1,6 @@
-// This schema is not used - Prisma has been removed from this project
+// This schema is minimal - Prisma has been mostly removed from this project
+// It exists only to satisfy transitive dependencies
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,4 +8,5 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
