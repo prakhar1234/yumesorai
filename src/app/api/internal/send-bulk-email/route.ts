@@ -2,16 +2,16 @@ import { validateBasicAuth, getBasicAuthErrorResponse } from '@/lib/auth';
 import { getClientEmailTemplate, DEFAULT_EMAIL_CONTENT, DEFAULT_EMAIL_SUBJECT } from '@/lib/email-templates';
 import { Resend } from 'resend';
 
+const resend = new Resend(process.env.RESEND_API_KEY);
+
 export async function POST(request: Request) {
   // Check basic auth
-  const authHeader = request.headers.get('authorization') ?? undefined;
+  const authHeader = request.headers.get('authorization');
   if (!validateBasicAuth(authHeader)) {
     return getBasicAuthErrorResponse();
   }
 
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY || '');
-
     const formData = await request.formData();
     const csvFile = formData.get('csv') as File;
     const subject = (formData.get('subject') as string) || DEFAULT_EMAIL_SUBJECT;
@@ -137,7 +137,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function OPTIONS() {
+export async function OPTIONS(request: Request) {
   return Response.json(
     {
       method: 'POST',
