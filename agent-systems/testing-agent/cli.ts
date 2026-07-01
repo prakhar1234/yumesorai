@@ -7,10 +7,18 @@
 
 import path from 'path';
 import fs from 'fs';
-import { TestingAgent, createTestingAgent } from './agent';
-import { TestingAgentConfig } from './types';
+import { createTestingAgent } from './agent';
 import { getFeatureRegistry } from './feature-registry';
 import { createTestOrchestrator } from './test-orchestrator';
+
+// Types
+interface TestingAgentConfig {
+  railway: any;
+  github: any;
+  testing: any;
+  notifications: any;
+  features: any;
+}
 
 interface CLIOptions {
   command: string;
@@ -18,7 +26,7 @@ interface CLIOptions {
   features?: string[];
   config?: string;
   baseUrl?: string;
-  headless?: boolean;
+  headless: boolean;
   help?: boolean;
 }
 
