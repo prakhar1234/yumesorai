@@ -1,0 +1,211 @@
+{
+  "features": [
+    {
+      "id": "contact-form",
+      "name": "Contact Form",
+      "description": "Contact form for lead generation and inquiries",
+      "category": "form",
+      "apiEndpoints": [
+        "/api/contact"
+      ],
+      "formPages": [
+        "/contact"
+      ],
+      "dependencies": [
+        "email-service",
+        "form-validation"
+      ],
+      "tags": [
+        "form",
+        "frontend",
+        "validation",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "demo-form",
+      "name": "Demo Booking Form",
+      "description": "Demo and briefing booking form with date selection",
+      "category": "form",
+      "apiEndpoints": [
+        "/api/demo"
+      ],
+      "formPages": [
+        "/demo"
+      ],
+      "dependencies": [
+        "email-service",
+        "calendar-integration",
+        "form-validation"
+      ],
+      "tags": [
+        "form",
+        "frontend",
+        "scheduling",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "assessment-form",
+      "name": "Assessment Form",
+      "description": "Multi-step assessment form for system evaluation",
+      "category": "form",
+      "apiEndpoints": [
+        "/api/assessment"
+      ],
+      "formPages": [
+        "/assessment"
+      ],
+      "dependencies": [
+        "email-service",
+        "hubspot-integration",
+        "form-validation"
+      ],
+      "tags": [
+        "form",
+        "frontend",
+        "multi-step",
+        "crm",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "risk-briefing-form",
+      "name": "Risk Briefing Form",
+      "description": "Risk briefing scheduling form with date and time selection",
+      "category": "form",
+      "apiEndpoints": [
+        "/api/risk-briefing"
+      ],
+      "formPages": [
+        "/risk-briefing"
+      ],
+      "dependencies": [
+        "email-service",
+        "calendar-integration",
+        "form-validation"
+      ],
+      "tags": [
+        "form",
+        "frontend",
+        "scheduling",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "roi-calculator",
+      "name": "ROI Calculator",
+      "description": "Interactive ROI calculation tool with email export",
+      "category": "form",
+      "apiEndpoints": [
+        "/api/roi-calculator"
+      ],
+      "formPages": [
+        "/tools/roi-calculator"
+      ],
+      "dependencies": [
+        "email-service",
+        "form-validation"
+      ],
+      "tags": [
+        "form",
+        "frontend",
+        "calculator",
+        "tool"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "email-service",
+      "name": "Email Service",
+      "description": "Email delivery and notification system using Resend",
+      "category": "integration",
+      "apiEndpoints": [
+        "/api/internal/send-bulk-email"
+      ],
+      "dependencies": [],
+      "tags": [
+        "email",
+        "backend",
+        "infrastructure",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "calendar-integration",
+      "name": "Calendar Integration",
+      "description": "Calendar availability and scheduling integration",
+      "category": "integration",
+      "dependencies": [],
+      "tags": [
+        "scheduling",
+        "integration",
+        "calendar"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "hubspot-integration",
+      "name": "HubSpot Integration",
+      "description": "HubSpot CRM synchronization for assessment submissions",
+      "category": "integration",
+      "dependencies": [],
+      "tags": [
+        "crm",
+        "integration",
+        "hubspot"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "form-validation",
+      "name": "Form Validation",
+      "description": "Server-side form validation and error handling",
+      "category": "api",
+      "apiEndpoints": [
+        "/api/contact",
+        "/api/demo",
+        "/api/assessment",
+        "/api/risk-briefing",
+        "/api/roi-calculator"
+      ],
+      "dependencies": [],
+      "tags": [
+        "api",
+        "validation",
+        "backend",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "form-submission",
+      "name": "Form Submission",
+      "description": "Form submission processing and data handling",
+      "category": "api",
+      "apiEndpoints": [
+        "/api/contact",
+        "/api/demo",
+        "/api/assessment",
+        "/api/risk-briefing",
+        "/api/roi-calculator"
+      ],
+      "dependencies": [
+        "email-service",
+        "form-validation"
+      ],
+      "tags": [
+        "api",
+        "backend",
+        "critical"
+      ],
+      "lastModified": "2026-06-28T00:00:00Z"
+    }
+  ],
+  "lastUpdated": "2026-06-28T00:00:00Z"
+}

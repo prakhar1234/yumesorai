@@ -13,7 +13,10 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:all": "npm run test:api && npm run test:e2e"
+    "test:all": "npm run test:api && npm run test:e2e",
+    "test:agent": "ts-node agent-systems/testing-agent/cli.ts",
+    "test:agent:validate": "npm run test:agent registry validate",
+    "test:agent:status": "npm run test:agent status"
   },
   "dependencies": {
     "@hubspot/api-client": "^13.5.0",
