@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     // Save to database if email is provided
     if (body.email) {
       try {
-        insertROICalculatorSubmission({
+        await insertROICalculatorSubmission({
           email: body.email,
           annual_spend: body.currentCost,
           expected_savings_percent: body.roiPercentage,
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const stats = getSubmissionStats();
+    const stats = await getSubmissionStats();
     return NextResponse.json({
       status: "ok",
       stats,

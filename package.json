@@ -31,7 +31,7 @@
     "@react-email/components": "^1.0.12",
     "@sanity/icons": "^2.9.0",
     "@sanity/image-url": "^1.0.0",
-    "better-sqlite3": "^12.11.1",
+    "pg": "^8.11.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",

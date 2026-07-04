@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
 
     // Save to database
     try {
-      insertRiskBriefingBooking({
+      await insertRiskBriefingBooking({
         name: body.name,
         email: body.email,
         company: body.company,
@@ -122,7 +122,7 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    const stats = getSubmissionStats();
+    const stats = await getSubmissionStats();
     return NextResponse.json({
       status: "ok",
       stats,
