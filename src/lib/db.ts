@@ -3,7 +3,7 @@
  * Connects to Railway PostgreSQL database
  */
 
-import { Pool, PoolClient } from 'pg';
+import { Pool } from 'pg';
 
 // Initialize connection pool
 let pool: Pool | null = null;

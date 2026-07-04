@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = (await request.json()) as { query?: string };
     const { query } = body;
 
     if (!query || typeof query !== 'string') {
@@ -75,12 +75,13 @@ export async function POST(request: NextRequest) {
     } finally {
       client.release();
     }
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     console.error('[DB Query API] Error:', error);
     return NextResponse.json(
       {
         error: 'Failed to execute query',
-        message: error.message,
+        message: errorMessage,
       },
       { status: 500 }
     );

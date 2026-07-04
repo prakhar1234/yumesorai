@@ -116,7 +116,7 @@ export async function POST(request: NextRequest) {
 /**
  * GET /api/demo - Get submission statistics
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const stats = await getSubmissionStats();
     return NextResponse.json({

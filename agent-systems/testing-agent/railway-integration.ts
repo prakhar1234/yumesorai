@@ -382,10 +382,15 @@ export class RailwayIntegration {
   async isDeploymentAccessible(baseUrl: string, maxAttempts: number = 5): Promise<boolean> {
     for (let attempt = 0; attempt < maxAttempts; attempt++) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+
         const response = await fetch(`${baseUrl}/api/internal/docs`, {
           method: 'GET',
-          timeout: 5000,
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           return true;
@@ -402,7 +407,8 @@ export class RailwayIntegration {
 export function createRailwayIntegration(
   projectId: string,
   environmentId: string,
-  apiToken: string
+  apiToken: string,
+  options?: { pollInterval?: number; maxPollAttempts?: number }
 ): RailwayIntegration {
-  return new RailwayIntegration(projectId, environmentId, apiToken);
+  return new RailwayIntegration(projectId, environmentId, apiToken, options);
 }

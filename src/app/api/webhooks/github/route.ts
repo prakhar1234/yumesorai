@@ -33,28 +33,35 @@ function verifyWebhookSignature(
 /**
  * Parse webhook payload
  */
-function parseWebhookPayload(body: any) {
-  const ref = body.ref || '';
+function parseWebhookPayload(
+  body: Record<string, unknown>
+) {
+  const ref = (body.ref as string) || '';
   const branch = ref.replace('refs/heads/', '');
-  const commitSha = body.after || '';
-  const repository = body.repository?.full_name || '';
-  const pusher = body.pusher?.name || 'Unknown';
+  const commitSha = (body.after as string) || '';
+  const repository = ((body.repository as Record<string, unknown>)?.full_name as string) || '';
+  const pusher = ((body.pusher as Record<string, unknown>)?.name as string) || 'Unknown';
 
   // Get commit message
   let commitMessage = 'No message';
-  if (body.head_commit?.message) {
-    commitMessage = body.head_commit.message.split('\n')[0];
-  } else if (body.commits && body.commits.length > 0) {
-    commitMessage = body.commits[0].message.split('\n')[0];
+  const headCommit = body.head_commit as Record<string, unknown> | undefined;
+  if (headCommit?.message) {
+    commitMessage = ((headCommit.message as string) || '').split('\n')[0];
+  } else {
+    const commits = body.commits as Array<Record<string, unknown>> | undefined;
+    if (commits && Array.isArray(commits) && commits.length > 0) {
+      const firstCommit = commits[0];
+      commitMessage = ((firstCommit.message as string) || '').split('\n')[0];
+    }
   }
 
   // Collect changed files
   const changedFiles = new Set<string>();
   if (body.commits && Array.isArray(body.commits)) {
-    body.commits.forEach((commit: any) => {
-      (commit.added || []).forEach((file: string) => changedFiles.add(file));
-      (commit.modified || []).forEach((file: string) => changedFiles.add(file));
-      (commit.removed || []).forEach((file: string) => changedFiles.add(file));
+    (body.commits as Array<Record<string, unknown>>).forEach((commit) => {
+      ((commit.added as string[]) || []).forEach((file: string) => changedFiles.add(file));
+      ((commit.modified as string[]) || []).forEach((file: string) => changedFiles.add(file));
+      ((commit.removed as string[]) || []).forEach((file: string) => changedFiles.add(file));
     });
   }
 
@@ -99,7 +106,9 @@ function identifyAffectedFeatures(changedFiles: string[]): string[] {
 /**
  * Handle GitHub push event
  */
-async function handlePushEvent(body: any): Promise<{ status: string; message: string }> {
+async function handlePushEvent(
+  body: Record<string, unknown>
+): Promise<{ status: string; message: string }> {
   const eventData = parseWebhookPayload(body);
 
   // Only process main, develop, and staging branches

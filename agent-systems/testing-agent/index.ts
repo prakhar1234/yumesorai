@@ -4,7 +4,7 @@
  */
 
 // Type exports
-export {
+export type {
   Feature,
   FeatureRegistry,
   RailwayDeployment,
