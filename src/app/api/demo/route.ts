@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { insertDemoBooking, getSubmissionStats } from "@/lib/db";
 
 interface DemoFormData {
   name: string;
@@ -61,6 +62,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Save to database
+    try {
+      insertDemoBooking({
+        name: body.name,
+        email: body.email,
+        company: body.company,
+        date: body.preferredDate.split('T')[0], // Extract date part
+        message: body.message,
+      });
+      console.log(`[Demo API] Booking saved to database for ${body.email}`);
+    } catch (dbError) {
+      console.error("[Demo API] Database error:", dbError);
+      return NextResponse.json(
+        { error: "Failed to save booking to database" },
+        { status: 500 }
+      );
+    }
 
     // TODO: Send confirmation email to user
     // TODO: Send notification to admin/sales team
@@ -91,6 +108,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: "An error occurred while booking your demo. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/demo - Get submission statistics
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const stats = getSubmissionStats();
+    return NextResponse.json({
+      status: "ok",
+      stats,
+    });
+  } catch (error) {
+    console.error("[Demo API] GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to get statistics" },
       { status: 500 }
     );
   }

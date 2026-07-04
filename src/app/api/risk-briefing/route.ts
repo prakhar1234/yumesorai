@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { insertRiskBriefingBooking, getSubmissionStats } from "@/lib/db";
 
 interface RiskBriefingFormData {
   name: string;
@@ -64,6 +65,23 @@ export async function POST(request: NextRequest) {
     }
 
     // Save to database
+    try {
+      insertRiskBriefingBooking({
+        name: body.name,
+        email: body.email,
+        company: body.company,
+        date: body.preferredDate,
+        time: body.preferredTime,
+        phone: body.phone,
+      });
+      console.log(`[Risk Briefing API] Booking saved to database for ${body.email}`);
+    } catch (dbError) {
+      console.error("[Risk Briefing API] Database error:", dbError);
+      return NextResponse.json(
+        { error: "Failed to save booking to database" },
+        { status: 500 }
+      );
+    }
 
     // TODO: Send confirmation email to user
     // TODO: Send notification to briefing team
@@ -94,6 +112,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: "An error occurred while scheduling your briefing. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/risk-briefing - Get submission statistics
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const stats = getSubmissionStats();
+    return NextResponse.json({
+      status: "ok",
+      stats,
+    });
+  } catch (error) {
+    console.error("[Risk Briefing API] GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to get statistics" },
       { status: 500 }
     );
   }

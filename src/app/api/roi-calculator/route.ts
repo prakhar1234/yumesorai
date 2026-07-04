@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { insertROICalculatorSubmission, getSubmissionStats } from "@/lib/db";
 
 interface ROICalculatorData {
   email?: string;
@@ -53,6 +54,24 @@ export async function POST(request: NextRequest) {
     // Log calculation
     console.log(`[ROI Calculator API] Calculation received${body.email ? ` from ${body.email}` : ""}`);
 
+    // Save to database if email is provided
+    if (body.email) {
+      try {
+        insertROICalculatorSubmission({
+          email: body.email,
+          annual_spend: body.currentCost,
+          expected_savings_percent: body.roiPercentage,
+        });
+        console.log(`[ROI Calculator API] Calculation saved to database for ${body.email}`);
+      } catch (dbError) {
+        console.error("[ROI Calculator API] Database error:", dbError);
+        return NextResponse.json(
+          { error: "Failed to save calculation to database" },
+          { status: 500 }
+        );
+      }
+    }
+
     // TODO: Send ROI calculation summary to email if provided
     // TODO: Store for analytics and reporting
 
@@ -73,6 +92,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: "An error occurred while processing your calculation. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/roi-calculator - Get submission statistics
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const stats = getSubmissionStats();
+    return NextResponse.json({
+      status: "ok",
+      stats,
+    });
+  } catch (error) {
+    console.error("[ROI Calculator API] GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to get statistics" },
       { status: 500 }
     );
   }

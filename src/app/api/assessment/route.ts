@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { insertAssessmentSubmission, getSubmissionStats } from "@/lib/db";
 
 interface AssessmentFormData {
   name: string;
@@ -43,6 +44,25 @@ export async function POST(request: NextRequest) {
     // Log submission
     console.log(`[Assessment API] Submission received from ${body.email}`);
 
+    // Save to database
+    try {
+      insertAssessmentSubmission({
+        name: body.name,
+        email: body.email,
+        company: body.company,
+        industry: body.industry,
+        company_size: body.systemType,
+        pain_points: body.challenges,
+      });
+      console.log(`[Assessment API] Submission saved to database for ${body.email}`);
+    } catch (dbError) {
+      console.error("[Assessment API] Database error:", dbError);
+      return NextResponse.json(
+        { error: "Failed to save submission to database" },
+        { status: 500 }
+      );
+    }
+
     // TODO: Send confirmation email to user
     // TODO: Send notification to assessment team
     // TODO: Trigger automated assessment report generation
@@ -59,6 +79,25 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       { error: "An error occurred while processing your assessment. Please try again later." },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/assessment - Get submission statistics
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const stats = getSubmissionStats();
+    return NextResponse.json({
+      status: "ok",
+      stats,
+    });
+  } catch (error) {
+    console.error("[Assessment API] GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to get statistics" },
       { status: 500 }
     );
   }
