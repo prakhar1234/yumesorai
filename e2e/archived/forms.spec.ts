@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
-const BASE_URL = process.env.TEST_BASE_URL || 'http://localhost:3000';
+// Use production as default for E2E tests (localhost cannot access Railway database)
+const BASE_URL = process.env.TEST_BASE_URL || 'https://www.yumesorai.com';
 
 test.describe('Form E2E Tests - User Interactions', () => {
   // =====================================================
