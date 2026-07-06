@@ -1,0 +1,104 @@
+
+> yumesorai-website@0.1.0 test:e2e
+> playwright test --workers=1
+
+
+Running 8 tests using 1 worker
+
+[1/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:17:9 › Comprehensive Form Flow Tests with Database Verification › Contact Form Complete Flow › should fill and submit contact form, verify API response and database persistence
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:17:9 › Comprehensive Form Flow Tests with Database Verification › Contact Form Complete Flow › should fill and submit contact form, verify API response and database persistence
+Step 1: Navigating to contact page...
+
+Step 2: Filling contact form...
+
+Step 3: Submitting form...
+
+Step 4: Verifying API submission...
+
+✅ API Response verified
+
+Step 5: Verifying database persistence...
+
+✅ Database verified - Contact count: 20
+
+[2/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:81:9 › Comprehensive Form Flow Tests with Database Verification › Contact Form Complete Flow › should validate contact form and prevent invalid submissions
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:81:9 › Comprehensive Form Flow Tests with Database Verification › Contact Form Complete Flow › should validate contact form and prevent invalid submissions
+Testing contact form validation...
+
+✅ Invalid email rejected correctly
+
+✅ Missing fields rejected correctly
+
+[3/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:120:9 › Comprehensive Form Flow Tests with Database Verification › Demo Booking Form Complete Flow › should fill and submit demo form, verify database persistence
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:120:9 › Comprehensive Form Flow Tests with Database Verification › Demo Booking Form Complete Flow › should fill and submit demo form, verify database persistence
+Step 1: Navigating to demo page...
+
+Step 2: Submitting demo via API...
+
+✅ Demo booking API response verified
+
+Step 3: Verifying database persistence...
+
+✅ Database verified - Demo count: 15
+
+[4/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:160:9 › Comprehensive Form Flow Tests with Database Verification › Demo Booking Form Complete Flow › should reject invalid demo dates
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:160:9 › Comprehensive Form Flow Tests with Database Verification › Demo Booking Form Complete Flow › should reject invalid demo dates
+Testing demo form date validation...
+
+✅ Past dates rejected correctly
+
+[5/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:189:9 › Comprehensive Form Flow Tests with Database Verification › Assessment Form Complete Flow › should fill and submit assessment form with database verification
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:189:9 › Comprehensive Form Flow Tests with Database Verification › Assessment Form Complete Flow › should fill and submit assessment form with database verification
+Step 1: Navigating to assessment page...
+
+Step 2: Submitting assessment via API...
+
+✅ Assessment API response verified
+
+Step 3: Verifying database persistence...
+
+✅ Database verified - Assessment count: 12
+
+[6/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:229:9 › Comprehensive Form Flow Tests with Database Verification › Risk Briefing Form Complete Flow › should fill and submit risk briefing form with database verification
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:229:9 › Comprehensive Form Flow Tests with Database Verification › Risk Briefing Form Complete Flow › should fill and submit risk briefing form with database verification
+Step 1: Navigating to risk briefing page...
+
+Step 2: Submitting risk briefing via API...
+
+✅ Risk briefing API response verified
+
+Step 3: Verifying database persistence...
+
+✅ Database verified - Risk briefing count: 12
+
+[7/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:274:9 › Comprehensive Form Flow Tests with Database Verification › ROI Calculator Form Complete Flow › should submit ROI calculation with database verification
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:274:9 › Comprehensive Form Flow Tests with Database Verification › ROI Calculator Form Complete Flow › should submit ROI calculation with database verification
+Step 1: Navigating to ROI calculator page...
+
+Step 2: Submitting ROI calculation via API...
+
+✅ ROI calculator API response verified
+
+Step 3: Verifying database persistence...
+
+✅ Database verified - ROI submission count: 12
+
+[8/8] [chromium] › e2e/comprehensive-flow-tests.spec.ts:316:9 › Comprehensive Form Flow Tests with Database Verification › Cross-Form Database Consistency › should verify all forms save data and statistics are consistent
+[chromium] › e2e/comprehensive-flow-tests.spec.ts:316:9 › Comprehensive Form Flow Tests with Database Verification › Cross-Form Database Consistency › should verify all forms save data and statistics are consistent
+Getting initial statistics...
+
+📊 Current Database Statistics:
+
+- Contacts: 20
+
+- Demos: 15
+
+- Assessments: 12
+
+- Risk Briefings: 12
+
+- ROI Submissions: 12
+
+✅ All forms have consistent database state
+
+  8 passed (39.2s)
