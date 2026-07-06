@@ -6,7 +6,6 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
-import bcrypt from 'bcrypt';
 
 export async function POST(request: NextRequest) {
   try {
@@ -47,9 +46,10 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Hash password
+      // Hash password (dynamic import to avoid edge runtime issues)
       const password = 'YumeSorai123!';
-      const passwordHash = await bcrypt.hash(password, 12);
+      const bcrypt = await import('bcrypt');
+      const passwordHash = await bcrypt.default.hash(password, 12);
 
       // Insert admin user
       await client.query(
