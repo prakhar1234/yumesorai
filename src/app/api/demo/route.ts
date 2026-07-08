@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { insertDemoBooking, getSubmissionStats } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import { createDemoConfirmationEmail, createTeamNotificationEmail } from "@/lib/email-templates";
 
 interface DemoFormData {
   name: string;
@@ -79,10 +81,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Send confirmation email to user
-    // TODO: Send notification to admin/sales team
-    // TODO: Integrate with calendar scheduling system
-
     const formattedDate = requestedDate.toLocaleString("en-US", {
       year: "numeric",
       month: "long",
@@ -90,6 +88,43 @@ export async function POST(request: NextRequest) {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+    // Send confirmation email to user
+    try {
+      const confirmationEmailHtml = createDemoConfirmationEmail(body.name, formattedDate);
+      await sendEmail({
+        to: body.email,
+        subject: "Demo Booking Confirmed - Yumesorai",
+        html: confirmationEmailHtml,
+        from: "noreply@yumesorai.com",
+        replyTo: "team@yumesorai.com",
+      });
+      console.log(`[Demo API] Confirmation email sent to ${body.email}`);
+    } catch (emailError) {
+      console.error("[Demo API] Failed to send confirmation email:", emailError);
+      // Don't fail the request if email fails
+    }
+
+    // Send team notification email
+    try {
+      const teamEmailHtml = createTeamNotificationEmail(
+        body.name,
+        body.email,
+        body.company,
+        `Demo Request for ${formattedDate}\nJob Title: ${body.jobTitle}\nPhone: ${body.phone}\nTimezone: ${body.timezone}\n${body.message ? `Message: ${body.message}` : ''}`,
+        'Demo Booking'
+      );
+      await sendEmail({
+        to: "team@yumesorai.com",
+        subject: `New Demo Booking from ${body.name} - ${formattedDate}`,
+        html: teamEmailHtml,
+        from: "noreply@yumesorai.com",
+      });
+      console.log(`[Demo API] Team notification sent to team@yumesorai.com`);
+    } catch (emailError) {
+      console.error("[Demo API] Failed to send team notification:", emailError);
+      // Don't fail the request if email fails
+    }
 
     console.log(
       `[Demo API] Booking received from ${body.email} for ${formattedDate}`

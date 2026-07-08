@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { insertAssessmentSubmission, getSubmissionStats } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import { createAssessmentConfirmationEmail, createTeamNotificationEmail } from "@/lib/email-templates";
 
 interface AssessmentFormData {
   name: string;
@@ -63,9 +65,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Send confirmation email to user
-    // TODO: Send notification to assessment team
-    // TODO: Trigger automated assessment report generation
+    // Send confirmation email to user
+    try {
+      const confirmationEmailHtml = createAssessmentConfirmationEmail(body.name);
+      await sendEmail({
+        to: body.email,
+        subject: "Assessment Received - Yumesorai",
+        html: confirmationEmailHtml,
+        from: "noreply@yumesorai.com",
+        replyTo: "team@yumesorai.com",
+      });
+      console.log(`[Assessment API] Confirmation email sent to ${body.email}`);
+    } catch (emailError) {
+      console.error("[Assessment API] Failed to send confirmation email:", emailError);
+      // Don't fail the request if email fails
+    }
+
+    // Send team notification email
+    try {
+      const teamEmailHtml = createTeamNotificationEmail(
+        body.name,
+        body.email,
+        body.company,
+        `Industry: ${body.industry}\nSystem Type: ${body.systemType}\nCOBOL Lines: ${body.cobolLines || 'Not specified'}\nChallenges: ${body.challenges || 'Not provided'}`,
+        'Assessment Submission'
+      );
+      await sendEmail({
+        to: "team@yumesorai.com",
+        subject: `New Assessment Submission from ${body.name}`,
+        html: teamEmailHtml,
+        from: "noreply@yumesorai.com",
+      });
+      console.log(`[Assessment API] Team notification sent to team@yumesorai.com`);
+    } catch (emailError) {
+      console.error("[Assessment API] Failed to send team notification:", emailError);
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json(
       {

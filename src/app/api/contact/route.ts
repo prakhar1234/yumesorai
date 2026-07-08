@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { insertContactSubmission, getSubmissionStats } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import { createContactConfirmationEmail, createTeamNotificationEmail } from "@/lib/email-templates";
 
 interface ContactFormData {
   name: string;
@@ -64,8 +66,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Send email notification to admin and user
-    // TODO: Integrate with CRM/email service (SendGrid, Mailchimp, etc.)
+    // Send confirmation email to user
+    try {
+      const confirmationEmailHtml = createContactConfirmationEmail(body.name);
+      await sendEmail({
+        to: body.email,
+        subject: "We received your message - Yumesorai",
+        html: confirmationEmailHtml,
+        from: "noreply@yumesorai.com",
+        replyTo: "team@yumesorai.com",
+      });
+      console.log(`[Contact API] Confirmation email sent to ${body.email}`);
+    } catch (emailError) {
+      console.error("[Contact API] Failed to send confirmation email:", emailError);
+      // Don't fail the request if email fails
+    }
+
+    // Send team notification email to team@yumesorai.com
+    try {
+      const teamEmailHtml = createTeamNotificationEmail(
+        body.name,
+        body.email,
+        body.company,
+        body.message,
+        'Contact Form'
+      );
+      await sendEmail({
+        to: "team@yumesorai.com",
+        subject: `New Contact Form Submission from ${body.name}`,
+        html: teamEmailHtml,
+        from: "noreply@yumesorai.com",
+      });
+      console.log(`[Contact API] Team notification sent to team@yumesorai.com`);
+    } catch (emailError) {
+      console.error("[Contact API] Failed to send team notification:", emailError);
+      // Don't fail the request if email fails
+    }
 
     return NextResponse.json(
       {

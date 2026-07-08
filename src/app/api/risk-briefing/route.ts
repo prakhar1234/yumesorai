@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { insertRiskBriefingBooking, getSubmissionStats } from "@/lib/db";
+import { sendEmail } from "@/lib/email";
+import { createDemoConfirmationEmail, createTeamNotificationEmail } from "@/lib/email-templates";
 
 interface RiskBriefingFormData {
   name: string;
@@ -83,10 +85,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // TODO: Send confirmation email to user
-    // TODO: Send notification to briefing team
-    // TODO: Integrate with calendar scheduling system
-
     const formattedDate = datetime.toLocaleString("en-US", {
       year: "numeric",
       month: "long",
@@ -94,6 +92,43 @@ export async function POST(request: NextRequest) {
       hour: "2-digit",
       minute: "2-digit",
     });
+
+    // Send confirmation email to user
+    try {
+      const confirmationEmailHtml = createDemoConfirmationEmail(body.name, formattedDate);
+      await sendEmail({
+        to: body.email,
+        subject: "Risk Briefing Scheduled - Yumesorai",
+        html: confirmationEmailHtml,
+        from: "noreply@yumesorai.com",
+        replyTo: "team@yumesorai.com",
+      });
+      console.log(`[Risk Briefing API] Confirmation email sent to ${body.email}`);
+    } catch (emailError) {
+      console.error("[Risk Briefing API] Failed to send confirmation email:", emailError);
+      // Don't fail the request if email fails
+    }
+
+    // Send team notification email
+    try {
+      const teamEmailHtml = createTeamNotificationEmail(
+        body.name,
+        body.email,
+        body.company,
+        `Risk Briefing Scheduled for ${formattedDate}\nIndustry: ${body.industry}\nTimezone: ${body.timezone}\nPhone: ${body.phone || 'Not provided'}\n${body.message ? `Message: ${body.message}` : ''}`,
+        'Risk Briefing Booking'
+      );
+      await sendEmail({
+        to: "team@yumesorai.com",
+        subject: `New Risk Briefing Booking from ${body.name} - ${formattedDate}`,
+        html: teamEmailHtml,
+        from: "noreply@yumesorai.com",
+      });
+      console.log(`[Risk Briefing API] Team notification sent to team@yumesorai.com`);
+    } catch (emailError) {
+      console.error("[Risk Briefing API] Failed to send team notification:", emailError);
+      // Don't fail the request if email fails
+    }
 
     console.log(
       `[Risk Briefing API] Briefing scheduled from ${body.email} for ${formattedDate}`
