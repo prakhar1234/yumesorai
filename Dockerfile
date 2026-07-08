@@ -13,7 +13,7 @@ RUN npm ci --legacy-peer-deps
 COPY . .
 
 # Build Next.js app
-RUN npm run build
+RUN npm run build --legacy-peer-deps
 
 # Production stage
 FROM node:20
@@ -30,6 +30,7 @@ RUN npm ci --omit=dev --legacy-peer-deps
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY prisma ./prisma
+COPY .env.production ./
 
 # Set dummy DATABASE_URL for Prisma schema validation (not actually used)
 ENV DATABASE_URL="postgresql://user:password@localhost:5432/dummy"
