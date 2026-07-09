@@ -3,6 +3,13 @@ FROM node:20 AS builder
 
 WORKDIR /app
 
+# Set SMTP configuration for build time (needed by Next.js)
+ENV SMTP_HOST="smtpout.secureserver.net"
+ENV SMTP_PORT="465"
+ENV SMTP_SECURE="true"
+ENV SMTP_USER="team@yumesorai.com"
+ENV SMTP_PASSWORD="yumesorai@123"
+
 # Copy package files
 COPY package*.json ./
 
