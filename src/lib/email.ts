@@ -32,6 +32,12 @@ function getSMTPTransporter(): nodemailer.Transporter | null {
   const smtpUser = process.env.SMTP_USER;
   const smtpPassword = process.env.SMTP_PASSWORD;
 
+  // Debug logging
+  console.log("[SMTP Debug] Host:", smtpHost ? "set" : "NOT SET");
+  console.log("[SMTP Debug] Port:", smtpPort ? "set" : "NOT SET");
+  console.log("[SMTP Debug] User:", smtpUser ? "set" : "NOT SET");
+  console.log("[SMTP Debug] Password:", smtpPassword ? "set" : "NOT SET");
+
   if (!smtpHost || !smtpPort || !smtpUser || !smtpPassword) {
     return null;
   }
