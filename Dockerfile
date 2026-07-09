@@ -35,6 +35,13 @@ COPY .env.production ./
 # Set dummy DATABASE_URL for Prisma schema validation (not actually used)
 ENV DATABASE_URL="postgresql://user:password@localhost:5432/dummy"
 
+# SMTP Email Configuration (GoDaddy)
+ENV SMTP_HOST="smtpout.secureserver.net"
+ENV SMTP_PORT="465"
+ENV SMTP_SECURE="true"
+ENV SMTP_USER="team@yumesorai.com"
+ENV SMTP_PASSWORD="yumesorai@123"
+
 # Expose port
 EXPOSE 3000
 
