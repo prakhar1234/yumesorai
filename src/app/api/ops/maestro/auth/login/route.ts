@@ -54,7 +54,20 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    let body: any;
+    try {
+      const text = await request.text();
+      body = JSON.parse(text);
+    } catch (parseError: any) {
+      console.error('[Auth] JSON parse error - raw body:', parseError.message);
+      return addCORSHeaders(
+        NextResponse.json(
+          { error: 'Invalid JSON in request body' },
+          { status: 400 }
+        )
+      );
+    }
+
     const { username, password } = body;
 
     // Validate input
