@@ -53,6 +53,10 @@ ENV NODE_ENV=production
 # Set dummy DATABASE_URL for Prisma schema validation (not actually used)
 ENV DATABASE_URL="postgresql://user:password@localhost:5432/dummy"
 
+# JWT Authentication Secret for Maestro Admin System
+# This can be overridden by Railway environment variables
+ENV JWT_SECRET="maestro_prod_secret_minimum_32_characters_long_key_123456"
+
 # SMTP Email Configuration (GoDaddy)
 ENV SMTP_HOST="smtpout.secureserver.net"
 ENV SMTP_PORT="465"
