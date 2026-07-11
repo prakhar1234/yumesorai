@@ -40,7 +40,9 @@ RUN npm ci --omit=dev --legacy-peer-deps
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY prisma ./prisma
-COPY .env.production ./
+
+# Note: .env files are NOT used in production - environment variables must be set via Dockerfile ENV
+# or Railway's environment variable configuration
 
 # Verify build artifacts exist
 RUN if [ ! -d "./.next" ]; then echo "ERROR: .next folder not found!" && exit 1; fi
