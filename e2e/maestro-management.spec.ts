@@ -42,7 +42,7 @@ test.describe('Maestro Email Management System', () => {
 
       // Wait for redirect to dashboard
       await page.waitForURL(DASHBOARD_URL);
-      await expect(page.locator('text=Dashboard')).toBeVisible();
+      await expect(page.locator('h1:has-text("Dashboard")')).toBeVisible();
     });
 
     test('should show error with invalid credentials', async () => {
@@ -93,13 +93,13 @@ test.describe('Maestro Email Management System', () => {
     });
 
     test('should display dashboard overview', async () => {
-      await expect(page.locator('text=Dashboard')).toBeVisible();
+      await expect(page.locator('h1:has-text("Dashboard")')).toBeVisible();
       await expect(page.locator('text=Total Campaigns')).toBeVisible();
       await expect(page.locator('text=Quick Actions')).toBeVisible();
     });
 
     test('should have navigation links', async () => {
-      await expect(page.locator('text=Dashboard')).toBeVisible();
+      await expect(page.locator('h1:has-text("Dashboard")')).toBeVisible();
       await expect(page.locator('text=Campaigns')).toBeVisible();
       await expect(page.locator('text=Settings')).toBeVisible();
     });
