@@ -36,17 +36,17 @@ export default function ClientForm({ initialData, isEdit = false }: ClientFormPr
   const [loading, setLoading] = useState(false);
   const [duplicateClientId, setDuplicateClientId] = useState('');
 
-  const industries = [
-    'Technology',
-    'Finance',
-    'Healthcare',
-    'Retail',
-    'Manufacturing',
-    'Education',
-    'Real Estate',
-    'Hospitality',
-    'Transportation',
-    'Other',
+  const industryOptions = [
+    { label: 'Technology', value: 'Technology' },
+    { label: 'Finance', value: 'Finance' },
+    { label: 'Healthcare', value: 'Healthcare' },
+    { label: 'Retail', value: 'Retail' },
+    { label: 'Manufacturing', value: 'Manufacturing' },
+    { label: 'Education', value: 'Education' },
+    { label: 'Real Estate', value: 'Real Estate' },
+    { label: 'Hospitality', value: 'Hospitality' },
+    { label: 'Transportation', value: 'Transportation' },
+    { label: 'Other', value: 'Other' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -190,17 +190,15 @@ export default function ClientForm({ initialData, isEdit = false }: ClientFormPr
           </div>
 
           <div>
-            <label htmlFor="industry" className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Industry
             </label>
-            <Select value={industry} onChange={(e) => setIndustry(e.target.value)}>
-              <option value="">Select an industry</option>
-              {industries.map((ind) => (
-                <option key={ind} value={ind}>
-                  {ind}
-                </option>
-              ))}
-            </Select>
+            <Select
+              value={industry}
+              onValueChange={setIndustry}
+              options={industryOptions}
+              placeholder="Select an industry"
+            />
           </div>
         </div>
       </Card>
