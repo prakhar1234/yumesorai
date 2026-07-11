@@ -78,7 +78,7 @@ test.describe('Maestro Email Management System', () => {
 
       // Should redirect to login
       await page.waitForURL(LOGIN_URL);
-      await expect(page.locator('text=Maestro')).toBeVisible();
+      await expect(page.locator('h1:has-text("Maestro")')).toBeVisible();
     });
   });
 
