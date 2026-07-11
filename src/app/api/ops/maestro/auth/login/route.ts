@@ -54,20 +54,8 @@ export async function OPTIONS(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log('[Auth Login] Received POST request');
-    console.log('[Auth Login] Request headers:', Object.fromEntries(request.headers));
-
-    let body: any;
-    try {
-      body = await request.json();
-      console.log('[Auth Login] Parsed JSON body:', { username: body.username, passwordLength: body.password?.length });
-    } catch (parseError) {
-      console.error('[Auth Login] JSON parse error:', parseError);
-      throw parseError;
-    }
-
+    const body = await request.json();
     const { username, password } = body;
-    console.log('[Auth Login] Extracted credentials - username:', username, 'passwordLength:', password?.length);
 
     // Validate input
     if (!username || !password) {
@@ -94,9 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user from database
-    console.log('[Auth Login] Querying database for user:', username);
     const user = await getUserByUsername(username);
-    console.log('[Auth Login] Database query result:', user ? 'User found' : 'User not found');
 
     if (!user) {
       return addCORSHeaders(
@@ -108,9 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify password
-    console.log('[Auth Login] Verifying password for user:', username);
     const passwordValid = await verifyPassword(password, user.password_hash);
-    console.log('[Auth Login] Password verification result:', passwordValid);
 
     if (!passwordValid) {
       return addCORSHeaders(
