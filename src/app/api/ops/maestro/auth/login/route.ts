@@ -56,15 +56,15 @@ export async function POST(request: NextRequest) {
   try {
     let body: any;
     try {
-      const text = await request.text();
-      console.log('[Auth] Raw request body length:', text.length);
-      console.log('[Auth] Raw request body:', text);
-      console.log('[Auth] Char at position 49:', text.charCodeAt(49), '(', String.fromCharCode(text.charCodeAt(49)), ')');
+      let text = await request.text();
+
+      // Fix for reverse proxy escaping issue - remove backslash before ! if present
+      // The reverse proxy escapes ! as \! which is invalid JSON
+      text = text.replace(/\\!/g, '!');
+
       body = JSON.parse(text);
     } catch (parseError: any) {
       console.error('[Auth] JSON parse error:', parseError.message);
-      console.error('[Auth] Parse error code:', parseError.code);
-      console.error('[Auth] Parse error name:', parseError.name);
       return addCORSHeaders(
         NextResponse.json(
           { error: 'Invalid JSON in request body' },
