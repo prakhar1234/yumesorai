@@ -57,10 +57,12 @@ export async function POST(request: NextRequest) {
     let body: any;
     try {
       let text = await request.text();
+      console.log('[Auth] Original text:', text);
 
       // Fix for reverse proxy escaping issue - remove backslash before ! if present
       // The reverse proxy escapes ! as \! which is invalid JSON
       text = text.replace(/\\!/g, '!');
+      console.log('[Auth] After unescape:', text);
 
       body = JSON.parse(text);
     } catch (parseError: any) {
