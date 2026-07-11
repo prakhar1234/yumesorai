@@ -8,6 +8,7 @@ interface Stats {
   draftCampaigns: number;
   completedCampaigns: number;
   totalEmails: number;
+  totalClients: number;
 }
 
 export default function OverviewStats() {
@@ -16,6 +17,7 @@ export default function OverviewStats() {
     draftCampaigns: 0,
     completedCampaigns: 0,
     totalEmails: 0,
+    totalClients: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -23,22 +25,39 @@ export default function OverviewStats() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Fetch campaigns to calculate stats
-        const response = await fetch('/api/ops/maestro/campaigns?limit=1000');
-        const data = await response.json();
+        // Fetch campaigns and clients stats
+        const [campaignsRes, clientsRes] = await Promise.all([
+          fetch('/api/ops/maestro/campaigns?limit=1000'),
+          fetch('/api/ops/maestro/clients/stats'),
+        ]);
 
-        if (response.ok && data.campaigns) {
-          const campaigns = data.campaigns;
-          const draftCount = campaigns.filter((c: any) => c.status === 'draft').length;
-          const completedCount = campaigns.filter((c: any) => c.status === 'completed').length;
-          const totalEmails = campaigns.reduce((sum: number, c: any) => sum + (c.total_recipients || 0), 0);
+        let totalClients = 0;
 
-          setStats({
-            totalCampaigns: campaigns.length,
-            draftCampaigns: draftCount,
-            completedCampaigns: completedCount,
-            totalEmails,
-          });
+        if (campaignsRes.ok) {
+          const data = await campaignsRes.json();
+          if (data.campaigns) {
+            const campaigns = data.campaigns;
+            const draftCount = campaigns.filter((c: any) => c.status === 'draft').length;
+            const completedCount = campaigns.filter((c: any) => c.status === 'completed').length;
+            const totalEmails = campaigns.reduce((sum: number, c: any) => sum + (c.total_recipients || 0), 0);
+
+            setStats((prev) => ({
+              ...prev,
+              totalCampaigns: campaigns.length,
+              draftCampaigns: draftCount,
+              completedCampaigns: completedCount,
+              totalEmails,
+            }));
+          }
+        }
+
+        if (clientsRes.ok) {
+          const data = await clientsRes.json();
+          totalClients = data.totalClients || 0;
+          setStats((prev) => ({
+            ...prev,
+            totalClients,
+          }));
         }
       } catch (err) {
         setError('Failed to load statistics');
@@ -53,8 +72,8 @@ export default function OverviewStats() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {[1, 2, 3, 4, 5].map((i) => (
           <Card key={i} className="p-6 bg-gray-100 animate-pulse h-24" />
         ))}
       </div>
@@ -66,6 +85,12 @@ export default function OverviewStats() {
   }
 
   const statItems = [
+    {
+      label: 'Total Clients',
+      value: stats.totalClients,
+      icon: '👥',
+      color: 'bg-indigo-100',
+    },
     {
       label: 'Total Campaigns',
       value: stats.totalCampaigns,
@@ -93,7 +118,7 @@ export default function OverviewStats() {
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       {statItems.map((item) => (
         <Card key={item.label} className={`p-6 ${item.color} border-0`}>
           <div className="flex items-center justify-between">

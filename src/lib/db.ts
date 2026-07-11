@@ -168,6 +168,25 @@ async function initializeSchema() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
 
+      -- Clients Table
+      CREATE TABLE IF NOT EXISTS clients (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        email TEXT NOT NULL UNIQUE,
+        name TEXT,
+        company TEXT,
+        phone TEXT,
+        industry TEXT,
+        source TEXT,
+        tags TEXT[],
+        notes TEXT,
+        last_emailed_at TIMESTAMP,
+        total_emails_sent INTEGER DEFAULT 0,
+        total_emails_failed INTEGER DEFAULT 0,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_by TEXT REFERENCES admin_users(id)
+      );
+
       -- Create indexes for maestro tables
       CREATE INDEX IF NOT EXISTS idx_admin_users_username ON admin_users(username);
       CREATE INDEX IF NOT EXISTS idx_admin_users_email ON admin_users(email);
@@ -176,6 +195,9 @@ async function initializeSchema() {
       CREATE INDEX IF NOT EXISTS idx_campaign_recipients_campaign ON campaign_recipients(campaign_id);
       CREATE INDEX IF NOT EXISTS idx_campaign_recipients_email ON campaign_recipients(email);
       CREATE INDEX IF NOT EXISTS idx_campaign_recipients_status ON campaign_recipients(status);
+      CREATE INDEX IF NOT EXISTS idx_clients_email ON clients(email);
+      CREATE INDEX IF NOT EXISTS idx_clients_source ON clients(source);
+      CREATE INDEX IF NOT EXISTS idx_clients_created_at ON clients(created_at);
     `);
 
     console.log('[DB] Schema initialized successfully');
@@ -963,6 +985,341 @@ export async function getPendingRecipients(campaignId: string) {
     );
 
     return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * ============================================
+ * CLIENTS DATABASE FUNCTIONS
+ * ============================================
+ */
+
+/**
+ * Get clients with pagination and filters
+ */
+export async function getClients(filters: {
+  source?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const client = await getPool().connect();
+
+  try {
+    const limit = filters.limit || 50;
+    const offset = filters.offset || 0;
+
+    let query = `SELECT * FROM clients WHERE 1=1`;
+    const values: any[] = [];
+    let paramCount = 1;
+
+    if (filters.source) {
+      query += ` AND source = $${paramCount}`;
+      values.push(filters.source);
+      paramCount++;
+    }
+
+    if (filters.search) {
+      const searchPattern = `%${filters.search}%`;
+      query += ` AND (email ILIKE $${paramCount} OR name ILIKE $${paramCount + 1})`;
+      values.push(searchPattern, searchPattern);
+      paramCount += 2;
+    }
+
+    query += ` ORDER BY created_at DESC LIMIT $${paramCount} OFFSET $${paramCount + 1}`;
+    values.push(limit, offset);
+
+    const result = await client.query(query, values);
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get single client by ID
+ */
+export async function getClientById(clientId: string) {
+  const client = await getPool().connect();
+
+  try {
+    const result = await client.query(
+      `SELECT * FROM clients WHERE id = $1`,
+      [clientId]
+    );
+
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get client by email (check for duplicates)
+ */
+export async function getClientByEmail(email: string) {
+  const client = await getPool().connect();
+
+  try {
+    const result = await client.query(
+      `SELECT * FROM clients WHERE email = $1`,
+      [email]
+    );
+
+    return result.rows[0] || null;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Create single client
+ */
+export async function createClient(
+  data: {
+    email: string;
+    name?: string;
+    company?: string;
+    phone?: string;
+    industry?: string;
+    source?: string;
+    tags?: string[];
+    notes?: string;
+  },
+  createdBy: string
+) {
+  const client = await getPool().connect();
+
+  try {
+    const result = await client.query(
+      `INSERT INTO clients (email, name, company, phone, industry, source, tags, notes, created_by)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING *`,
+      [
+        data.email,
+        data.name || null,
+        data.company || null,
+        data.phone || null,
+        data.industry || null,
+        data.source || 'manual',
+        data.tags || [],
+        data.notes || null,
+        createdBy,
+      ]
+    );
+
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Update client
+ */
+export async function updateClient(
+  clientId: string,
+  data: {
+    name?: string;
+    company?: string;
+    phone?: string;
+    industry?: string;
+    tags?: string[];
+    notes?: string;
+  }
+) {
+  const client = await getPool().connect();
+
+  try {
+    const updates: string[] = [];
+    const values: any[] = [];
+    let paramCount = 1;
+
+    if (data.name !== undefined) {
+      updates.push(`name = $${paramCount}`);
+      values.push(data.name);
+      paramCount++;
+    }
+
+    if (data.company !== undefined) {
+      updates.push(`company = $${paramCount}`);
+      values.push(data.company);
+      paramCount++;
+    }
+
+    if (data.phone !== undefined) {
+      updates.push(`phone = $${paramCount}`);
+      values.push(data.phone);
+      paramCount++;
+    }
+
+    if (data.industry !== undefined) {
+      updates.push(`industry = $${paramCount}`);
+      values.push(data.industry);
+      paramCount++;
+    }
+
+    if (data.tags !== undefined) {
+      updates.push(`tags = $${paramCount}`);
+      values.push(data.tags);
+      paramCount++;
+    }
+
+    if (data.notes !== undefined) {
+      updates.push(`notes = $${paramCount}`);
+      values.push(data.notes);
+      paramCount++;
+    }
+
+    if (updates.length === 0) {
+      return null;
+    }
+
+    updates.push(`updated_at = CURRENT_TIMESTAMP`);
+    values.push(clientId);
+
+    const query = `UPDATE clients SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+
+    const result = await client.query(query, values);
+    return result.rows[0];
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Delete client
+ */
+export async function deleteClient(clientId: string) {
+  const client = await getPool().connect();
+
+  try {
+    await client.query(`DELETE FROM clients WHERE id = $1`, [clientId]);
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Create multiple clients in bulk
+ */
+export async function createBulkClients(
+  clients: Array<{
+    email: string;
+    name?: string;
+    company?: string;
+    phone?: string;
+    industry?: string;
+    source?: string;
+    tags?: string[];
+    notes?: string;
+  }>,
+  createdBy: string
+) {
+  const client = await getPool().connect();
+
+  try {
+    const values: any[] = [];
+    let paramCount = 1;
+    const placeholders: string[] = [];
+    const skipped: { email: string; reason: string }[] = [];
+    const errors: { email: string; error: string }[] = [];
+
+    for (const clientData of clients) {
+      try {
+        placeholders.push(
+          `(gen_random_uuid()::text, $${paramCount}, $${paramCount + 1}, $${paramCount + 2}, $${paramCount + 3}, $${paramCount + 4}, $${paramCount + 5}, $${paramCount + 6}, $${paramCount + 7}, $${paramCount + 8})`
+        );
+        values.push(
+          clientData.email,
+          clientData.name || null,
+          clientData.company || null,
+          clientData.phone || null,
+          clientData.industry || null,
+          clientData.source || 'csv_upload',
+          clientData.tags || [],
+          clientData.notes || null,
+          createdBy
+        );
+        paramCount += 9;
+      } catch (err) {
+        errors.push({
+          email: clientData.email,
+          error: 'Failed to parse client data',
+        });
+      }
+    }
+
+    if (placeholders.length === 0) {
+      return { created: 0, duplicates: 0, errors };
+    }
+
+    const query = `INSERT INTO clients (id, email, name, company, phone, industry, source, tags, notes, created_by)
+                   VALUES ${placeholders.join(', ')}
+                   ON CONFLICT (email) DO NOTHING
+                   RETURNING *`;
+
+    const result = await client.query(query, values);
+    const created = result.rows.length;
+    const duplicates = clients.length - created - errors.length;
+
+    return { created, duplicates, errors };
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get email history for a client (from campaign_recipients)
+ */
+export async function getClientEmailHistory(email: string) {
+  const client = await getPool().connect();
+
+  try {
+    const result = await client.query(
+      `SELECT
+        cr.id,
+        ec.name as campaign_name,
+        cr.status,
+        cr.sent_at,
+        cr.error_message,
+        cr.created_at
+      FROM campaign_recipients cr
+      LEFT JOIN email_campaigns ec ON cr.campaign_id = ec.id
+      WHERE cr.email = $1
+      ORDER BY cr.created_at DESC`,
+      [email]
+    );
+
+    return result.rows;
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get clients statistics
+ */
+export async function getClientsStats() {
+  const client = await getPool().connect();
+
+  try {
+    const totalResult = await client.query(`SELECT COUNT(*) as count FROM clients`);
+    const sourceResult = await client.query(
+      `SELECT source, COUNT(*) as count FROM clients GROUP BY source`
+    );
+
+    const stats: { [key: string]: number } = {};
+    sourceResult.rows.forEach((row) => {
+      stats[row.source || 'unknown'] = parseInt(row.count);
+    });
+
+    return {
+      totalClients: parseInt(totalResult.rows[0].count),
+      bySource: stats,
+    };
   } finally {
     client.release();
   }

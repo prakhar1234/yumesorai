@@ -35,6 +35,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const navItems = [
     { href: '/ops/maestro/dashboard', label: '📊 Dashboard', icon: '📊' },
+    { href: '/ops/maestro/clients', label: '👥 Clients', icon: '👥' },
     { href: '/ops/maestro/campaigns', label: '📧 Campaigns', icon: '📧' },
     { href: '/ops/maestro/settings', label: '⚙️ Settings', icon: '⚙️' },
   ];
