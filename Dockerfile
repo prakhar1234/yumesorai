@@ -19,6 +19,9 @@ RUN npm ci --legacy-peer-deps
 # Copy source
 COPY . .
 
+# Build timestamp to bypass cache
+RUN echo "Build: $(date +%s)" > /tmp/build-time.txt
+
 # Build Next.js app
 RUN npm run build --legacy-peer-deps
 
