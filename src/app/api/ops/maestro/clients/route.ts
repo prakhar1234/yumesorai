@@ -11,6 +11,8 @@ import {
   getClientByEmail,
 } from '@/lib/db';
 
+console.log('[Clients API] Route handler loaded');
+
 async function requireAuth(request: NextRequest) {
   const token = request.cookies.get('maestro_token')?.value;
 

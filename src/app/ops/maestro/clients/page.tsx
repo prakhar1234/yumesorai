@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import ClientsList from './clients-list';
 
+console.log('[Clients] Page route loaded successfully');
+
 export const metadata: Metadata = {
   title: 'Clients - Maestro Admin',
   description: 'Manage clients',
