@@ -19,8 +19,11 @@ RUN npm ci --legacy-peer-deps
 # Copy source
 COPY . .
 
+# Add build timestamp to ensure fresh build on each deployment
+RUN echo "Build timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" > /tmp/build-info.txt
+
 # Build Next.js app
-RUN npm run build --legacy-peer-deps
+RUN npm run build --legacy-peer-deps || (echo "Build failed!" && exit 1)
 
 # Production stage
 FROM node:20
@@ -38,6 +41,14 @@ COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
 COPY prisma ./prisma
 COPY .env.production ./
+
+# Verify build artifacts exist
+RUN if [ ! -d "./.next" ]; then echo "ERROR: .next folder not found!" && exit 1; fi
+RUN if [ ! -f "./.next/BUILD_ID" ]; then echo "ERROR: .next/BUILD_ID not found!" && exit 1; fi
+RUN echo "Build verification passed. Next.js app ready for deployment."
+
+# Set Node environment to production
+ENV NODE_ENV=production
 
 # Set dummy DATABASE_URL for Prisma schema validation (not actually used)
 ENV DATABASE_URL="postgresql://user:password@localhost:5432/dummy"
