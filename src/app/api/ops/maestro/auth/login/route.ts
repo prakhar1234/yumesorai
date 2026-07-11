@@ -57,9 +57,14 @@ export async function POST(request: NextRequest) {
     let body: any;
     try {
       const text = await request.text();
+      console.log('[Auth] Raw request body length:', text.length);
+      console.log('[Auth] Raw request body:', text);
+      console.log('[Auth] Char at position 49:', text.charCodeAt(49), '(', String.fromCharCode(text.charCodeAt(49)), ')');
       body = JSON.parse(text);
     } catch (parseError: any) {
-      console.error('[Auth] JSON parse error - raw body:', parseError.message);
+      console.error('[Auth] JSON parse error:', parseError.message);
+      console.error('[Auth] Parse error code:', parseError.code);
+      console.error('[Auth] Parse error name:', parseError.name);
       return addCORSHeaders(
         NextResponse.json(
           { error: 'Invalid JSON in request body' },
