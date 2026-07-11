@@ -60,16 +60,21 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const isActive = (href: string) => pathname === href;
 
+  // Check if current page should have fixed sidebar
+  const shouldBeFixed = pathname.includes('/campaigns') ||
+                        pathname.includes('/clients') ||
+                        pathname.includes('/settings');
+
   if (!mounted) {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sidebar - Fixed or Scrollable based on user preference */}
+      {/* Sidebar - Fixed only on campaigns, clients, and settings pages */}
       <aside
         className={`${
-          sidebarFixed ? 'fixed left-0 top-0 h-screen z-50' : 'relative'
+          shouldBeFixed && sidebarFixed ? 'fixed left-0 top-0 h-screen z-50' : 'relative'
         } ${
           sidebarOpen ? 'w-64' : 'w-20'
         } bg-gray-900 text-white transition-all duration-300 flex flex-col shadow-lg overflow-y-auto`}
@@ -110,23 +115,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </Button>
         </div>
 
-        {/* Toggle Fixed Sidebar Button */}
-        <div className="p-4 border-t border-gray-800 sticky bottom-12 bg-gray-900">
-          <button
-            onClick={handleToggleSidebarFixed}
-            title={sidebarFixed ? 'Click to make sidebar scrollable' : 'Click to fix sidebar'}
-            className="w-full text-gray-400 hover:text-white text-sm py-2 rounded-md transition flex items-center justify-center gap-2"
-          >
-            {sidebarOpen ? (
-              <>
+        {/* Toggle Fixed Sidebar Button - Only on campaigns, clients, settings pages */}
+        {shouldBeFixed && (
+          <div className="p-4 border-t border-gray-800 sticky bottom-12 bg-gray-900">
+            <button
+              onClick={handleToggleSidebarFixed}
+              title={sidebarFixed ? 'Click to make sidebar scrollable' : 'Click to fix sidebar'}
+              className="w-full text-gray-400 hover:text-white text-sm py-2 rounded-md transition flex items-center justify-center gap-2"
+            >
+              {sidebarOpen ? (
+                <>
+                  <span>{sidebarFixed ? '📌' : '📄'}</span>
+                  <span className="text-xs">{sidebarFixed ? 'Fixed' : 'Scroll'}</span>
+                </>
+              ) : (
                 <span>{sidebarFixed ? '📌' : '📄'}</span>
-                <span className="text-xs">{sidebarFixed ? 'Fixed' : 'Scroll'}</span>
-              </>
-            ) : (
-              <span>{sidebarFixed ? '📌' : '📄'}</span>
-            )}
-          </button>
-        </div>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Toggle Sidebar Width Button */}
         <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
@@ -140,12 +147,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content - Offset by sidebar width only if sidebar is fixed */}
+      {/* Main Content - Offset by sidebar width only if sidebar is fixed on specific pages */}
       <main
         className={`${
-          sidebarFixed ? (sidebarOpen ? 'ml-64' : 'ml-20') : ''
+          shouldBeFixed && sidebarFixed ? (sidebarOpen ? 'ml-64' : 'ml-20') : ''
         } transition-all duration-300 flex flex-col ${
-          sidebarFixed ? 'min-h-screen' : ''
+          shouldBeFixed && sidebarFixed ? 'min-h-screen' : ''
         }`}
       >
         {/* Header */}
