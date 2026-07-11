@@ -21,12 +21,19 @@ const COOKIE_OPTIONS = {
  * Validate JWT secret is configured
  */
 function validateJWTSecret(): Uint8Array {
+  console.log('[Auth JWT] validateJWTSecret called');
+  console.log('[Auth JWT] JWT_SECRET exists:', !!JWT_SECRET);
+  console.log('[Auth JWT] JWT_SECRET length:', JWT_SECRET?.length || 0);
+
   if (!JWT_SECRET) {
+    console.error('[Auth JWT] JWT_SECRET not defined in environment');
     throw new Error('JWT_SECRET environment variable is not set');
   }
   if (JWT_SECRET.length < 32) {
+    console.error('[Auth JWT] JWT_SECRET too short, length:', JWT_SECRET.length);
     throw new Error('JWT_SECRET must be at least 32 characters long');
   }
+  console.log('[Auth JWT] JWT_SECRET validation passed');
   return new TextEncoder().encode(JWT_SECRET);
 }
 
@@ -52,11 +59,18 @@ export async function verifyJWT(
   token: string
 ): Promise<Record<string, any> | null> {
   try {
+    console.log('[Auth JWT] Starting JWT verification');
     const secret = validateJWTSecret();
+    console.log('[Auth JWT] Secret validated, length:', JWT_SECRET?.length || 0);
+
     const verified = await jwtVerify(token, secret);
+    console.log('[Auth JWT] Token verified successfully');
     return verified.payload as Record<string, any>;
   } catch (error) {
-    console.error('[Auth] JWT verification failed:', error);
+    console.error('[Auth JWT] JWT verification failed:', error instanceof Error ? error.message : error);
+    if (error instanceof Error) {
+      console.error('[Auth JWT] Error details:', error.stack);
+    }
     return null;
   }
 }
