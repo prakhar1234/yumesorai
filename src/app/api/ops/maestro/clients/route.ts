@@ -17,15 +17,23 @@ async function requireAuth(request: NextRequest) {
   const token = request.cookies.get('maestro_token')?.value;
 
   if (!token) {
+    console.log('[Clients API] No maestro_token cookie found');
     return { user: null, error: 'Unauthorized' };
   }
+
+  console.log('[Clients API] Token found, verifying JWT...');
+  console.log('[Clients API] JWT_SECRET defined:', !!process.env.JWT_SECRET);
+  console.log('[Clients API] JWT_SECRET length:', process.env.JWT_SECRET?.length || 0);
 
   const payload = await verifyJWT(token);
 
   if (!payload || !payload.userId) {
+    console.log('[Clients API] JWT verification failed or no userId in payload');
+    console.log('[Clients API] Payload:', payload);
     return { user: null, error: 'Unauthorized' };
   }
 
+  console.log('[Clients API] Auth successful for user:', payload.userId);
   return { user: payload, error: null };
 }
 
