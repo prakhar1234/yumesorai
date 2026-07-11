@@ -19,6 +19,39 @@ const loginLimiter = new RateLimiterMemory({
   duration: 15 * 60,
 });
 
+// Helper to add CORS headers to response
+function addCORSHeaders(response: NextResponse) {
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  return response;
+}
+
+// Handle GET requests
+export async function GET(request: NextRequest) {
+  const response = new NextResponse(
+    JSON.stringify({ error: 'Method not allowed. Use POST to login.' }),
+    { status: 405 }
+  );
+  response.headers.set('Content-Type', 'application/json');
+  response.headers.set('Allow', 'POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  return response;
+}
+
+// Handle OPTIONS requests (CORS preflight)
+export async function OPTIONS(request: NextRequest) {
+  const response = new NextResponse(null, { status: 204 });
+
+  response.headers.set('Access-Control-Allow-Origin', '*');
+  response.headers.set('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  response.headers.set('Access-Control-Max-Age', '86400');
+  response.headers.set('Allow', 'POST, OPTIONS');
+
+  return response;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -26,9 +59,11 @@ export async function POST(request: NextRequest) {
 
     // Validate input
     if (!username || !password) {
-      return NextResponse.json(
-        { error: 'Username and password are required' },
-        { status: 400 }
+      return addCORSHeaders(
+        NextResponse.json(
+          { error: 'Username and password are required' },
+          { status: 400 }
+        )
       );
     }
 
@@ -38,9 +73,11 @@ export async function POST(request: NextRequest) {
       await loginLimiter.consume(ip);
     } catch (error) {
       console.warn(`[Auth] Login rate limit exceeded for IP: ${ip}`);
-      return NextResponse.json(
-        { error: 'Too many login attempts. Please try again later.' },
-        { status: 429 }
+      return addCORSHeaders(
+        NextResponse.json(
+          { error: 'Too many login attempts. Please try again later.' },
+          { status: 429 }
+        )
       );
     }
 
@@ -48,9 +85,11 @@ export async function POST(request: NextRequest) {
     const user = await getUserByUsername(username);
 
     if (!user) {
-      return NextResponse.json(
-        { error: 'Invalid username or password' },
-        { status: 401 }
+      return addCORSHeaders(
+        NextResponse.json(
+          { error: 'Invalid username or password' },
+          { status: 401 }
+        )
       );
     }
 
@@ -58,9 +97,11 @@ export async function POST(request: NextRequest) {
     const passwordValid = await verifyPassword(password, user.password_hash);
 
     if (!passwordValid) {
-      return NextResponse.json(
-        { error: 'Invalid username or password' },
-        { status: 401 }
+      return addCORSHeaders(
+        NextResponse.json(
+          { error: 'Invalid username or password' },
+          { status: 401 }
+        )
       );
     }
 
@@ -94,12 +135,14 @@ export async function POST(request: NextRequest) {
       maxAge: 8 * 60 * 60,
     });
 
-    return response;
+    return addCORSHeaders(response);
   } catch (error) {
     console.error('[Auth] Login error:', error);
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
+    return addCORSHeaders(
+      NextResponse.json(
+        { error: 'Internal server error' },
+        { status: 500 }
+      )
     );
   }
 }
