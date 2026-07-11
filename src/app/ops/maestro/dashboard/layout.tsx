@@ -5,7 +5,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/Button';
@@ -18,7 +18,25 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarFixed, setSidebarFixed] = useState(true);
   const [logoutLoading, setLogoutLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Load sidebar preference from localStorage
+  useEffect(() => {
+    const savedSidebarFixed = localStorage.getItem('maestro-sidebar-fixed');
+    if (savedSidebarFixed !== null) {
+      setSidebarFixed(JSON.parse(savedSidebarFixed));
+    }
+    setMounted(true);
+  }, []);
+
+  // Save sidebar preference to localStorage
+  const handleToggleSidebarFixed = () => {
+    const newValue = !sidebarFixed;
+    setSidebarFixed(newValue);
+    localStorage.setItem('maestro-sidebar-fixed', JSON.stringify(newValue));
+  };
 
   const handleLogout = async () => {
     setLogoutLoading(true);
@@ -42,13 +60,19 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
 
   const isActive = (href: string) => pathname === href;
 
+  if (!mounted) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Fixed Sidebar */}
+      {/* Sidebar - Fixed or Scrollable based on user preference */}
       <aside
-        className={`fixed left-0 top-0 h-screen ${
+        className={`${
+          sidebarFixed ? 'fixed left-0 top-0 h-screen z-50' : 'relative'
+        } ${
           sidebarOpen ? 'w-64' : 'w-20'
-        } bg-gray-900 text-white transition-all duration-300 flex flex-col z-50 shadow-lg overflow-y-auto`}
+        } bg-gray-900 text-white transition-all duration-300 flex flex-col shadow-lg overflow-y-auto`}
       >
         {/* Logo */}
         <div className="p-4 border-b border-gray-800 sticky top-0 bg-gray-900">
@@ -76,7 +100,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </nav>
 
         {/* Logout Button */}
-        <div className="p-4 border-t border-gray-800 sticky bottom-16 bg-gray-900">
+        <div className="p-4 border-t border-gray-800 sticky bottom-24 bg-gray-900">
           <Button
             onClick={handleLogout}
             disabled={logoutLoading}
@@ -86,22 +110,43 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </Button>
         </div>
 
-        {/* Toggle Button */}
+        {/* Toggle Fixed Sidebar Button */}
+        <div className="p-4 border-t border-gray-800 sticky bottom-12 bg-gray-900">
+          <button
+            onClick={handleToggleSidebarFixed}
+            title={sidebarFixed ? 'Click to make sidebar scrollable' : 'Click to fix sidebar'}
+            className="w-full text-gray-400 hover:text-white text-sm py-2 rounded-md transition flex items-center justify-center gap-2"
+          >
+            {sidebarOpen ? (
+              <>
+                <span>{sidebarFixed ? '📌' : '📄'}</span>
+                <span className="text-xs">{sidebarFixed ? 'Fixed' : 'Scroll'}</span>
+              </>
+            ) : (
+              <span>{sidebarFixed ? '📌' : '📄'}</span>
+            )}
+          </button>
+        </div>
+
+        {/* Toggle Sidebar Width Button */}
         <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="w-full text-gray-400 hover:text-white text-sm py-2 rounded-md transition"
+            title={sidebarOpen ? 'Collapse sidebar' : 'Expand sidebar'}
           >
             {sidebarOpen ? '◀' : '▶'}
           </button>
         </div>
       </aside>
 
-      {/* Main Content - Offset by sidebar width */}
+      {/* Main Content - Offset by sidebar width only if sidebar is fixed */}
       <main
         className={`${
-          sidebarOpen ? 'ml-64' : 'ml-20'
-        } transition-all duration-300 flex flex-col min-h-screen`}
+          sidebarFixed ? (sidebarOpen ? 'ml-64' : 'ml-20') : ''
+        } transition-all duration-300 flex flex-col ${
+          sidebarFixed ? 'min-h-screen' : ''
+        }`}
       >
         {/* Header */}
         <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm sticky top-0 z-40">
