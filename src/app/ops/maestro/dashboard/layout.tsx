@@ -43,15 +43,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const isActive = (href: string) => pathname === href;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* Sidebar */}
+    <div className="min-h-screen bg-gray-50">
+      {/* Fixed Sidebar */}
       <aside
-        className={`${
+        className={`fixed left-0 top-0 h-screen ${
           sidebarOpen ? 'w-64' : 'w-20'
-        } bg-gray-900 text-white transition-all duration-300 flex flex-col`}
+        } bg-gray-900 text-white transition-all duration-300 flex flex-col z-50 shadow-lg overflow-y-auto`}
       >
         {/* Logo */}
-        <div className="p-4 border-b border-gray-800">
+        <div className="p-4 border-b border-gray-800 sticky top-0 bg-gray-900">
           <h1 className={`font-bold ${sidebarOpen ? 'text-xl' : 'text-sm'}`}>
             {sidebarOpen ? '🎵 Maestro' : '🎵'}
           </h1>
@@ -76,7 +76,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </nav>
 
         {/* Logout Button */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-gray-800 sticky bottom-16 bg-gray-900">
           <Button
             onClick={handleLogout}
             disabled={logoutLoading}
@@ -87,7 +87,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
 
         {/* Toggle Button */}
-        <div className="p-4 border-t border-gray-800">
+        <div className="p-4 border-t border-gray-800 sticky bottom-0 bg-gray-900">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
             className="w-full text-gray-400 hover:text-white text-sm py-2 rounded-md transition"
@@ -97,10 +97,14 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      {/* Main Content - Offset by sidebar width */}
+      <main
+        className={`${
+          sidebarOpen ? 'ml-64' : 'ml-20'
+        } transition-all duration-300 flex flex-col min-h-screen`}
+      >
         {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm">
+        <header className="bg-white border-b border-gray-200 px-8 py-4 flex items-center justify-between shadow-sm sticky top-0 z-40">
           <h2 className="text-lg font-semibold text-gray-900">Admin Panel</h2>
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">Welcome to Maestro</span>
