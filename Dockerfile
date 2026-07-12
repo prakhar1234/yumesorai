@@ -39,6 +39,7 @@ RUN npm ci --omit=dev --legacy-peer-deps
 # Copy built app from builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
+COPY --from=builder /app/scripts ./scripts
 COPY prisma ./prisma
 
 # Note: .env files are NOT used in production - environment variables must be set via Dockerfile ENV
