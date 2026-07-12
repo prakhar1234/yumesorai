@@ -113,7 +113,8 @@ export default function LoginForm({ onSuccess }: LoginFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-md transition"
+          size="lg"
+          className="w-full"
         >
           {loading ? 'Signing in...' : 'Sign In'}
         </Button>
