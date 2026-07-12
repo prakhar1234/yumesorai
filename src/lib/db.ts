@@ -229,9 +229,9 @@ async function seedInitialAdminUser(client: any) {
       email = 'admin@yumesorai.com';
     }
 
-    // Dynamically import bcrypt for password hashing
-    const bcrypt = await import('bcrypt');
-    const passwordHash = await bcrypt.default.hash(password, 12);
+    // Import hashPassword from auth-utils for consistent password hashing
+    const { hashPassword } = await import('@/lib/auth-utils');
+    const passwordHash = await hashPassword(password);
 
     // Upsert admin user (create or update if exists)
     const result = await client.query(
