@@ -229,29 +229,26 @@ async function seedInitialAdminUser(client: any) {
       email = 'admin@yumesorai.com';
     }
 
-    // Check if admin user already exists
-    const result = await client.query(
-      'SELECT id FROM admin_users WHERE username = $1',
-      [username]
-    );
-
-    if (result.rows.length > 0) {
-      console.log(`[DB] Initial admin user '${username}' already exists`);
-      return;
-    }
-
     // Dynamically import bcrypt for password hashing
     const bcrypt = await import('bcrypt');
     const passwordHash = await bcrypt.default.hash(password, 12);
 
-    // Create initial admin user
-    await client.query(
-      `INSERT INTO admin_users (username, password_hash, email, full_name, is_active)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [username, passwordHash, email, 'Initial Admin', true]
+    // Upsert admin user (create or update if exists)
+    const result = await client.query(
+      `INSERT INTO admin_users (id, username, password_hash, email, full_name, is_active)
+       VALUES (gen_random_uuid(), $1, $2, $3, $4, true)
+       ON CONFLICT (username) DO UPDATE SET
+         password_hash = $2,
+         email = $3,
+         is_active = true,
+         updated_at = CURRENT_TIMESTAMP
+       RETURNING username`,
+      [username, passwordHash, email, 'Initial Admin']
     );
 
-    console.log(`[DB] Initial admin user created: ${username}`);
+    if (result.rows.length > 0) {
+      console.log(`[DB] Initial admin user ensured: ${result.rows[0].username}`);
+    }
   } catch (error) {
     console.error('[DB] Error seeding initial admin user:', error);
     // Don't throw - this is optional
