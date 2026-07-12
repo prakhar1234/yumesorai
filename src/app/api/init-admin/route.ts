@@ -26,8 +26,24 @@ export async function POST(request: Request) {
     try {
       // If force=true, delete existing user first
       if (force) {
-        await client.query('DELETE FROM admin_users WHERE username = $1', [username]);
-        console.log(`[Init Admin] Deleted existing user: ${username}`);
+        // First, get the user ID
+        const userResult = await client.query('SELECT id FROM admin_users WHERE username = $1', [username]);
+
+        if (userResult.rows.length > 0) {
+          const userId = userResult.rows[0].id;
+
+          // Delete clients created by this user (foreign key constraint)
+          await client.query('DELETE FROM clients WHERE created_by = $1', [userId]);
+          console.log(`[Init Admin] Deleted clients for user: ${username}`);
+
+          // Delete email campaigns created by this user
+          await client.query('DELETE FROM email_campaigns WHERE created_by = $1', [userId]);
+          console.log(`[Init Admin] Deleted campaigns for user: ${username}`);
+
+          // Delete the user
+          await client.query('DELETE FROM admin_users WHERE id = $1', [userId]);
+          console.log(`[Init Admin] Deleted existing user: ${username}`);
+        }
       }
 
       // Hash password
