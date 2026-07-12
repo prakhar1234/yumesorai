@@ -213,17 +213,20 @@ async function initializeSchema() {
 }
 
 /**
- * Seed initial admin user from environment variables
+ * Seed initial admin user from environment variables or hardcoded defaults
  */
 async function seedInitialAdminUser(client: any) {
   try {
-    const username = process.env.INITIAL_ADMIN_USERNAME;
-    const password = process.env.INITIAL_ADMIN_PASSWORD;
-    const email = process.env.INITIAL_ADMIN_EMAIL;
+    let username = process.env.INITIAL_ADMIN_USERNAME;
+    let password = process.env.INITIAL_ADMIN_PASSWORD;
+    let email = process.env.INITIAL_ADMIN_EMAIL;
 
+    // Use hardcoded defaults if environment variables not set
     if (!username || !password || !email) {
-      console.log('[DB] Initial admin user credentials not configured');
-      return;
+      console.log('[DB] Using hardcoded initial admin credentials');
+      username = 'yumesorai';
+      password = 'YumeSorai123!';
+      email = 'admin@yumesorai.com';
     }
 
     // Check if admin user already exists
@@ -233,7 +236,7 @@ async function seedInitialAdminUser(client: any) {
     );
 
     if (result.rows.length > 0) {
-      console.log('[DB] Initial admin user already exists');
+      console.log(`[DB] Initial admin user '${username}' already exists`);
       return;
     }
 
