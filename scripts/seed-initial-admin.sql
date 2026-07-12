@@ -7,7 +7,6 @@
 
 INSERT INTO admin_users (username, password_hash, email, full_name, is_active, created_at, updated_at)
 VALUES (
-  gen_random_uuid(),
   'yumesorai',
   '$2b$12$/mluxzkjExOJiT2jw7cycOJI6sRvnNvN8uW/uHItYossV.2bYEx2W',
   'admin@yumesorai.com',
