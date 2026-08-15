@@ -205,7 +205,69 @@
         "critical"
       ],
       "lastModified": "2026-06-28T00:00:00Z"
+    },
+    {
+      "id": "demystifier-analysis",
+      "name": "Demystifier Analysis",
+      "description": "COBOL repository analysis via LLM with JSON file storage for persistence",
+      "category": "api",
+      "apiEndpoints": [
+        "/api/demystifier",
+        "/api/demystifier/analyses"
+      ],
+      "formPages": [
+        "/demystifier"
+      ],
+      "dependencies": [
+        "demystifier-storage"
+      ],
+      "tags": [
+        "api",
+        "backend",
+        "llm",
+        "demystifier",
+        "critical"
+      ],
+      "lastModified": "2026-08-09T00:00:00Z"
+    },
+    {
+      "id": "demystifier-storage",
+      "name": "Demystifier Storage",
+      "description": "JSON file-based storage for saved analyses (CRUD operations)",
+      "category": "api",
+      "apiEndpoints": [
+        "/api/demystifier/analyses"
+      ],
+      "dependencies": [],
+      "tags": [
+        "api",
+        "backend",
+        "storage",
+        "demystifier"
+      ],
+      "lastModified": "2026-08-09T00:00:00Z"
+    },
+    {
+      "id": "demystifier-bff",
+      "name": "Demystifier BFF Proxy",
+      "description": "Next.js BFF proxy routes that forward to Flask demystifier API",
+      "category": "api",
+      "apiEndpoints": [
+        "/api/demystifier",
+        "/api/demystifier/analyses"
+      ],
+      "dependencies": [
+        "demystifier-analysis",
+        "demystifier-storage"
+      ],
+      "tags": [
+        "api",
+        "proxy",
+        "bff",
+        "demystifier"
+      ],
+      "lastModified": "2026-08-09T00:00:00Z"
     }
   ],
-  "lastUpdated": "2026-06-28T00:00:00Z"
+  "lastUpdated": "2026-08-09T00:00:00Z"
 }

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
+import { HolographicFrame } from "@/components/HolographicFrame";
 
 const siteUrl = "https://www.yumesorai.com";
 
@@ -80,216 +82,241 @@ function PlatformSchema() {
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Data                                                               */
+/* ------------------------------------------------------------------ */
+
+const products = [
+  {
+    name: "Demistifier",
+    href: "#demistifier",
+    tagline:
+      "Knowledge graph explorer — map every call chain, copybook, JCL job and CICS screen before you change a line.",
+    icon: "M9 20 3 17V4l6 3 6-3 6 3v13l-6-3-6 3z M9 7v13 M15 4v13",
+  },
+  {
+    name: "Transformer",
+    href: "#transformer",
+    tagline:
+      "COBOL → modern language, cloud-ready. Complexity scoring, reviewable AI plans, and generated unit tests.",
+    icon: "M8 6 3 12l5 6 M16 6l5 6-5 6 M13 4l-2 16",
+  },
+  {
+    name: "Code Flux",
+    href: "#codeflux",
+    tagline:
+      "Change workflow — edit → impact → approval. Sandbox branches with blast-radius preview from the graph.",
+    icon: "M21 12a9 9 0 1 1-3-6.7 M21 3v5h-5",
+  },
+];
+
+const howSteps = [
+  {
+    num: "01",
+    title: "Map",
+    desc: "Demistifier scans your repositories and builds a full knowledge graph of every program, copybook, JCL job, data file and CICS screen.",
+  },
+  {
+    num: "02",
+    title: "Plan",
+    desc: "Transformer scores each program by complexity and generates a reviewable, step-by-step conversion plan before any code is touched.",
+  },
+  {
+    num: "03",
+    title: "Transform",
+    desc: "AI converts COBOL to your target language, generates unit tests, and the code reconciler validates logic coverage line by line.",
+  },
+  {
+    num: "04",
+    title: "Validate",
+    desc: "Code Flux opens a sandbox branch for every change, previews blast-radius from the graph, and routes approvals before merge.",
+  },
+];
+
+const deepDives = [
+  {
+    id: "demistifier",
+    bg: "bg-[#FAF9F6]",
+    reverse: false,
+    kicker: "Demistifier",
+    title: "See how every COBOL program connects",
+    body: "Point Demistifier at a repository and it maps the call chains, copybooks, JCL jobs, data files and CICS screens into one navigable knowledge graph — so you can debug across the whole system, not one program at a time.",
+    points: [
+      "Full-system call graph — CALL, PERFORM and dynamic links",
+      "Copybooks, JCL & data access fully mapped",
+      "Impact & path analysis before you change a line",
+      "Risk & dead-code heatmap",
+    ],
+    screenshot: "/images/platform/shot-demistifier.png",
+    label: "Demistifier — knowledge graph explorer",
+    tilt: "rotateY(-9deg) rotateX(3deg)",
+  },
+  {
+    id: "graph",
+    bg: "bg-white",
+    reverse: true,
+    kicker: "Demistifier · Graph view",
+    title: "Every dependency, one navigable graph",
+    body: "Drill into any program to see its calls, data access, and vendor black-boxes. Dashed edges flag code with no source — the risks that surprise migrations are visible on day one.",
+    points: [
+      "CALL / PERFORM edges with direction",
+      "Data and DB access mapped per program",
+      "Vendor black-boxes detected and isolated",
+    ],
+    screenshot: "/images/platform/shot-graph.png",
+    label: "CLAIM055 — dependency graph",
+    tilt: "rotateY(9deg) rotateX(3deg)",
+  },
+  {
+    id: "transformer",
+    bg: "bg-[#FAF9F6]",
+    reverse: false,
+    kicker: "Transformer",
+    title: "COBOL → Java, with a reviewable plan",
+    body: "Transformer scores every program by complexity — lines of code, call depth, embedded SQL, vendor black-boxes — then generates a step-by-step conversion plan you review before any code is written.",
+    points: [
+      "Complexity scoring: LOC, calls, embedded SQL, black-boxes",
+      "Reviewable step-by-step transformation plans",
+      "Code reconciler validates logic coverage after conversion",
+    ],
+    screenshot: "/images/platform/shot-transformer.png",
+    label: "Transformer — migration workbench",
+    tilt: "rotateY(-9deg) rotateX(3deg)",
+  },
+  {
+    id: "codeflux",
+    bg: "bg-white",
+    reverse: true,
+    kicker: "Code Flux",
+    title: "Safe change management, before and after cutover",
+    body: "Code Flux wraps every change in a sandbox branch, previews the blast radius from the knowledge graph, and routes approvals before merge — so post-cutover maintenance is as safe as pre-cutover migration.",
+    points: [
+      "Sandbox branches for every change",
+      "Blast-radius preview from the knowledge graph",
+      "Approval routing before merge",
+    ],
+    screenshot: "/images/platform/shot-codeflux.png",
+    label: "Code Flux — change workflow",
+    tilt: "rotateY(9deg) rotateX(3deg)",
+  },
+];
+
+const securityCards = [
+  {
+    title: "On-prem & VPC deployment",
+    body: "Your source code never leaves your network. Yumesorai runs inside your data centre or VPC — nothing is sent to external servers.",
+  },
+  {
+    title: "Compliance preserved",
+    body: "Regulatory mappings (HIPAA, PCI-DSS, SOX) are tracked through every transformation step so auditors see a clear chain of custody.",
+  },
+  {
+    title: "Full audit trail",
+    body: "Every AI decision, plan approval, and code change is logged with user, timestamp, and rationale — exportable for any audit framework.",
+  },
+];
+
+const integrations = [
+  "COBOL",
+  "PL/I",
+  "Assembler",
+  "JCL",
+  "CICS",
+  "DB2",
+  "IMS",
+  "Java · Spring Boot",
+  "PostgreSQL · RDS",
+  "GitHub",
+  "GitLab",
+  "Jenkins",
+];
+
+/* ------------------------------------------------------------------ */
+/*  Component                                                          */
+/* ------------------------------------------------------------------ */
+
 export default function PlatformPage() {
-  const processSteps = [
-    {
-      number: 1,
-      title: "Analyze",
-      icon: "🔍",
-      description:
-        "Our AI performs semantic code analysis on your legacy systems, mapping business logic with 99.99% accuracy. We extract data models, transaction flows, and compliance requirements.",
-    },
-    {
-      number: 2,
-      title: "Design",
-      icon: "📐",
-      description:
-        "We create a comprehensive modernization blueprint including system architecture, data migration strategy, and transformation roadmap tailored to your business requirements.",
-    },
-    {
-      number: 3,
-      title: "Transform",
-      icon: "⚙️",
-      description:
-        "Automated code and data migration translates your legacy systems to modern languages and cloud-native architecture. We handle billions of lines of code with precision.",
-    },
-    {
-      number: 4,
-      title: "Test",
-      icon: "✓",
-      description:
-        "AI-driven testing generates comprehensive test suites from production data patterns. We validate every transaction, edge case, and regulatory requirement before deployment.",
-    },
-    {
-      number: 5,
-      title: "Deploy",
-      icon: "🚀",
-      description:
-        "Zero-downtime cutover with parallel-run architecture ensures your business never stops. We monitor, validate, and optimize your new system in production.",
-    },
-  ];
-
-  const features = [
-    {
-      title: "AI-Powered Analysis",
-      description:
-        "Our AI understands COBOL, PL/I, and Assembler at a semantic level, mapping business logic automatically with 99.99% accuracy.",
-      icon: "🤖",
-    },
-    {
-      title: "Zero-Downtime Migration",
-      description:
-        "Parallel-run architecture ensures your business never stops. We validate every transaction before cutover.",
-      icon: "⚡",
-    },
-    {
-      title: "Compliance Preservation",
-      description:
-        "Regulatory mappings are maintained throughout modernization. HIPAA, PCI-DSS, SOX -- all handled automatically.",
-      icon: "🔒",
-    },
-    {
-      title: "Reduced Risk",
-      description:
-        "AI-driven testing generates comprehensive test suites from production data patterns, catching edge cases humans miss.",
-      icon: "🛡️",
-    },
-    {
-      title: "Fast Deployment",
-      description:
-        "What traditionally takes 3-5 years, we deliver in 6-12 months through automated code transformation.",
-      icon: "📈",
-    },
-    {
-      title: "Knowledge Capture",
-      description:
-        "We extract and document decades of embedded business logic before your retiring workforce takes it with them.",
-      icon: "📚",
-    },
-  ];
-
-  const supportedLanguages = [
-    "COBOL",
-    "PL/I",
-    "Assembler",
-    "NATURAL",
-    "RPG",
-    "FOCUS",
-    "FORTRAN",
-  ];
-
-  const targetPlatforms = [
-    "Microservices (Kubernetes)",
-    "Cloud-Native (AWS, Azure, GCP)",
-    "Node.js & TypeScript",
-    "Python & FastAPI",
-    "Java & Spring Boot",
-    "Go & Rust",
-  ];
-
-  const integrations = [
-    "Legacy Database Migration",
-    "API Gateway Integration",
-    "Message Queue Systems",
-    "Event Streaming",
-    "Blockchain & Smart Contracts",
-    "Machine Learning Pipelines",
-  ];
-
   return (
     <>
       <PlatformSchema />
 
-      {/* Hero Section */}
+      {/* ── Hero ── */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 -z-10 bg-gradient-to-b from-indigo-950/[0.03] to-transparent" />
         <div className="mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 sm:pb-24 sm:pt-28 lg:px-8 lg:pt-32">
           <div className="mx-auto max-w-3xl text-center">
-            {/* Breadcrumb */}
-            <p className="mb-6 inline-flex items-center gap-1 text-xs font-medium text-indigo-950/60">
-              <Link href="/" className="hover:text-indigo-950">
-                Home
-              </Link>
-              <span>/</span>
-              <span className="text-indigo-950">Platform</span>
+            <p className="mb-6 font-mono text-xs uppercase tracking-[2px] text-coral">
+              The Platform
             </p>
-
-            {/* Title */}
             <h1 className="text-balance text-4xl font-bold tracking-tight text-indigo-950 sm:text-5xl lg:text-6xl">
-              How Yumesorai Works
+              One AI platform. Three products. Zero downtime.
             </h1>
-
-            {/* Subtitle */}
             <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-indigo-950/60 sm:text-xl">
-              Our proven 5-step methodology transforms legacy systems into
-              modern, cloud-native platforms using AI-powered analysis and
-              automated transformation. Zero disruption. Maximum speed.
+              Demistifier maps your legacy estate, Transformer converts it, and
+              Code Flux keeps it healthy after cutover — all driven by AI that
+              understands COBOL at a semantic level.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Process Steps Section */}
+      {/* ── Product Suite Index ── */}
       <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight text-indigo-950 sm:text-4xl">
-              The Modernization Process
-            </h2>
-            <p className="mt-4 text-lg text-indigo-950/60">
-              From analysis to deployment, every step is optimized for speed,
-              accuracy, and zero-downtime execution.
-            </p>
-          </div>
-
-          {/* Process Flow */}
-          <div className="space-y-8">
-            {processSteps.map((step, index) => (
-              <div key={step.title}>
-                <div className="flex gap-6 sm:gap-8">
-                  {/* Step Number */}
-                  <div className="flex flex-col items-center">
-                    <div className="flex h-16 w-16 items-center justify-center rounded-full bg-coral/10 text-2xl font-bold text-coral ring-4 ring-coral/20 sm:h-20 sm:w-20 sm:text-3xl">
-                      {step.icon}
-                    </div>
-                    {/* Connector Line */}
-                    {index < processSteps.length - 1 && (
-                      <div className="mt-4 w-1 flex-grow bg-gradient-to-b from-coral/30 to-coral/10 sm:h-24" />
-                    )}
-                  </div>
-
-                  {/* Step Content */}
-                  <div className="flex-1 pt-2">
-                    <h3 className="text-2xl font-bold text-indigo-950">
-                      Step {step.number}: {step.title}
-                    </h3>
-                    <p className="mt-3 text-base leading-relaxed text-indigo-950/70">
-                      {step.description}
-                    </p>
-                    {index < processSteps.length - 1 && (
-                      <div className="mt-6 h-px bg-indigo-950/5" />
-                    )}
-                  </div>
+          <div className="grid gap-8 sm:grid-cols-3">
+            {products.map((p) => (
+              <Link
+                key={p.name}
+                href={p.href}
+                className="group rounded-xl border border-indigo-950/10 bg-white p-8 transition-colors hover:border-coral/30 hover:bg-coral/5"
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={24}
+                    height={24}
+                    fill="none"
+                    strokeWidth={1.5}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="shrink-0"
+                  >
+                    <path d={p.icon} stroke="#FF6B6B" />
+                  </svg>
+                  <span className="text-lg font-bold text-indigo-950">
+                    {p.name}
+                  </span>
                 </div>
-              </div>
+                <p className="text-sm leading-relaxed text-indigo-950/60">
+                  {p.tagline}
+                </p>
+                <span className="mt-4 inline-block text-sm font-medium text-coral">
+                  Jump to product&nbsp;&darr;
+                </span>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Feature Highlights Section */}
-      <section className="bg-indigo-950 py-16 text-white sm:py-24">
+      {/* ── How It Works ── */}
+      <section className="border-t border-b border-indigo-950/10 bg-white py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Why Enterprises Choose Yumesorai
-            </h2>
-            <p className="mt-4 text-lg text-white/60">
-              We combine deep enterprise expertise with cutting-edge AI to
-              deliver modernization outcomes that were previously impossible.
-            </p>
-          </div>
-
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            {features.map((feature) => (
+          <h2 className="mb-16 text-center text-3xl font-bold tracking-tight text-indigo-950 sm:text-4xl">
+            How It Works
+          </h2>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+            {howSteps.map((s) => (
               <div
-                key={feature.title}
-                className="rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm hover:bg-white/10 transition-colors"
+                key={s.num}
+                className="rounded-xl border border-indigo-950/10 bg-indigo-950/[0.02] p-8"
               >
-                <div className="mb-4 text-3xl">{feature.icon}</div>
-                <h3 className="text-lg font-semibold">{feature.title}</h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/70">
-                  {feature.description}
+                <p className="font-mono text-sm text-coral">{s.num}</p>
+                <h3 className="mt-2 text-xl font-bold text-indigo-950">
+                  {s.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-indigo-950/60">
+                  {s.desc}
                 </p>
               </div>
             ))}
@@ -297,101 +324,146 @@ export default function PlatformPage() {
         </div>
       </section>
 
-      {/* Technology & Platform Details */}
-      <section className="py-16 sm:py-24">
+      {/* ── Product Deep Dives ── */}
+      {deepDives.map((section) => (
+        <section
+          key={section.id}
+          id={section.id}
+          className={`${section.bg} py-16 sm:py-24`}
+        >
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div
+              className={`grid items-center gap-12 lg:grid-cols-2 lg:gap-16 ${
+                section.reverse ? "" : ""
+              }`}
+            >
+              {/* Text column */}
+              <div className={section.reverse ? "lg:order-2" : ""}>
+                <p className="mb-3 font-mono text-xs uppercase tracking-[2px] text-coral">
+                  {section.kicker}
+                </p>
+                <h2 className="text-3xl font-bold tracking-tight text-indigo-950 sm:text-4xl">
+                  {section.title}
+                </h2>
+                <p className="mt-4 text-base leading-relaxed text-indigo-950/60">
+                  {section.body}
+                </p>
+                <ul className="mt-6 space-y-3">
+                  {section.points.map((pt) => (
+                    <li key={pt} className="flex items-start gap-3">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width={20}
+                        height={20}
+                        fill="none"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        className="mt-0.5 shrink-0"
+                      >
+                        <path d="M5 10l3 3 7-7" stroke="#FF6B6B" />
+                      </svg>
+                      <span className="text-sm text-indigo-950/70">{pt}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Screenshot column */}
+              <div className={section.reverse ? "lg:order-1" : ""}>
+                <HolographicFrame
+                  src={section.screenshot}
+                  alt={section.label}
+                  label={section.label}
+                  heroStyle={false}
+                  tilt={section.tilt}
+                  hoverTilt="rotateY(0deg) rotateX(0deg) scale(1.12)"
+                  glowBlur={26}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+      ))}
+
+      {/* ── Security Strip ── */}
+      <section className="bg-gradient-to-b from-indigo-950 to-[#2D2A6E] py-16 text-white sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          {/* Supported Languages */}
-          <div className="mb-16">
-            <h2 className="mb-8 text-2xl font-bold tracking-tight text-indigo-950 sm:text-3xl">
-              Supported Languages
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              Security built into every step
             </h2>
-            <p className="mb-6 text-base text-indigo-950/60">
-              Yumesorai&apos;s AI understands and transforms legacy code in:
+            <p className="mt-4 text-lg text-white/60">
+              Your source code never leaves your network. Yumesorai deploys
+              on-prem or inside your VPC, with a full audit trail for every AI
+              decision.
             </p>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {supportedLanguages.map((lang) => (
-                <div
-                  key={lang}
-                  className="rounded-lg border border-indigo-950/10 bg-white p-4 text-center font-medium text-indigo-950 hover:border-coral/30 hover:bg-coral/5 transition-colors"
-                >
-                  {lang}
-                </div>
-              ))}
-            </div>
           </div>
-
-          {/* Target Platforms */}
-          <div className="mb-16 border-t border-indigo-950/5 pt-16">
-            <h2 className="mb-8 text-2xl font-bold tracking-tight text-indigo-950 sm:text-3xl">
-              Target Platforms
-            </h2>
-            <p className="mb-6 text-base text-indigo-950/60">
-              We transform your systems to modern, cloud-native platforms including:
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {targetPlatforms.map((platform) => (
-                <div
-                  key={platform}
-                  className="flex items-start gap-3 rounded-lg border border-indigo-950/10 bg-white p-4 hover:border-coral/30 hover:bg-coral/5 transition-colors"
-                >
-                  <span className="mt-0.5 text-coral font-bold">✓</span>
-                  <span className="font-medium text-indigo-950">{platform}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Integration Capabilities */}
-          <div className="border-t border-indigo-950/5 pt-16">
-            <h2 className="mb-8 text-2xl font-bold tracking-tight text-indigo-950 sm:text-3xl">
-              Integration Capabilities
-            </h2>
-            <p className="mb-6 text-base text-indigo-950/60">
-              We seamlessly integrate with modern systems and frameworks:
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {integrations.map((integration) => (
-                <div
-                  key={integration}
-                  className="flex items-start gap-3 rounded-lg border border-indigo-950/10 bg-white p-4 hover:border-coral/30 hover:bg-coral/5 transition-colors"
-                >
-                  <span className="mt-0.5 text-coral font-bold">+</span>
-                  <span className="font-medium text-indigo-950">{integration}</span>
-                </div>
-              ))}
-            </div>
+          <div className="mt-16 grid gap-8 sm:grid-cols-3">
+            {securityCards.map((card) => (
+              <div
+                key={card.title}
+                className="rounded-xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm"
+              >
+                <h3 className="text-lg font-semibold">{card.title}</h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/70">
+                  {card.body}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Banner */}
+      {/* ── Integrations ── */}
+      <section className="bg-white py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-indigo-950 sm:text-4xl">
+              Works with your stack
+            </h2>
+            <p className="mt-4 text-lg text-indigo-950/60">
+              Yumesorai plugs into the languages, databases, CI/CD pipelines and
+              source-control systems you already use.
+            </p>
+          </div>
+          <div className="mx-auto mt-12 flex max-w-3xl flex-wrap justify-center gap-3">
+            {integrations.map((tag) => (
+              <span
+                key={tag}
+                className="rounded-full border border-indigo-950/10 px-5 py-2.5 font-mono text-sm text-indigo-950"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── CTA ── */}
       <section className="py-16 sm:py-24">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-2xl bg-indigo-950 px-6 py-16 shadow-2xl sm:px-16 sm:py-20">
-            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/30 to-transparent" />
-            <div className="relative mx-auto max-w-2xl text-center">
-              <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                Ready to get started?
-              </h2>
-              <p className="mt-4 text-base leading-7 text-white/60">
-                Schedule a demo to see how Yumesorai can transform your legacy
-                systems. Or download our case studies to learn from enterprises
-                that have already succeeded.
-              </p>
-              <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
-                <Link
-                  href="/demo"
-                  className="inline-flex items-center justify-center rounded-lg bg-coral px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-coral/25 transition-all hover:bg-coral-dark hover:shadow-xl hover:shadow-coral/30"
-                >
-                  Schedule Demo
-                </Link>
-                <Link
-                  href="/resources/case-studies"
-                  className="inline-flex items-center justify-center rounded-lg border border-white/20 bg-transparent px-6 py-3.5 text-base font-semibold text-white transition-all hover:border-white/40 hover:bg-white/5"
-                >
-                  Download Case Study
-                </Link>
-              </div>
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight text-indigo-950 sm:text-4xl">
+              See the platform on your own codebase
+            </h2>
+            <p className="mt-4 text-lg text-indigo-950/60">
+              Book a 30-minute demo and we will run Demistifier on a sample of
+              your COBOL estate — live, on your screen.
+            </p>
+            <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:justify-center">
+              <Link
+                href="/about#contact"
+                className="inline-flex items-center justify-center rounded-lg bg-coral px-6 py-3.5 text-base font-semibold text-white shadow-lg shadow-coral/25 transition-all hover:bg-coral-dark hover:shadow-xl hover:shadow-coral/30"
+              >
+                Request Demo
+              </Link>
+              <Link
+                href="/solutions"
+                className="inline-flex items-center justify-center rounded-lg border border-indigo-950/20 bg-white px-6 py-3.5 text-base font-semibold text-indigo-950 transition-all hover:border-indigo-950/40 hover:bg-indigo-950/5"
+              >
+                Explore Solutions
+              </Link>
             </div>
           </div>
         </div>

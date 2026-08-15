@@ -14,7 +14,14 @@ const navLinks = [
       { label: "Banking", href: "/solutions/banking" },
     ],
   },
-  { label: "Platform", href: "/platform" },
+  {
+    label: "Platform",
+    href: "/platform",
+    children: [
+      { label: "Overview", href: "/platform" },
+      { label: "Demystifier", href: "/demystifier" },
+    ],
+  },
   { label: "Resources", href: "/resources" },
   { label: "About", href: "/about" },
 ];

@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import PlausibleProvider from "@/components/analytics/PlausibleProvider";
 import CookieConsent from "@/components/analytics/CookieConsent";
-import { Header } from "@/components/layout/Header";
-import { Footer } from "@/components/layout/Footer";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -132,9 +131,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased bg-offwhite text-indigo-950`}
       >
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SiteChrome>{children}</SiteChrome>
         <PlausibleProvider />
         <CookieConsent />
       </body>

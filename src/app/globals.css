@@ -51,3 +51,28 @@ body {
     -moz-osx-font-smoothing: grayscale;
   }
 }
+
+/* Holographic effects for product frames */
+@keyframes holoHue {
+  to { filter: blur(28px) hue-rotate(360deg); }
+}
+@keyframes holoHueSm {
+  to { filter: blur(14px) hue-rotate(360deg); }
+}
+@keyframes holoSheen {
+  0%, 55% { transform: translateX(-130%) skewX(-18deg); }
+  100% { transform: translateX(260%) skewX(-18deg); }
+}
+
+.animate-holo-hue {
+  animation: holoHue 9s linear infinite;
+}
+.animate-holo-hue-sm {
+  animation: holoHueSm 9s linear infinite;
+}
+.animate-holo-sheen {
+  animation: holoSheen 5.5s ease-in-out infinite;
+}
+.animate-holo-sheen-slow {
+  animation: holoSheen 6.5s ease-in-out infinite;
+}

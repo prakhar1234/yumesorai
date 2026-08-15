@@ -175,6 +175,16 @@ const config: Config = {
         spinner: {
           to: { transform: "rotate(360deg)" },
         },
+        holoHue: {
+          to: { filter: "blur(28px) hue-rotate(360deg)" },
+        },
+        holoHueSm: {
+          to: { filter: "blur(14px) hue-rotate(360deg)" },
+        },
+        holoSheen: {
+          "0%, 55%": { transform: "translateX(-130%) skewX(-18deg)" },
+          "100%": { transform: "translateX(260%) skewX(-18deg)" },
+        },
       },
       animation: {
         "fade-in": "fadeIn 0.6s ease-out forwards",
@@ -183,6 +193,10 @@ const config: Config = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         spinner: "spinner 0.6s linear infinite",
+        "holo-hue": "holoHue 9s linear infinite",
+        "holo-hue-sm": "holoHueSm 9s linear infinite",
+        "holo-sheen": "holoSheen 5.5s ease-in-out infinite",
+        "holo-sheen-slow": "holoSheen 6.5s ease-in-out infinite",
       },
     },
   },

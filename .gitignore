@@ -27,6 +27,8 @@ yarn-error.log*
 
 # local env files
 .env*.local
+flask-api/.env
+flask-api/data/logs/
 
 # vercel
 .vercel

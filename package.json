@@ -16,7 +16,8 @@
     "test:all": "npm run test:api && npm run test:e2e",
     "test:agent": "ts-node agent-systems/testing-agent/cli.ts",
     "test:agent:validate": "npm run test:agent registry validate",
-    "test:agent:status": "npm run test:agent status"
+    "test:agent:status": "npm run test:agent status",
+    "dev:flask": "cd flask-api && python -m flask --app app:create_app run --port 5050 --reload"
   },
   "dependencies": {
     "@hubspot/api-client": "^13.5.0",
