@@ -1,0 +1,122 @@
+{
+  "id": "20260811205612-f64c96",
+  "repo_url": "https://github.com/manyone/cobol-report-generator",
+  "input_type": "github",
+  "created_at": "2026-08-11T20:56:12.724917+00:00",
+  "node_count": 5,
+  "edge_count": 6,
+  "result": {
+    "nodes": [
+      {
+        "id": "SALESRPT",
+        "label": "SALESRPT",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 100,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "SALES-FILE",
+        "label": "SALES-FILE",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "REPORT-FILE",
+        "label": "REPORT-FILE",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "MYRPG/SALESRPT",
+        "label": "SALESRPT",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.28,
+        "dead": false,
+        "loc": 181,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "RPTGEN/SALESRPT",
+        "label": "SALESRPT",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.32,
+        "dead": false,
+        "loc": 215,
+        "fanIn": 0,
+        "fanOut": 2
+      }
+    ],
+    "edges": [
+      {
+        "source": "SALESRPT",
+        "target": "SALES-FILE",
+        "type": "data"
+      },
+      {
+        "source": "SALESRPT",
+        "target": "REPORT-FILE",
+        "type": "data"
+      },
+      {
+        "source": "MYRPG/SALESRPT",
+        "target": "SALES-FILE",
+        "type": "data"
+      },
+      {
+        "source": "MYRPG/SALESRPT",
+        "target": "REPORT-FILE",
+        "type": "data"
+      },
+      {
+        "source": "RPTGEN/SALESRPT",
+        "target": "SALES-FILE",
+        "type": "data"
+      },
+      {
+        "source": "RPTGEN/SALESRPT",
+        "target": "REPORT-FILE",
+        "type": "data"
+      }
+    ],
+    "domains": [
+      {
+        "id": "GEN",
+        "name": "General",
+        "color": "#94a3b8"
+      },
+      {
+        "id": "RPT",
+        "name": "Reporting",
+        "color": "#a78bfa"
+      }
+    ],
+    "metadata": {
+      "repo": "https://github.com/manyone/cobol-report-generator",
+      "nodeCount": 5,
+      "edgeCount": 6,
+      "analyzedAt": "2026-08-11T20:56:12.724657+00:00"
+    }
+  }
+}

@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Yumesorai — Logo Collection</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Noto+Sans+JP:wght@300;400;700&family=Exo+2:ital,wght@0,300;0,700;1,400&family=Rajdhani:wght@400;600;700&family=Space+Mono:wght@400;700&family=Cinzel:wght@400;700&family=Chakra+Petch:wght@300;600;700&family=Bebas+Neue&family=Oxanium:wght@300;600;800&family=Share+Tech+Mono&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0a0a0f;
+    color: #e0e0e0;
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  header h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: clamp(1.6rem, 4vw, 2.8rem);
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    background: linear-gradient(135deg, #00f5c4, #7b61ff, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-transform: uppercase;
+  }
+
+  header p {
+    font-family: 'Share Tech Mono', monospace;
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 32px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .logo-card {
+    border-radius: 16px;
+    padding: 36px 28px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+  }
+
+  .logo-card:hover {
+    transform: translateY(-6px);
+  }
+
+  .logo-card svg {
+    width: 100%;
+    max-width: 280px;
+    height: auto;
+  }
+
+  .badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 20px;
+    opacity: 0.7;
+  }
+
+  /* --- Card Themes --- */
+  .c1 { background: #0d0d1a; border: 1px solid #1a1a3a; box-shadow: 0 0 40px #7b61ff22; }
+  .c1:hover { box-shadow: 0 12px 60px #7b61ff44; }
+  .c1 .badge { background: #7b61ff22; color: #7b61ff; border: 1px solid #7b61ff44; }
+
+  .c2 { background: #0a1a12; border: 1px solid #0e2e1e; box-shadow: 0 0 40px #00f5c422; }
+  .c2:hover { box-shadow: 0 12px 60px #00f5c444; }
+  .c2 .badge { background: #00f5c422; color: #00f5c4; border: 1px solid #00f5c444; }
+
+  .c3 { background: #1a0d0a; border: 1px solid #3a1a0d; box-shadow: 0 0 40px #ff6b6b22; }
+  .c3:hover { box-shadow: 0 12px 60px #ff6b6b44; }
+  .c3 .badge { background: #ff6b6b22; color: #ff8080; border: 1px solid #ff6b6b44; }
+
+  .c4 { background: #0a0f1a; border: 1px solid #101a2e; box-shadow: 0 0 40px #00c8ff22; }
+  .c4:hover { box-shadow: 0 12px 60px #00c8ff44; }
+  .c4 .badge { background: #00c8ff22; color: #00c8ff; border: 1px solid #00c8ff44; }
+
+  .c5 { background: #0f0a1a; border: 1px solid #1e0f2e; box-shadow: 0 0 40px #d463ff22; }
+  .c5:hover { box-shadow: 0 12px 60px #d463ff44; }
+  .c5 .badge { background: #d463ff22; color: #d463ff; border: 1px solid #d463ff44; }
+
+  .c6 { background: #0a1219; border: 1px solid #0e2030; box-shadow: 0 0 40px #00e5ff22; }
+  .c6:hover { box-shadow: 0 12px 60px #00e5ff44; }
+  .c6 .badge { background: #00e5ff22; color: #00e5ff; border: 1px solid #00e5ff44; }
+
+  .c7 { background: #131309; border: 1px solid #26260e; box-shadow: 0 0 40px #f5e04222; }
+  .c7:hover { box-shadow: 0 12px 60px #f5e04244; }
+  .c7 .badge { background: #f5e04222; color: #f5e042; border: 1px solid #f5e04244; }
+
+  .c8 { background: #0d160d; border: 1px solid #152515; box-shadow: 0 0 40px #44ff9922; }
+  .c8:hover { box-shadow: 0 12px 60px #44ff9944; }
+  .c8 .badge { background: #44ff9922; color: #44ff99; border: 1px solid #44ff9944; }
+
+  .c9 { background: #150d12; border: 1px solid #2a1520; box-shadow: 0 0 40px #ff63a522; }
+  .c9:hover { box-shadow: 0 12px 60px #ff63a544; }
+  .c9 .badge { background: #ff63a522; color: #ff63a5; border: 1px solid #ff63a544; }
+
+  .c10 { background: #0d1215; border: 1px solid #151e25; box-shadow: 0 0 40px #63d4ff22; }
+  .c10:hover { box-shadow: 0 12px 60px #63d4ff44; }
+  .c10 .badge { background: #63d4ff22; color: #63d4ff; border: 1px solid #63d4ff44; }
+
+  @keyframes pulse-glow { 0%,100%{opacity:1} 50%{opacity:0.5} }
+  @keyframes rotate-slow { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+  @keyframes dash { to { stroke-dashoffset: -100; } }
+  @keyframes flicker { 0%,100%{opacity:1}50%{opacity:0.7}75%{opacity:0.9} }
+
+  .spin-me { animation: rotate-slow 8s linear infinite; transform-origin: center; }
+  .pulse-me { animation: pulse-glow 2.5s ease-in-out infinite; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Yumesorai</h1>
+  <p>Logo Collection — Technology Modernization Company</p>
+</header>
+
+<div class="grid">
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 1: CIRCUIT METAMORPHOSIS (Purple/Indigo) -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c1">
+    <svg viewBox="0 0 300 140" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g1a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#7b61ff"/>
+          <stop offset="100%" stop-color="#c084fc"/>
+        </linearGradient>
+        <filter id="glow1">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <!-- Old circuit (left) fading into new (right) -->
+      <!-- Old blocky circuit lines -->
+      <g opacity="0.4" stroke="#7b61ff" stroke-width="1.2" fill="none">
+        <line x1="10" y1="50" x2="35" y2="50"/>
+        <line x1="35" y1="50" x2="35" y2="30"/>
+        <line x1="35" y1="30" x2="60" y2="30"/>
+        <rect x="60" y="24" width="14" height="12" rx="2" fill="#7b61ff" opacity="0.5"/>
+        <line x1="74" y1="30" x2="90" y2="30"/>
+        <line x1="90" y1="30" x2="90" y2="50"/>
+        <line x1="90" y1="50" x2="115" y2="50"/>
+        <circle cx="35" cy="50" r="3" fill="#7b61ff" opacity="0.7"/>
+        <circle cx="90" cy="50" r="3" fill="#7b61ff" opacity="0.7"/>
+
+        <line x1="10" y1="70" x2="50" y2="70"/>
+        <line x1="50" y1="70" x2="50" y2="90"/>
+        <line x1="50" y1="90" x2="75" y2="90"/>
+        <rect x="75" y="84" width="14" height="12" rx="2" fill="#7b61ff" opacity="0.5"/>
+        <line x1="89" y1="90" x2="115" y2="90"/>
+      </g>
+
+      <!-- Arrow/transform bridge -->
+      <g filter="url(#glow1)">
+        <path d="M115 40 Q140 40 140 70 Q140 100 165 100" stroke="url(#g1a)" stroke-width="2.5" fill="none" stroke-dasharray="4 2"/>
+        <path d="M115 100 Q140 100 140 70 Q140 40 165 40" stroke="url(#g1a)" stroke-width="2.5" fill="none" stroke-dasharray="4 2"/>
+        <!-- Arrow head -->
+        <polygon points="160,36 170,40 160,44" fill="#c084fc"/>
+        <polygon points="160,96 170,100 160,104" fill="#c084fc"/>
+      </g>
+
+      <!-- New modern circuit (right) -->
+      <g stroke="#c084fc" stroke-width="1.5" fill="none" filter="url(#glow1)">
+        <path d="M170 40 Q195 40 195 55 Q195 70 210 70 Q225 70 225 55 Q225 40 250 40" stroke-linecap="round"/>
+        <path d="M170 100 Q200 100 215 85" stroke-linecap="round"/>
+        <circle cx="210" cy="70" r="8" stroke="#c084fc" fill="#c084fc22"/>
+        <circle cx="210" cy="70" r="3" fill="#c084fc"/>
+        <line x1="250" y1="40" x2="290" y2="40"/>
+        <line x1="215" y1="85" x2="250" y2="85"/>
+        <line x1="250" y1="85" x2="250" y2="60"/>
+        <line x1="250" y1="60" x2="290" y2="60"/>
+        <circle cx="250" cy="40" r="4" fill="#c084fc"/>
+        <circle cx="250" cy="60" r="4" fill="#7b61ff"/>
+      </g>
+
+      <!-- Company name -->
+      <text x="150" y="125" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="17" font-weight="900" fill="url(#g1a)" letter-spacing="4">YUMESORAI</text>
+      <text x="150" y="136" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6" fill="#7b61ff88" letter-spacing="3">TECHNOLOGY MODERNISATION</text>
+    </svg>
+    <span class="badge">Concept 01 — Circuit Metamorphosis</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 2: RISING PHOENIX / KANJI DREAM (Teal)    -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c2">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g2a" x1="0%" y1="100%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00f5c4"/>
+          <stop offset="100%" stop-color="#00e0ff"/>
+        </linearGradient>
+        <filter id="glow2">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      <!-- Abstract stylized "Y" that forms a rising bird/phoenix -->
+      <g filter="url(#glow2)">
+        <!-- Wings -->
+        <path d="M100 90 Q75 60 50 70 Q65 85 80 90 Q65 100 50 110 Q75 115 100 90Z" fill="#00f5c444" stroke="#00f5c4" stroke-width="1.5"/>
+        <path d="M200 90 Q225 60 250 70 Q235 85 220 90 Q235 100 250 110 Q225 115 200 90Z" fill="#00f5c444" stroke="#00f5c4" stroke-width="1.5"/>
+        <!-- Body -->
+        <path d="M120 110 Q150 130 180 110 L175 75 Q150 65 125 75Z" fill="#00f5c433" stroke="#00f5c4" stroke-width="1.5"/>
+        <!-- Head / beak -->
+        <circle cx="150" cy="58" r="12" fill="#00f5c422" stroke="#00f5c4" stroke-width="1.5"/>
+        <path d="M150 52 L158 58 L150 64Z" fill="#00f5c4"/>
+        <!-- Tail feather streams — code lines -->
+        <path d="M130 108 L110 135" stroke="#00f5c488" stroke-width="1" stroke-dasharray="3 2"/>
+        <path d="M150 112 L150 138" stroke="#00f5c488" stroke-width="1" stroke-dasharray="3 2"/>
+        <path d="M170 108 L190 135" stroke="#00f5c488" stroke-width="1" stroke-dasharray="3 2"/>
+      </g>
+
+      <!-- Japanese kanji-ish mark inside circle — stylized 夢 (dream) -->
+      <text x="150" y="62" text-anchor="middle" font-family="Noto Sans JP,sans-serif" font-size="10" fill="#00f5c4" font-weight="700">夢</text>
+
+      <text x="150" y="143" text-anchor="middle" font-family="Exo 2,sans-serif" font-size="16" font-weight="700" fill="url(#g2a)" letter-spacing="5">YUMESORAI</text>
+      <text x="150" y="152" text-anchor="middle" font-family="Noto Sans JP,sans-serif" font-size="6.5" fill="#00f5c466" letter-spacing="2">ゆめそらい • MODERNISATION</text>
+    </svg>
+    <span class="badge">Concept 02 — Rising Phoenix Dream</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 3: CODE ARROW / TRANSFORMATION (Red)      -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c3">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g3a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff6b6b"/>
+          <stop offset="100%" stop-color="#ffb347"/>
+        </linearGradient>
+        <filter id="glow3"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Code snippets fading left to right -->
+      <g font-family="Share Tech Mono,monospace" font-size="7.5" fill="#ff6b6b55">
+        <text x="8" y="35">PERFORM PROCESS-DATA</text>
+        <text x="8" y="47">  MOVE WS-INPUT TO WS-OUT</text>
+        <text x="8" y="59">  COMPUTE WS-TOTAL</text>
+        <text x="8" y="71">    = WS-AMT * 1.18</text>
+        <text x="8" y="83">END-PERFORM.</text>
+        <text x="8" y="95">STOP RUN.</text>
+      </g>
+
+      <!-- Gradient overlay mask to fade text -->
+      <rect x="8" y="28" width="120" height="75" fill="url(#fadeL3)"/>
+      <defs>
+        <linearGradient id="fadeL3" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1a0d0a" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#1a0d0a" stop-opacity="1"/>
+        </linearGradient>
+      </defs>
+
+      <!-- Big arrow -->
+      <g filter="url(#glow3)">
+        <path d="M118 65 L168 40 L158 65 L230 65 L158 65 L168 90 Z" fill="url(#g3a)" opacity="0.9"/>
+      </g>
+
+      <!-- New Java/Angular code fading in right -->
+      <defs>
+        <linearGradient id="fadeR3" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#1a0d0a" stop-opacity="1"/>
+          <stop offset="40%" stop-color="#1a0d0a" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g font-family="Share Tech Mono,monospace" font-size="7.5" fill="#ffb34788">
+        <text x="180" y="35">@Service</text>
+        <text x="180" y="47">public class DataProcessor {</text>
+        <text x="180" y="59">  @Autowired</text>
+        <text x="180" y="71">  private Repo repo;</text>
+        <text x="180" y="83">  public void process(){</text>
+        <text x="180" y="95">  }</text>
+      </g>
+      <rect x="180" y="28" width="115" height="75" fill="url(#fadeR3)"/>
+
+      <text x="150" y="120" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="26" fill="url(#g3a)" letter-spacing="8">YUMESORAI</text>
+      <text x="150" y="132" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6" fill="#ff6b6b66" letter-spacing="3">LEGACY TO MODERN · FAST</text>
+    </svg>
+    <span class="badge">Concept 03 — Code Transformation</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 4: HEXAGON CORE / TECH NODE (Cyan)        -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c4">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g4a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00c8ff"/>
+          <stop offset="100%" stop-color="#0084ff"/>
+        </linearGradient>
+        <filter id="glow4"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Hexagons cluster -->
+      <!-- Center large hex -->
+      <g filter="url(#glow4)" transform="translate(95,75)">
+        <polygon points="0,-38 33,-19 33,19 0,38 -33,19 -33,-19" fill="#00c8ff11" stroke="#00c8ff" stroke-width="2"/>
+        <!-- Inner hex -->
+        <polygon points="0,-22 19,-11 19,11 0,22 -19,11 -19,-11" fill="#00c8ff22" stroke="#00c8ff88" stroke-width="1.5"/>
+        <!-- Core dot + letter Y -->
+        <text x="0" y="8" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="18" font-weight="900" fill="#00c8ff">Y</text>
+      </g>
+
+      <!-- Satellite hexagons -->
+      <g fill="#0084ff11" stroke="#0084ff" stroke-width="1.2">
+        <polygon transform="translate(95,75) translate(0,-58)" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8"/>
+        <polygon transform="translate(95,75) translate(50,-29)" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8"/>
+        <polygon transform="translate(95,75) translate(50,29)" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8"/>
+        <polygon transform="translate(95,75) translate(0,58)" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8"/>
+        <polygon transform="translate(95,75) translate(-50,29)" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8"/>
+        <polygon transform="translate(95,75) translate(-50,-29)" points="0,-16 14,-8 14,8 0,16 -14,8 -14,-8"/>
+      </g>
+      <!-- Connection lines from center to satellites -->
+      <g stroke="#00c8ff44" stroke-width="1" fill="none">
+        <line x1="95" y1="37" x2="95" y2="17"/>
+        <line x1="127" y1="56" x2="141" y2="46"/>
+        <line x1="127" y1="94" x2="141" y2="104"/>
+        <line x1="95" y1="113" x2="95" y2="133"/>
+        <line x1="63" y1="94" x2="49" y2="104"/>
+        <line x1="63" y1="56" x2="49" y2="46"/>
+      </g>
+      <!-- Small dots at satellite centers -->
+      <g fill="#00c8ff88">
+        <circle cx="95" cy="17" r="3"/>
+        <circle cx="145" cy="46" r="3"/>
+        <circle cx="145" cy="104" r="3"/>
+        <circle cx="95" cy="133" r="3"/>
+        <circle cx="45" cy="104" r="3"/>
+        <circle cx="45" cy="46" r="3"/>
+      </g>
+
+      <!-- Right side: text block -->
+      <g>
+        <text x="175" y="62" font-family="Orbitron,sans-serif" font-size="20" font-weight="900" fill="url(#g4a)" letter-spacing="2">YUME</text>
+        <text x="175" y="84" font-family="Orbitron,sans-serif" font-size="20" font-weight="900" fill="#0084ff" letter-spacing="2">SORAI</text>
+        <line x1="175" y1="90" x2="295" y2="90" stroke="#00c8ff33" stroke-width="1"/>
+        <text x="175" y="100" font-family="Chakra Petch,sans-serif" font-size="7" fill="#00c8ff66" letter-spacing="2.5">TECH MODERNISATION</text>
+        <text x="175" y="111" font-family="Chakra Petch,sans-serif" font-size="7" fill="#0084ff66" letter-spacing="2.5">COBOL · JAVA · ANGULAR</text>
+      </g>
+    </svg>
+    <span class="badge">Concept 04 — Hexagon Node Network</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 5: INFINITY EVOLUTION (Violet/Magenta)    -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c5">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g5a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#d463ff"/>
+          <stop offset="50%" stop-color="#7b61ff"/>
+          <stop offset="100%" stop-color="#ff63a5"/>
+        </linearGradient>
+        <filter id="glow5"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Lemniscate / infinity ∞ as tech evolution symbol -->
+      <g filter="url(#glow5)" transform="translate(150,72)">
+        <!-- Infinity outline -->
+        <path d="M-55 0 Q-55,-40 -20,-40 Q20,-40 0,0 Q-20,40 20,40 Q55,40 55,0 Q55,-40 20,-40 Q-20,-40 0,0 Q20,40 -20,40 Q-55,40 -55,0Z"
+              fill="none" stroke="url(#g5a)" stroke-width="3" stroke-linecap="round"/>
+        <!-- Inner glow path slight offset -->
+        <path d="M-55 0 Q-55,-40 -20,-40 Q20,-40 0,0 Q-20,40 20,40 Q55,40 55,0 Q55,-40 20,-40 Q-20,-40 0,0 Q20,40 -20,40 Q-55,40 -55,0Z"
+              fill="none" stroke="#ffffff" stroke-width="0.8" opacity="0.3"/>
+
+        <!-- Left circle fill - OLD tech (faded) -->
+        <circle cx="-27" cy="0" r="22" fill="#7b61ff18"/>
+        <text x="-27" y="5" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="9" fill="#7b61ff88">COBOL</text>
+
+        <!-- Right circle fill - NEW tech (bright) -->
+        <circle cx="27" cy="0" r="22" fill="#d463ff22"/>
+        <text x="27" y="5" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="9" fill="#d463ff">JAVA</text>
+
+        <!-- Center node -->
+        <circle cx="0" cy="0" r="5" fill="url(#g5a)"/>
+        <!-- Orbiting dot -->
+        <circle cx="0" cy="-38" r="4" fill="#ff63a5"/>
+        <circle cx="0" cy="38" r="4" fill="#7b61ff"/>
+      </g>
+
+      <text x="150" y="128" text-anchor="middle" font-family="Cinzel,serif" font-size="17" font-weight="700" fill="url(#g5a)" letter-spacing="6">YUMESORAI</text>
+      <text x="150" y="140" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6.5" fill="#d463ff55" letter-spacing="3">∞ CONTINUOUS MODERNISATION ∞</text>
+    </svg>
+    <span class="badge">Concept 05 — Infinity Evolution</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 6: GEOMETRIC ORIGAMI / PAPER CRANE (Aqua) -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c6">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g6a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#00e5ff"/>
+          <stop offset="100%" stop-color="#0099cc"/>
+        </linearGradient>
+        <linearGradient id="g6b" x1="100%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#00e5ff55"/>
+          <stop offset="100%" stop-color="#0099cc22"/>
+        </linearGradient>
+        <filter id="glow6"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Geometric origami crane / paper bird (tech symbol) -->
+      <g transform="translate(90,75)" filter="url(#glow6)">
+        <!-- Body -->
+        <polygon points="0,-50 40,0 0,30 -40,0" fill="url(#g6b)" stroke="#00e5ff" stroke-width="1.8"/>
+        <!-- Internal fold lines -->
+        <line x1="0" y1="-50" x2="0" y2="30" stroke="#00e5ff44" stroke-width="1"/>
+        <line x1="-40" y1="0" x2="40" y2="0" stroke="#00e5ff44" stroke-width="1"/>
+        <!-- Left wing -->
+        <polygon points="-40,0 -80,-20 -60,25" fill="#00e5ff22" stroke="#00e5ff88" stroke-width="1.5"/>
+        <line x1="-40" y1="0" x2="-70" y2="3" stroke="#00e5ff44" stroke-width="1"/>
+        <!-- Right wing -->
+        <polygon points="40,0 80,-20 60,25" fill="#00e5ff11" stroke="#00e5ff66" stroke-width="1.5"/>
+        <line x1="40" y1="0" x2="70" y2="3" stroke="#00e5ff33" stroke-width="1"/>
+        <!-- Tail -->
+        <polygon points="0,30 -20,55 20,55" fill="#0099cc33" stroke="#0099cc88" stroke-width="1.5"/>
+        <!-- Head -->
+        <circle cx="0" cy="-50" r="7" fill="#00e5ff22" stroke="#00e5ff" stroke-width="1.5"/>
+        <circle cx="0" cy="-50" r="2.5" fill="#00e5ff"/>
+        <!-- Small "Y" mark on body -->
+        <text x="0" y="5" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="10" font-weight="900" fill="#00e5ff">YS</text>
+      </g>
+
+      <text x="220" y="55" font-family="Chakra Petch,sans-serif" font-size="19" font-weight="700" fill="url(#g6a)" letter-spacing="2">YUME</text>
+      <text x="220" y="77" font-family="Chakra Petch,sans-serif" font-size="19" font-weight="700" fill="#0099cc" letter-spacing="2">SORAI</text>
+      <line x1="220" y1="83" x2="295" y2="83" stroke="#00e5ff33" stroke-width="0.8"/>
+      <text x="220" y="94" font-family="Share Tech Mono,monospace" font-size="6.5" fill="#00e5ff55" letter-spacing="1.5">MODERNISE. ELEVATE.</text>
+      <text x="220" y="105" font-family="Share Tech Mono,monospace" font-size="6.5" fill="#0099cc55" letter-spacing="1.5">TRANSFORM.</text>
+    </svg>
+    <span class="badge">Concept 06 — Origami Crane</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 7: SUNRISE / HORIZON (Gold)               -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c7">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g7a" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#f59e0b"/>
+          <stop offset="60%" stop-color="#fde047"/>
+          <stop offset="100%" stop-color="#fff7a0"/>
+        </linearGradient>
+        <linearGradient id="g7sky" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#131309"/>
+          <stop offset="100%" stop-color="#1a180a"/>
+        </linearGradient>
+        <radialGradient id="g7sun" cx="50%" cy="50%">
+          <stop offset="0%" stop-color="#fde047" stop-opacity="1"/>
+          <stop offset="60%" stop-color="#f59e0b" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/>
+        </radialGradient>
+        <filter id="glow7"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <clipPath id="clip7"><rect x="0" y="0" width="300" height="150"/></clipPath>
+      </defs>
+
+      <!-- Sky BG -->
+      <rect width="300" height="150" fill="url(#g7sky)"/>
+
+      <!-- Horizon line grid (code grid) -->
+      <g stroke="#f59e0b18" stroke-width="0.8" clip-path="url(#clip7)">
+        <!-- Horizontal lines converging to vanishing point -->
+        <line x1="0" y1="100" x2="300" y2="100"/>
+        <line x1="30" y1="108" x2="270" y2="108"/>
+        <line x1="60" y1="115" x2="240" y2="115"/>
+        <line x1="90" y1="122" x2="210" y2="122"/>
+        <line x1="110" y1="130" x2="190" y2="130"/>
+        <!-- Vertical lines converging -->
+        <line x1="150" y1="100" x2="150" y2="150"/>
+        <line x1="100" y1="100" x2="80" y2="150"/>
+        <line x1="200" y1="100" x2="220" y2="150"/>
+        <line x1="60" y1="100" x2="20" y2="150"/>
+        <line x1="240" y1="100" x2="280" y2="150"/>
+      </g>
+
+      <!-- Sun rising at horizon -->
+      <g filter="url(#glow7)">
+        <circle cx="150" cy="100" r="35" fill="url(#g7sun)"/>
+        <circle cx="150" cy="100" r="20" fill="none" stroke="#fde047" stroke-width="2"/>
+        <circle cx="150" cy="100" r="12" fill="#fde04788"/>
+      </g>
+
+      <!-- Sun rays -->
+      <g stroke="#fde047" stroke-width="1.5" opacity="0.6" filter="url(#glow7)">
+        <line x1="150" y1="62" x2="150" y2="52"/>
+        <line x1="175" y1="75" x2="183" y2="67"/>
+        <line x1="184" y1="100" x2="194" y2="100"/>
+        <line x1="125" y1="75" x2="117" y2="67"/>
+        <line x1="116" y1="100" x2="106" y2="100"/>
+        <line x1="170" y1="68" x2="176" y2="60"/>
+        <line x1="130" y1="68" x2="124" y2="60"/>
+      </g>
+
+      <!-- Horizon line (bright) -->
+      <line x1="0" y1="100" x2="300" y2="100" stroke="url(#g7a)" stroke-width="1.5"/>
+
+      <!-- Company name over horizon -->
+      <text x="150" y="96" text-anchor="middle" font-family="Cinzel,serif" font-size="8" font-weight="400" fill="#fde047aa" letter-spacing="6">TECHNOLOGY MODERNISATION</text>
+      <text x="150" y="125" text-anchor="middle" font-family="Bebas Neue,sans-serif" font-size="30" fill="url(#g7a)" letter-spacing="10">YUMESORAI</text>
+      <text x="150" y="140" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6" fill="#f59e0b55" letter-spacing="4">夢空来 — DREAM · SKY · ARRIVAL</text>
+    </svg>
+    <span class="badge">Concept 07 — Sunrise Horizon</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 8: DNA HELIX / EVOLUTION (Green)          -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c8">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g8a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#44ff99"/>
+          <stop offset="100%" stop-color="#00cc66"/>
+        </linearGradient>
+        <filter id="glow8"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- DNA-like double helix (old code → new code strands) -->
+      <g transform="translate(80,75)" filter="url(#glow8)">
+        <!-- Strand 1 (green — new) -->
+        <path d="M-60,-55 C-30,-55 30,-35 60,-35 S150,-15 180,-15" fill="none" stroke="#44ff99" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M-60,55 C-30,55 30,35 60,35 S150,15 180,15" fill="none" stroke="#44ff99" stroke-width="2.5" stroke-linecap="round"/>
+        <!-- Strand 2 (faded — old COBOL) -->
+        <path d="M-60,-35 C-30,-35 30,-55 60,-55 S150,-75 180,-75" fill="none" stroke="#44ff9944" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 3"/>
+        <path d="M-60,35 C-30,35 30,55 60,55 S150,75 180,75" fill="none" stroke="#44ff9944" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="5 3"/>
+
+        <!-- Cross rungs (base pairs = transformation steps) -->
+        <g stroke="#44ff9966" stroke-width="1.5">
+          <line x1="-50" y1="-45" x2="-50" y2="-38"/>
+          <line x1="-20" y1="-53" x2="-20" y2="53"/>
+          <line x1="10" y1="-50" x2="10" y2="50"/>
+          <line x1="40" y1="-43" x2="40" y2="43"/>
+          <line x1="70" y1="-36" x2="70" y2="36"/>
+          <line x1="100" y1="-30" x2="100" y2="30"/>
+          <line x1="130" y1="-23" x2="130" y2="23"/>
+          <line x1="160" y1="-16" x2="160" y2="16"/>
+        </g>
+
+        <!-- Nodes on strand 1 -->
+        <g fill="#44ff99">
+          <circle cx="-60" cy="-55" r="5"/>
+          <circle cx="-20" cy="-53" r="4"/>
+          <circle cx="20" cy="-48" r="4"/>
+          <circle cx="60" cy="-35" r="4"/>
+          <circle cx="100" cy="-25" r="4"/>
+          <circle cx="140" cy="-18" r="4"/>
+          <circle cx="180" cy="-15" r="5"/>
+        </g>
+
+        <!-- Tech labels on nodes -->
+        <g font-family="Share Tech Mono,monospace" font-size="6.5" fill="#44ff9988">
+          <text x="-64" y="-60">CBL</text>
+          <text x="176" y="-20">JAVA</text>
+        </g>
+      </g>
+
+      <!-- Right text -->
+      <text x="148" y="130" text-anchor="middle" font-family="Oxanium,sans-serif" font-size="18" font-weight="800" fill="url(#g8a)" letter-spacing="4">YUMESORAI</text>
+      <text x="148" y="143" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6.5" fill="#44ff9955" letter-spacing="2">EVOLVING CODE · EVERY STRAND</text>
+    </svg>
+    <span class="badge">Concept 08 — DNA Code Evolution</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 9: TORII GATE / JAPANESE PORTAL (Pink)   -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c9">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g9a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ff63a5"/>
+          <stop offset="100%" stop-color="#ff8c42"/>
+        </linearGradient>
+        <radialGradient id="g9glow" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="#ff63a522"/>
+          <stop offset="100%" stop-color="transparent"/>
+        </radialGradient>
+        <filter id="glow9"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Torii Gate (Japanese portal = passage from old to new) -->
+      <g transform="translate(90,75)" filter="url(#glow9)">
+        <!-- Outer crossbeam (curved top) -->
+        <path d="M-65,-55 Q0,-75 65,-55" fill="none" stroke="url(#g9a)" stroke-width="7" stroke-linecap="round"/>
+        <!-- Inner crossbeam -->
+        <line x1="-52" y1="-35" x2="52" y2="-35" stroke="url(#g9a)" stroke-width="5"/>
+        <!-- Left pillar -->
+        <line x1="-45" y1="-45" x2="-45" y2="55" stroke="#ff63a5" stroke-width="5" stroke-linecap="round"/>
+        <!-- Right pillar -->
+        <line x1="45" y1="-45" x2="45" y2="55" stroke="#ff63a5" stroke-width="5" stroke-linecap="round"/>
+        <!-- Leg bases -->
+        <line x1="-50" y1="55" x2="-40" y2="55" stroke="#ff8c42" stroke-width="4" stroke-linecap="round"/>
+        <line x1="40" y1="55" x2="50" y2="55" stroke="#ff8c42" stroke-width="4" stroke-linecap="round"/>
+
+        <!-- Path through gate = digital portal glow -->
+        <ellipse cx="0" cy="5" rx="30" ry="40" fill="url(#g9glow)"/>
+
+        <!-- Kanji inside gate -->
+        <text x="0" y="-8" text-anchor="middle" font-family="Noto Sans JP,sans-serif" font-size="14" font-weight="700" fill="#ff63a5cc">夢</text>
+        <text x="0" y="12" text-anchor="middle" font-family="Noto Sans JP,sans-serif" font-size="14" font-weight="700" fill="#ff8c42cc">空</text>
+
+        <!-- Hanging lantern shapes = code blocks -->
+        <rect x="-8" y="-68" width="16" height="10" rx="3" fill="#ff63a533" stroke="#ff63a5" stroke-width="1"/>
+        <line x1="0" y1="-58" x2="0" y2="-48" stroke="#ff63a577" stroke-width="1"/>
+      </g>
+
+      <!-- Text right side -->
+      <text x="200" y="53" font-family="Exo 2,sans-serif" font-size="20" font-weight="700" font-style="italic" fill="url(#g9a)" letter-spacing="1">YUME</text>
+      <text x="200" y="77" font-family="Exo 2,sans-serif" font-size="20" font-weight="700" font-style="italic" fill="#ff8c42" letter-spacing="1">SORAI</text>
+      <line x1="200" y1="83" x2="292" y2="83" stroke="#ff63a533" stroke-width="0.8"/>
+      <text x="200" y="93" font-family="Noto Sans JP,sans-serif" font-size="7" fill="#ff63a555" letter-spacing="2">夢空来 · ゆめそらい</text>
+      <text x="200" y="106" font-family="Share Tech Mono,monospace" font-size="6" fill="#ff8c4244" letter-spacing="1.5">OPEN THE GATE TO MODERN</text>
+    </svg>
+    <span class="badge">Concept 09 — Torii Gate Portal</span>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- LOGO 10: HOLOGRAPHIC MONOGRAM (Sky Blue)       -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div class="logo-card c10">
+    <svg viewBox="0 0 300 150" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="g10a" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#63d4ff"/>
+          <stop offset="50%" stop-color="#7b61ff"/>
+          <stop offset="100%" stop-color="#ff63a5"/>
+        </linearGradient>
+        <linearGradient id="g10b" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#63d4ff"/>
+          <stop offset="100%" stop-color="#7b61ff"/>
+        </linearGradient>
+        <filter id="glow10"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        <filter id="glow10s"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+      </defs>
+
+      <!-- Holographic "Y" monogram with stacked/glitched layers -->
+      <g transform="translate(75,75)">
+        <!-- Shadow/glitch layers -->
+        <text x="3" y="28" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="72" font-weight="900" fill="#ff63a5" opacity="0.2">Y</text>
+        <text x="-3" y="22" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="72" font-weight="900" fill="#63d4ff" opacity="0.2">Y</text>
+        <!-- Main "Y" -->
+        <text x="0" y="25" text-anchor="middle" font-family="Orbitron,sans-serif" font-size="72" font-weight="900" fill="url(#g10a)" filter="url(#glow10)">Y</text>
+        <!-- Scan lines over letter -->
+        <g stroke="#63d4ff" stroke-width="0.4" opacity="0.15">
+          <line x1="-35" y1="-45" x2="35" y2="-45"/>
+          <line x1="-35" y1="-35" x2="35" y2="-35"/>
+          <line x1="-35" y1="-25" x2="35" y2="-25"/>
+          <line x1="-38" y1="-15" x2="38" y2="-15"/>
+          <line x1="-38" y1="-5" x2="38" y2="-5"/>
+          <line x1="-38" y1="5" x2="38" y2="5"/>
+          <line x1="-38" y1="15" x2="38" y2="15"/>
+          <line x1="-28" y1="25" x2="28" y2="25"/>
+        </g>
+        <!-- Corner brackets (tech feel) -->
+        <g stroke="#63d4ff" stroke-width="1.5" fill="none" filter="url(#glow10s)">
+          <path d="M-42,-48 L-42,-55 L-35,-55"/>
+          <path d="M42,-48 L42,-55 L35,-55"/>
+          <path d="M-42,38 L-42,45 L-35,45"/>
+          <path d="M42,38 L42,45 L35,45"/>
+        </g>
+      </g>
+
+      <!-- Right side text block -->
+      <g>
+        <text x="160" y="52" font-family="Orbitron,sans-serif" font-size="13" font-weight="900" fill="url(#g10b)" letter-spacing="4">YUME</text>
+        <text x="160" y="68" font-family="Orbitron,sans-serif" font-size="13" font-weight="900" fill="#7b61ff" letter-spacing="4">SORAI</text>
+        <!-- Animated looking separator -->
+        <rect x="160" y="73" width="130" height="1.5" fill="url(#g10a)" rx="1"/>
+        <text x="160" y="86" font-family="Chakra Petch,sans-serif" font-size="7" fill="#63d4ff77" letter-spacing="2">COBOL → JAVA</text>
+        <text x="160" y="97" font-family="Chakra Petch,sans-serif" font-size="7" fill="#7b61ff77" letter-spacing="2">ANGULARJS → ANGULAR</text>
+        <text x="160" y="108" font-family="Chakra Petch,sans-serif" font-size="7" fill="#ff63a577" letter-spacing="2">LEGACY → MODERN</text>
+        <!-- Small holographic badge -->
+        <rect x="160" y="115" width="70" height="16" rx="8" fill="#63d4ff11" stroke="url(#g10a)" stroke-width="0.8"/>
+        <text x="195" y="126" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6.5" fill="url(#g10a)">PVT. LTD.</text>
+      </g>
+
+      <!-- Bottom tagline -->
+      <text x="150" y="145" text-anchor="middle" font-family="Share Tech Mono,monospace" font-size="6" fill="#63d4ff33" letter-spacing="4">BENGALURU · INDIA</text>
+    </svg>
+    <span class="badge">Concept 10 — Holographic Monogram</span>
+  </div>
+
+</div>
+
+<footer style="text-align:center;margin-top:60px;padding-bottom:40px;font-family:'Share Tech Mono',monospace;font-size:0.7rem;color:#333;letter-spacing:0.2em;text-transform:uppercase;">
+  Yumesorai Pvt. Ltd. — 10 Logo Concepts — Technology Modernisation
+</footer>
+
+</body>
+</html>

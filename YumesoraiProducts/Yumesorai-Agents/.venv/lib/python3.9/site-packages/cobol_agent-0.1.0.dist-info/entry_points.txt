@@ -1,0 +1,2 @@
+[console_scripts]
+cobol-agent = cobol_agent.cli:main

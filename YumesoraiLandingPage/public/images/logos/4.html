@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Space+Grotesk:wght@300;400;600;700&family=Rajdhani:wght@300;400;600;700&family=Exo+2:wght@100;400;700;900&family=Syne:wght@400;700;800&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0a0a0f;color:#fff;font-family:'Space Grotesk',sans-serif;padding:20px;}
+h1{text-align:center;font-family:'Syne',sans-serif;font-size:14px;color:#555;letter-spacing:6px;text-transform:uppercase;margin-bottom:30px;padding-bottom:16px;border-bottom:1px solid #1a1a2e;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;}
+.card{background:#0f0f1a;border:1px solid #1a1a2e;border-radius:12px;padding:32px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;position:relative;overflow:hidden;transition:border-color .3s;}
+.card:hover{border-color:#333360;}
+.card-label{position:absolute;bottom:10px;right:14px;font-size:9px;color:#333;letter-spacing:2px;text-transform:uppercase;}
+
+/* Logo 1: Circuit Metamorphosis */
+.logo1{display:flex;align-items:center;gap:16px;}
+.logo1 svg{width:56px;height:56px;}
+.logo1-text{display:flex;flex-direction:column;}
+.logo1-name{font-family:'Orbitron',sans-serif;font-size:20px;font-weight:700;background:linear-gradient(135deg,#00d4ff,#7b2fff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:2px;}
+.logo1-tag{font-family:'Rajdhani',sans-serif;font-size:10px;color:#444;letter-spacing:4px;text-transform:uppercase;margin-top:2px;}
+
+/* Logo 2: Waveform Evolution */
+.logo2{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.logo2-name{font-family:'Exo 2',sans-serif;font-size:26px;font-weight:900;color:#fff;letter-spacing:8px;text-transform:uppercase;}
+.logo2-name span{color:#ff6b35;}
+.logo2-sub{font-size:8px;letter-spacing:5px;color:#444;text-transform:uppercase;}
+
+/* Logo 3: Geometric Hex */
+.logo3{display:flex;align-items:center;gap:14px;}
+.logo3-wordmark{display:flex;flex-direction:column;}
+.logo3-y{font-family:'Syne',sans-serif;font-size:48px;font-weight:800;color:#22c55e;line-height:1;}
+.logo3-rest{font-family:'Syne',sans-serif;font-size:13px;font-weight:400;color:#888;letter-spacing:3px;text-transform:uppercase;}
+
+/* Logo 4: Data Stream */
+.logo4{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.logo4-badge{background:linear-gradient(90deg,#ff6b35,#f7b731);padding:3px 12px;border-radius:2px;}
+.logo4-badge span{font-family:'Rajdhani',sans-serif;font-size:8px;font-weight:700;letter-spacing:4px;color:#000;}
+.logo4-name{font-family:'Orbitron',sans-serif;font-size:22px;font-weight:400;color:#fff;letter-spacing:4px;}
+
+/* Logo 5: Minimal Arrow */
+.logo5{display:flex;align-items:center;gap:0;}
+.logo5-icon{width:36px;height:36px;display:flex;align-items:center;justify-content:center;}
+.logo5-name{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#fff;}
+.logo5-name em{font-style:normal;color:#6366f1;}
+
+/* Logo 6: Dual Layer */
+.logo6{display:flex;flex-direction:column;align-items:center;}
+.logo6-top{font-family:'Exo 2',sans-serif;font-size:11px;font-weight:100;letter-spacing:10px;color:#555;text-transform:uppercase;margin-bottom:4px;}
+.logo6-main{font-family:'Rajdhani',sans-serif;font-size:36px;font-weight:700;color:#fff;letter-spacing:6px;text-transform:uppercase;line-height:1;}
+.logo6-line{width:100%;height:1px;background:linear-gradient(90deg,transparent,#ff6b35,transparent);margin:6px 0;}
+.logo6-bottom{font-size:8px;letter-spacing:6px;color:#444;text-transform:uppercase;}
+
+/* Logo 7: Neon Bracket */
+.logo7{display:flex;align-items:center;gap:0;}
+.logo7-bracket{font-family:'Orbitron',sans-serif;font-size:32px;font-weight:400;color:#00ff87;line-height:1;}
+.logo7-inner{display:flex;flex-direction:column;align-items:center;padding:0 6px;}
+.logo7-name{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:600;color:#fff;letter-spacing:3px;}
+.logo7-ver{font-size:8px;color:#00ff87;letter-spacing:3px;text-transform:uppercase;}
+
+/* Logo 8: Split Halves */
+.logo8{display:flex;flex-direction:column;align-items:center;gap:2px;}
+.logo8-row{display:flex;align-items:baseline;gap:4px;}
+.logo8-old{font-family:'Exo 2',sans-serif;font-size:14px;font-weight:100;color:#555;letter-spacing:3px;text-decoration:line-through;text-decoration-color:#ff4444;}
+.logo8-arrow{color:#ff6b35;font-size:16px;margin:0 6px;}
+.logo8-new{font-family:'Exo 2',sans-serif;font-size:14px;font-weight:700;color:#00d4ff;letter-spacing:3px;}
+.logo8-name{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#fff;letter-spacing:2px;}
+.logo8-tagline{font-size:8px;letter-spacing:4px;color:#444;text-transform:uppercase;}
+
+/* Logo 9: Circular badge */
+.logo9{display:flex;flex-direction:column;align-items:center;gap:12px;}
+.logo9 svg{width:80px;height:80px;}
+.logo9-name{font-family:'Orbitron',sans-serif;font-size:14px;font-weight:700;letter-spacing:4px;color:#fff;}
+
+/* Logo 10: Full text treatment */
+.logo10{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.logo10-name{font-family:'Rajdhani',sans-serif;font-size:38px;font-weight:700;color:#fff;letter-spacing:8px;text-transform:uppercase;position:relative;}
+.logo10-name::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:2px;background:linear-gradient(90deg,#6366f1,#00d4ff,#6366f1);}
+.logo10-stack{display:flex;gap:8px;margin-top:8px;}
+.logo10-chip{padding:2px 8px;border:1px solid;border-radius:2px;font-size:8px;letter-spacing:2px;text-transform:uppercase;}
+.logo10-chip.old{border-color:#555;color:#555;}
+.logo10-chip.arr{border-color:transparent;color:#ff6b35;font-size:12px;letter-spacing:0;}
+.logo10-chip.nw{border-color:#6366f1;color:#6366f1;}
+
+/* Animation: pulse glow on logo9 */
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.blink{animation:blink 1.8s ease-in-out infinite;}
+
+/* Full-width card for logo 8 */
+.full-width{grid-column:1/-1;}
+</style>
+</head>
+<body>
+<h1>Yumesorai — Logo Concepts</h1>
+<div class="grid">
+
+<!-- LOGO 1: Circuit Metamorphosis -->
+<div class="card">
+  <div class="logo1">
+    <svg viewBox="0 0 56 56" fill="none">
+      <!-- Old circuit node -->
+      <rect x="2" y="20" width="12" height="12" rx="2" stroke="#555" stroke-width="1.5" fill="none"/>
+      <line x1="14" y1="26" x2="22" y2="26" stroke="#555" stroke-width="1.5"/>
+      <!-- Transform arrow -->
+      <polyline points="22,20 30,26 22,32" fill="none" stroke="url(#lg1)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+      <!-- New circuit node -->
+      <circle cx="44" cy="26" r="8" fill="none" stroke="url(#lg1)" stroke-width="1.5"/>
+      <circle cx="44" cy="26" r="3" fill="url(#lg1)"/>
+      <!-- Connecting lines -->
+      <line x1="32" y1="26" x2="36" y2="26" stroke="url(#lg1)" stroke-width="1.5"/>
+      <!-- Extra circuit detail -->
+      <line x1="2" y1="14" x2="8" y2="14" stroke="#333" stroke-width="1"/>
+      <line x1="8" y1="14" x2="8" y2="20" stroke="#333" stroke-width="1"/>
+      <line x1="2" y1="38" x2="8" y2="38" stroke="#333" stroke-width="1"/>
+      <line x1="8" y1="32" x2="8" y2="38" stroke="#333" stroke-width="1"/>
+      <defs>
+        <linearGradient id="lg1" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#00d4ff"/>
+          <stop offset="100%" stop-color="#7b2fff"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="logo1-text">
+      <div class="logo1-name">YUMESORAI</div>
+      <div class="logo1-tag">Technology Modernization</div>
+    </div>
+  </div>
+  <div class="card-label">01 — CIRCUIT</div>
+</div>
+
+<!-- LOGO 2: Waveform Evolution -->
+<div class="card">
+  <div class="logo2">
+    <svg width="200" height="32" viewBox="0 0 200 32" fill="none">
+      <!-- Old flat line (legacy) -->
+      <polyline points="0,16 14,16 20,6 26,26 32,6 38,26 44,16 58,16" stroke="#444" stroke-width="1.5" fill="none"/>
+      <!-- Transition zone -->
+      <line x1="60" y1="16" x2="76" y2="16" stroke="url(#lg2)" stroke-width="1.5" stroke-dasharray="3,3"/>
+      <!-- New smooth wave (modern) -->
+      <path d="M78,16 Q86,4 96,16 Q106,28 116,16 Q126,4 136,16 Q146,28 156,16" stroke="url(#lg2)" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <defs>
+        <linearGradient id="lg2" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#555"/>
+          <stop offset="100%" stop-color="#ff6b35"/>
+        </linearGradient>
+      </defs>
+    </svg>
+    <div class="logo2-name">YUME<span>SORAI</span></div>
+    <div class="logo2-sub">From legacy · To future</div>
+  </div>
+  <div class="card-label">02 — WAVEFORM</div>
+</div>
+
+<!-- LOGO 3: Green Initial + Wordmark -->
+<div class="card">
+  <div class="logo3">
+    <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+      <polygon points="32,4 60,20 60,44 32,60 4,44 4,20" fill="none" stroke="#22c55e" stroke-width="1.5"/>
+      <polygon points="32,12 52,24 52,40 32,52 12,40 12,24" fill="none" stroke="#22c55e" stroke-width="1" opacity="0.3"/>
+      <text x="32" y="42" text-anchor="middle" font-family="Syne,sans-serif" font-size="26" font-weight="800" fill="#22c55e">Y</text>
+    </svg>
+    <div class="logo3-wordmark">
+      <div class="logo3-y">umesorai</div>
+      <div class="logo3-rest">Modernise · Evolve · Lead</div>
+    </div>
+  </div>
+  <div class="card-label">03 — HEX MARK</div>
+</div>
+
+<!-- LOGO 4: Data Stream Badge -->
+<div class="card">
+  <div class="logo4">
+    <div class="logo4-badge"><span>Tech Modernization</span></div>
+    <div class="logo4-name">YUMESORAI</div>
+    <svg width="180" height="10" viewBox="0 0 180 10" fill="none">
+      <line x1="0" y1="5" x2="60" y2="5" stroke="#333" stroke-width="1"/>
+      <rect x="62" y="1" width="8" height="8" rx="1" fill="#ff6b35"/>
+      <rect x="74" y="2" width="6" height="6" rx="1" fill="#f7b731"/>
+      <rect x="84" y="3" width="4" height="4" rx="1" fill="#fff" opacity=".5"/>
+      <line x1="92" y1="5" x2="180" y2="5" stroke="#333" stroke-width="1"/>
+    </svg>
+  </div>
+  <div class="card-label">04 — BADGE STREAM</div>
+</div>
+
+<!-- LOGO 5: Minimal Arrow + Color Accent -->
+<div class="card">
+  <div class="logo5">
+    <div class="logo5-icon">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <!-- Backward-looking square (legacy) -->
+        <rect x="1" y="8" width="14" height="14" rx="2" fill="none" stroke="#444" stroke-width="1.5"/>
+        <!-- Forward arrow + modern circle -->
+        <path d="M17,15 L28,15 M24,11 L28,15 L24,19" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="30" cy="28" r="5" fill="#6366f1"/>
+        <path d="M28,28 L30,30 L33,26" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="logo5-name">yume<em>sorai</em></div>
+  </div>
+  <div class="card-label">05 — MINIMAL</div>
+</div>
+
+<!-- LOGO 6: Dual Layer Rule -->
+<div class="card">
+  <div class="logo6">
+    <div class="logo6-top">pvt ltd · est. 2024</div>
+    <div class="logo6-main">YUMESORAI</div>
+    <div class="logo6-line"></div>
+    <div class="logo6-bottom">Bridging Yesterday's Code to Tomorrow's Architecture</div>
+  </div>
+  <div class="card-label">06 — DUAL LAYER</div>
+</div>
+
+<!-- LOGO 7: Neon Bracket -->
+<div class="card">
+  <div class="logo7">
+    <div class="logo7-bracket">[</div>
+    <div class="logo7-inner">
+      <div class="logo7-name">YUMESORAI</div>
+      <div class="logo7-ver">v∞ · modernize</div>
+    </div>
+    <div class="logo7-bracket">]</div>
+  </div>
+  <div class="card-label">07 — BRACKET CODE</div>
+</div>
+
+<!-- LOGO 8: Legacy → Future Split (Full Width) -->
+<div class="card full-width">
+  <div class="logo8">
+    <div class="logo8-row">
+      <span class="logo8-old">COBOL</span>
+      <span class="logo8-old">Angular.js</span>
+      <span class="logo8-old">Legacy</span>
+      <span class="logo8-arrow">⟶</span>
+      <span class="logo8-new">JAVA</span>
+      <span class="logo8-new">Angular</span>
+      <span class="logo8-new">Modern</span>
+    </div>
+    <div class="logo8-name">YUMESORAI</div>
+    <div class="logo8-tagline">Technology Modernization Specialists · India</div>
+  </div>
+  <div class="card-label">08 — LEGACY TO FUTURE</div>
+</div>
+
+<!-- LOGO 9: Circular Badge Mark -->
+<div class="card">
+  <div class="logo9">
+    <svg viewBox="0 0 80 80" fill="none">
+      <defs>
+        <linearGradient id="cg9" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#6366f1"/>
+          <stop offset="100%" stop-color="#00d4ff"/>
+        </linearGradient>
+      </defs>
+      <!-- Outer ring -->
+      <circle cx="40" cy="40" r="36" stroke="url(#cg9)" stroke-width="1.5" stroke-dasharray="4 2"/>
+      <!-- Inner solid -->
+      <circle cx="40" cy="40" r="28" fill="#0f0f1a" stroke="url(#cg9)" stroke-width="2"/>
+      <!-- Y lettermark -->
+      <path d="M30,24 L40,36 L50,24 M40,36 L40,52" stroke="url(#cg9)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- Transform dot -->
+      <circle cx="54" cy="22" r="4" fill="#ff6b35"/>
+      <circle class="blink" cx="54" cy="22" r="4" fill="#ff6b35" opacity="0.4"/>
+    </svg>
+    <div class="logo9-name">YUMESORAI</div>
+  </div>
+  <div class="card-label">09 — CIRCULAR MARK</div>
+</div>
+
+<!-- LOGO 10: Full Stack Treatment -->
+<div class="card">
+  <div class="logo10">
+    <div class="logo10-name">YUMESORAI</div>
+    <div class="logo10-stack">
+      <div class="logo10-chip old">COBOL</div>
+      <div class="logo10-chip arr">→</div>
+      <div class="logo10-chip nw">Java</div>
+      <span style="color:#333;font-size:10px;">|</span>
+      <div class="logo10-chip old">AngularJS</div>
+      <div class="logo10-chip arr">→</div>
+      <div class="logo10-chip nw">Angular 18</div>
+    </div>
+  </div>
+  <div class="card-label">10 — TECH STACK</div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: cobol-agent
+Version: 0.1.0
+Summary: Agentic COBOL knowledge graph builder using Claude API
+Requires-Python: >=3.9
+Requires-Dist: anthropic>=0.39.0
+Requires-Dist: click>=8.1
+Requires-Dist: pydantic>=2.0
+Requires-Dist: requests>=2.31
+Requires-Dist: python-dotenv>=1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.0; extra == "dev"
+Requires-Dist: pytest-mock>=3.12; extra == "dev"

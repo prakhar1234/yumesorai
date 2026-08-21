@@ -1,0 +1,8 @@
+# Yumesorai Security Policy
+# https://securitytxt.org/
+
+Contact: mailto:security@yumesorai.com
+Expires: 2027-05-20T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://yumesorai.com/.well-known/security.txt
+Policy: https://yumesorai.com/privacy

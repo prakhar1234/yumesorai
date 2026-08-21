@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&family=Geist+Mono:wght@300..700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #FAF9F6; }
+  ::selection { background: #FF6B6B; color: #fff; }
+  a { color: #1E1B4B; text-decoration: none; }
+  a:hover { color: #FF6B6B; }
+  @keyframes holoHue { to { filter: blur(28px) hue-rotate(360deg); } }
+  @keyframes holoHueSm { to { filter: blur(14px) hue-rotate(360deg); } }
+  @keyframes holoSheen { 0%, 55% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(260%) skewX(-18deg); } }
+</style>
+</helmet>
+
+<div style="min-height:100vh; background:#FAF9F6; color:#1E1B4B; font-family:'Geist','system-ui',sans-serif; -webkit-font-smoothing:antialiased;" data-screen-label="Home">
+
+  <!-- Header -->
+  <header style="position:sticky; top:0; z-index:50; width:100%; border-bottom:1px solid rgba(30,27,75,0.06); background:rgba(250,249,246,0.85); backdrop-filter:blur(16px);">
+    <nav style="max-width:1200px; margin:0 auto; display:flex; align-items:center; justify-content:space-between; padding:14px 32px;">
+      <a href="Home.dc.html" style="display:flex; align-items:center; gap:12px;">
+        <span style="width:38px; height:38px; border-radius:11px; background:linear-gradient(135deg,#1E1B4B,#3730A3); display:flex; align-items:center; justify-content:center; box-shadow:0 6px 18px rgba(255,107,107,0.22); border:2px solid rgba(255,107,107,0.25);">
+          <span style="color:#fff; font-weight:800; font-size:18px; letter-spacing:-0.5px;">Y</span>
+        </span>
+        <span style="font-size:19px; font-weight:700; letter-spacing:-0.4px; color:#1E1B4B;">Yumesorai</span>
+      </a>
+      <div style="display:flex; align-items:center; gap:28px;">
+        <a href="Solutions.dc.html" style="font-size:15px; font-weight:500; color:rgba(30,27,75,0.7);" style-hover="color:#1E1B4B;">Solutions</a>
+        <a href="Platform.dc.html" style="font-size:15px; font-weight:500; color:rgba(30,27,75,0.7);" style-hover="color:#1E1B4B;">Platform</a>
+        <a href="About.dc.html" style="font-size:15px; font-weight:500; color:rgba(30,27,75,0.7);" style-hover="color:#1E1B4B;">About</a>
+        <a href="About.dc.html#contact" style="border-radius:8px; background:#FF6B6B; padding:9px 18px; font-size:14px; font-weight:600; color:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.08);" style-hover="background:#E85555; color:#fff;">Request Demo</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section style="position:relative; overflow:hidden; background:linear-gradient(180deg, rgba(30,27,75,0.03), transparent);">
+    <div style="max-width:1200px; margin:0 auto; padding:64px 32px 24px; text-align:center;">
+      <p style="display:inline-flex; align-items:center; gap:8px; border:1px solid rgba(30,27,75,0.1); background:#fff; border-radius:999px; padding:10px 20px; font-size:13px; font-weight:500; color:rgba(30,27,75,0.7); box-shadow:0 1px 2px rgba(0,0,0,0.04); margin:0 0 28px;">
+        <span style="width:8px; height:8px; border-radius:999px; background:#22c55e; display:inline-block;"></span>
+        Team of engineers from Fortune 100 companies with decades of legacy code migration expertise
+      </p>
+      <h1 style="font-size:58px; line-height:1.05; font-weight:800; letter-spacing:-1.8px; margin:0 auto; max-width:880px; text-wrap:balance;">
+        Your legacy systems are holding back your next <span style="color:#FF6B6B;">breakthrough</span>
+      </h1>
+      <p style="margin:24px auto 0; max-width:640px; font-size:20px; line-height:1.5; color:rgba(30,27,75,0.6); text-wrap:balance;">
+        Yumesorai uses AI to modernize your critical enterprise systems — reducing risk by 60%, cutting costs by 40%, and delivering in months, not years.
+      </p>
+      <div style="display:flex; gap:16px; justify-content:center; margin-top:36px; flex-wrap:wrap;">
+        <a href="About.dc.html#contact" style="border-radius:8px; background:#FF6B6B; padding:14px 30px; font-size:16px; font-weight:600; color:#fff; box-shadow:0 10px 20px rgba(255,107,107,0.25);" style-hover="background:#E85555; color:#fff;">Schedule Executive Briefing</a>
+        <a href="Platform.dc.html" style="border-radius:8px; background:#fff; border:1px solid rgba(30,27,75,0.15); padding:14px 30px; font-size:16px; font-weight:600; color:#1E1B4B;" style-hover="border-color:rgba(30,27,75,0.3); color:#1E1B4B;">See How It Works</a>
+      </div>
+      <!-- Sectors -->
+      <div style="margin-top:44px; padding-top:28px; border-top:1px solid rgba(30,27,75,0.1);">
+        <p style="font-size:13px; font-weight:600; letter-spacing:2px; color:rgba(30,27,75,0.55); margin:0 0 22px;">SERVING MAJOR SECTORS</p>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:40px; max-width:640px; margin:0 auto;">
+          <sc-for list="{{ sectors }}" as="s" hint-placeholder-count="3">
+            <div style="text-align:center;">
+              <span style="display:inline-flex; align-items:center; justify-content:center; width:60px; height:60px; border-radius:16px; background:linear-gradient(135deg,rgba(255,107,107,0.18),rgba(255,107,107,0.08)); margin-bottom:12px;">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#E85555" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ s.d }}"></path></svg>
+              </span>
+              <h4 style="font-size:16px; font-weight:700; margin:0;">{{ s.name }}</h4>
+              <p style="font-size:12px; color:rgba(30,27,75,0.6); margin:4px 0 0;">{{ s.desc }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+    <!-- Product hero shot -->
+    <div style="max-width:1060px; margin:0 auto; padding:40px 32px 0; perspective:1800px; position:relative;">
+      <div style="position:absolute; left:64px; right:64px; top:56px; bottom:-24px; background:conic-gradient(from 210deg, #FF6B6B, #a78bfa, #22d3ee, #6366f1, #FF6B6B); filter:blur(28px) hue-rotate(0deg); opacity:0.4; border-radius:24px; animation:holoHue 9s linear infinite;"></div>
+      <div style="position:relative; border-radius:16px 16px 0 0; background:linear-gradient(#0B0E1A,#0B0E1A) padding-box, conic-gradient(from 210deg, rgba(255,107,107,0.9), rgba(167,139,250,0.9), rgba(34,211,238,0.9), rgba(99,102,241,0.9), rgba(255,107,107,0.9)) border-box; border:1.5px solid transparent; border-bottom:none; box-shadow:0 -20px 60px rgba(30,27,75,0.12), 0 30px 60px -20px rgba(30,27,75,0.35); overflow:hidden; transform:rotateX(12deg) scale(0.98); transform-origin:bottom center; transition:transform 0.5s cubic-bezier(0.2,0.8,0.3,1), box-shadow 0.5s ease; z-index:1;" style-hover="transform:rotateX(0deg) scale(1.06); box-shadow:0 -20px 60px rgba(30,27,75,0.12), 0 60px 110px -24px rgba(30,27,75,0.45); z-index:20;">
+        <div style="position:absolute; top:0; bottom:0; left:0; width:38%; background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.1) 45%, rgba(167,139,250,0.12) 55%, transparent 100%); transform:translateX(-130%) skewX(-18deg); animation:holoSheen 5.5s ease-in-out infinite; pointer-events:none; z-index:2;"></div>
+        <div style="display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid rgba(255,255,255,0.08);">
+          <span style="width:11px; height:11px; border-radius:99px; background:#FF6B6B; opacity:0.8;"></span>
+          <span style="width:11px; height:11px; border-radius:99px; background:#fbbf24; opacity:0.8;"></span>
+          <span style="width:11px; height:11px; border-radius:99px; background:#22c55e; opacity:0.8;"></span>
+          <span style="margin-left:14px; font-family:'Geist Mono',monospace; font-size:12px; color:rgba(255,255,255,0.45);">{{ heroShotLabel }}</span>
+        </div>
+        <img src="{{ heroShotSrc }}" alt="Yumesorai platform" style="display:block; width:100%; height:auto;">
+      </div>
+    </div>
+  </section>
+
+  <!-- Proof bar -->
+  <section style="border-top:1px solid rgba(30,27,75,0.05); border-bottom:1px solid rgba(30,27,75,0.05); background:#fff;">
+    <div style="max-width:1200px; margin:0 auto; padding:44px 32px; display:grid; grid-template-columns:repeat(4,1fr); gap:32px;">
+      <sc-for list="{{ metrics }}" as="m" hint-placeholder-count="4">
+        <div style="text-align:center;">
+          <p style="font-size:38px; font-weight:800; letter-spacing:-1px; margin:0;">{{ m.value }}</p>
+          <p style="margin:10px 0 0; font-size:15px; font-weight:500; color:rgba(30,27,75,0.7); line-height:1.4;">{{ m.label }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- Products & Services -->
+  <section style="padding:96px 0; background:#fff;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:760px; margin:0 auto 60px; text-align:center;">
+        <p style="font-family:'Geist Mono',monospace; font-size:12px; font-weight:500; text-transform:uppercase; letter-spacing:2px; color:#FF6B6B; margin:0 0 14px;">The Product Suite</p>
+        <h2 style="font-size:38px; font-weight:700; letter-spacing:-1px; margin:0 0 16px;">Our Products &amp; Services</h2>
+        <p style="font-size:18px; color:rgba(30,27,75,0.6); margin:0; text-wrap:balance;">Comprehensive solutions designed to transform your legacy systems completely</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:28px;">
+        <sc-for list="{{ products }}" as="p" hint-placeholder-count="3">
+          <a href="{{ p.href }}" style="display:block; border-radius:12px; border:2px solid rgba(30,27,75,0.3); background:linear-gradient(135deg,#fff,rgba(238,242,255,0.3)); overflow:hidden; transition:all 0.35s cubic-bezier(0.2,0.8,0.3,1); color:#1E1B4B; z-index:1; position:relative;" style-hover="border-color:#FF6B6B; box-shadow:0 30px 60px -14px rgba(30,27,75,0.28); color:#1E1B4B; transform:scale(1.05); z-index:20;">
+            <div style="background:#0B0E1A; border-bottom:1.5px solid transparent; background-image:linear-gradient(#0B0E1A,#0B0E1A), linear-gradient(90deg, #FF6B6B, #a78bfa, #22d3ee, #FF6B6B); background-origin:border-box; background-clip:padding-box, border-box; overflow:hidden; perspective:900px; position:relative;">
+              <img src="{{ p.shot }}" alt="{{ p.product }}" style="display:block; width:100%; height:180px; object-fit:cover; object-position:top left; transform:rotateX(6deg) rotateY(-5deg) scale(1.12); transform-origin:center; transition:transform 0.45s cubic-bezier(0.2,0.8,0.3,1); box-shadow:0 20px 40px rgba(0,0,0,0.5);" style-hover="transform:rotateX(0deg) rotateY(0deg) scale(1.3);">
+              <div style="position:absolute; top:0; bottom:0; left:0; width:45%; background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.09) 45%, rgba(34,211,238,0.1) 55%, transparent 100%); transform:translateX(-130%) skewX(-18deg); animation:holoSheen 6.5s ease-in-out infinite; pointer-events:none;"></div>
+            </div>
+            <div style="padding:26px 28px 30px;">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF6B6B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ p.d }}"></path></svg>
+                <span style="font-family:'Geist Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:1.5px; color:rgba(30,27,75,0.5);">{{ p.product }}</span>
+              </div>
+              <h3 style="font-size:20px; font-weight:700; margin:0 0 10px;">{{ p.title }}</h3>
+              <p style="font-size:15px; line-height:1.6; color:rgba(30,27,75,0.7); margin:0 0 14px;">{{ p.body }}</p>
+              <span style="font-size:14px; font-weight:600; color:#FF6B6B;">Explore {{ p.product }} →</span>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Modernize Now -->
+  <section style="padding:96px 0; background:#FAF9F6;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:760px; margin:0 auto 60px; text-align:center;">
+        <h2 style="font-size:42px; font-weight:700; letter-spacing:-1px; margin:0 0 20px;">Why Modernize Now</h2>
+        <p style="font-size:20px; font-weight:600; margin:0; text-wrap:balance;">New age AI models can now attack your infrastructure with precision you have never seen before.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:32px;">
+        <sc-for list="{{ whyNow }}" as="w" hint-placeholder-count="3">
+          <div style="border-radius:12px; border:1px solid {{ w.border }}; background:{{ w.bg }}; padding:32px;" style-hover="box-shadow:0 10px 24px rgba(30,27,75,0.1);">
+            <div style="font-size:46px; font-weight:800; letter-spacing:-1px; color:{{ w.color }}; margin-bottom:6px;">{{ w.stat }}</div>
+            <p style="font-size:14px; color:rgba(30,27,75,0.6); margin:0 0 16px;">{{ w.statLabel }}</p>
+            <h3 style="font-size:18px; font-weight:700; margin:0 0 10px;">{{ w.title }}</h3>
+            <p style="font-size:14px; line-height:1.55; color:rgba(30,27,75,0.7); margin:0;">{{ w.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Industries -->
+  <section style="padding:96px 0; background:linear-gradient(180deg, rgba(238,242,255,0.5), #fff);">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:760px; margin:0 auto 60px; text-align:center;">
+        <h2 style="font-size:42px; font-weight:700; letter-spacing:-1px; margin:0 0 20px; text-wrap:balance;">Broad Spectrum of Industries We Serve</h2>
+        <p style="font-size:19px; color:rgba(30,27,75,0.7); margin:0; text-wrap:balance;">From Fortune 500 enterprises to growing SMEs, we modernize legacy systems across every sector</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:22px;">
+        <sc-for list="{{ industries }}" as="i" hint-placeholder-count="12">
+          <div style="border-radius:16px; border:1px solid rgba(99,102,241,0.25); background:linear-gradient(135deg,#fff,rgba(238,242,255,0.5)); padding:30px 20px; text-align:center; box-shadow:0 1px 3px rgba(30,27,75,0.05); transition:all 0.25s ease; cursor:default;" style-hover="transform:translateY(-8px); box-shadow:0 20px 40px rgba(30,27,75,0.12);">
+            <span style="display:inline-flex; align-items:center; justify-content:center; width:52px; height:52px; border-radius:14px; background:rgba(30,27,75,0.05); margin-bottom:14px;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3730A3" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ i.d }}"></path></svg>
+            </span>
+            <h3 style="font-size:16px; font-weight:600; margin:0;">{{ i.name }}</h3>
+          </div>
+        </sc-for>
+      </div>
+      <!-- Business sizes -->
+      <div style="margin-top:72px; padding-top:64px; border-top:1px solid rgba(30,27,75,0.1);">
+        <h3 style="font-size:26px; font-weight:700; letter-spacing:-0.5px; text-align:center; margin:0 0 44px;">All Business Sizes</h3>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:20px;">
+          <sc-for list="{{ sizes }}" as="sz" hint-placeholder-count="4">
+            <div style="position:relative; overflow:hidden; border-radius:12px; border:1px solid rgba(99,102,241,0.2); background:linear-gradient(135deg,#fff,rgba(238,242,255,0.5)); padding:32px 24px; text-align:center; box-shadow:0 1px 3px rgba(30,27,75,0.05);" style-hover="box-shadow:0 14px 30px rgba(30,27,75,0.12);">
+              <p style="font-size:13px; font-weight:700; text-transform:uppercase; letter-spacing:2px; color:#FF6B6B; margin:0 0 10px;">{{ sz.label }}</p>
+              <p style="font-size:18px; font-weight:600; margin:0;">{{ sz.range }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SME & MSME -->
+  <section style="padding:96px 0; background:#FAF9F6;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:820px; margin:0 auto 60px; text-align:center;">
+        <h2 style="font-size:42px; font-weight:700; letter-spacing:-1px; margin:0 0 20px; text-wrap:balance;">Focused on SME &amp; MSME Legacy Code Migration</h2>
+        <p style="font-size:19px; font-weight:600; color:rgba(30,27,75,0.85); margin:0; line-height:1.5; text-wrap:balance;">Enterprise-grade legacy modernization designed for SMEs and MSMEs at prices that fit their budgets.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:28px;">
+        <sc-for list="{{ smeCards }}" as="c" hint-placeholder-count="3">
+          <div style="border-radius:12px; border:2px solid rgba(30,27,75,0.35); background:#fff; padding:26px; transition:all 0.25s ease;" style-hover="border-color:#FF6B6B; box-shadow:0 14px 30px rgba(30,27,75,0.1); transform:translateY(-4px);">
+            <div style="margin-bottom:18px; padding:16px 18px; border-radius:10px; background:linear-gradient(90deg,rgba(255,107,107,0.12),rgba(255,107,107,0.05));">
+              <div style="font-size:30px; font-weight:800; letter-spacing:-0.5px; color:#FF6B6B; margin-bottom:2px;">{{ c.stat }}</div>
+              <p style="font-size:12px; font-weight:600; color:rgba(30,27,75,0.6); margin:0;">{{ c.label }}</p>
+            </div>
+            <h3 style="font-size:18px; font-weight:600; margin:0 0 8px;">{{ c.title }}</h3>
+            <p style="font-size:14px; line-height:1.6; color:rgba(30,27,75,0.6); margin:0;">{{ c.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Cost advantage -->
+  <section style="padding:96px 0; background:linear-gradient(90deg,#ecfdf5,#f0fdfa);">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:760px; margin:0 auto 48px; text-align:center;">
+        <h2 style="font-size:38px; font-weight:700; letter-spacing:-1px; margin:0 0 16px;">50% Cheaper Than Traditional Solutions</h2>
+        <p style="font-size:18px; color:rgba(30,27,75,0.7); margin:0; text-wrap:balance;">Do not pay legacy prices for legacy problems. Yumesorai delivers enterprise-grade modernization at half the cost of traditional consulting firms.</p>
+      </div>
+      <div style="max-width:720px; margin:0 auto; background:#fff; border-radius:16px; border:1px solid rgba(30,27,75,0.08); box-shadow:0 4px 16px rgba(30,27,75,0.06); overflow:hidden;">
+        <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr; border-bottom:2px solid rgba(30,27,75,0.15); padding:16px 24px; align-items:center;">
+          <span></span>
+          <span style="justify-self:center; display:inline-flex; align-items:center; gap:8px; border-radius:999px; background:#fff; border:2px solid #FF6B6B; padding:5px 14px; font-size:14px; font-weight:600;">Yumesorai <span style="color:#FF6B6B; font-weight:800;">✓</span></span>
+          <span style="justify-self:center; font-size:14px; font-weight:600; color:rgba(30,27,75,0.6);">Traditional Firms</span>
+        </div>
+        <sc-for list="{{ costRows }}" as="r" hint-placeholder-count="5">
+          <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr; padding:16px 24px; border-bottom:1px solid rgba(30,27,75,0.07); align-items:center;">
+            <span style="font-size:14px; font-weight:500;">{{ r.label }}</span>
+            <span style="justify-self:center; font-size:16px; font-weight:700; color:{{ r.usColor }};">{{ r.us }}</span>
+            <span style="justify-self:center; font-size:15px; font-weight:600; color:rgba(30,27,75,0.5);">{{ r.them }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <p style="text-align:center; margin:40px auto 0; max-width:640px; font-size:16px; color:rgba(30,27,75,0.7);"><span style="font-weight:600;">The math is simple:</span> Get the same or better results for half the price with Yumesorai AI-driven approach.</p>
+    </div>
+  </section>
+
+  <!-- Value proposition (dark) -->
+  <section style="background:#1E1B4B; color:#fff; padding:96px 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:640px; margin:0 auto 52px; text-align:center;">
+        <h2 style="font-size:36px; font-weight:700; letter-spacing:-0.8px; margin:0;">Why CIOs and CTOs choose Yumesorai</h2>
+        <p style="margin:16px 0 0; font-size:18px; color:rgba(255,255,255,0.6); text-wrap:balance;">We combine deep enterprise expertise with cutting-edge AI to deliver modernization outcomes that were previously impossible.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px;">
+        <sc-for list="{{ valueProps }}" as="v" hint-placeholder-count="6">
+          <div style="border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:26px; background:rgba(255,255,255,0.02);" style-hover="background:rgba(255,255,255,0.06);">
+            <h3 style="font-size:17px; font-weight:600; margin:0; color:#fff;">{{ v.title }}</h3>
+            <p style="margin:10px 0 0; font-size:14px; line-height:1.6; color:rgba(255,255,255,0.6);">{{ v.body }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Security (dark gradient) -->
+  <section style="background:linear-gradient(135deg,#1E1B4B,#2D2A6E); color:#fff; padding:96px 0;">
+    <div style="max-width:1200px; margin:0 auto; padding:0 32px;">
+      <div style="max-width:760px; margin:0 auto 52px; text-align:center;">
+        <h2 style="font-size:36px; font-weight:700; letter-spacing:-0.8px; margin:0 0 16px; text-wrap:balance;">Reduce Vulnerability Risk in the Age of Cyberattacks</h2>
+        <p style="font-size:18px; color:rgba(255,255,255,0.7); margin:0; text-wrap:balance;">Legacy systems are a liability. The Yumesorai AI-driven modernization eliminates security vulnerabilities while keeping your business operational.</p>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(2,1fr); gap:24px;">
+        <sc-for list="{{ security }}" as="s" hint-placeholder-count="5">
+          <div style="border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.05); border-radius:12px; padding:30px; backdrop-filter:blur(8px); display:flex; gap:18px; align-items:flex-start;">
+            <span style="flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; width:44px; height:44px; border-radius:11px; background:rgba(255,107,107,0.15);">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FF8A8A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{ s.d }}"></path></svg>
+            </span>
+            <div>
+              <h3 style="font-size:19px; font-weight:600; margin:0 0 8px; color:#fff;">{{ s.title }}</h3>
+              <p style="font-size:15px; line-height:1.6; color:rgba(255,255,255,0.7); margin:0;">{{ s.body }}</p>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top:44px; border-radius:12px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); padding:30px; backdrop-filter:blur(8px);">
+        <p style="text-align:center; margin:0; font-size:16px; line-height:1.6; color:#fff;"><span style="font-weight:600;">The Reality:</span> Every day your legacy systems stay in production is a day they are exposed to new threats. Modernization is not just about velocity — it is about survival.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section style="padding:96px 0;">
+    <div style="max-width:640px; margin:0 auto; padding:0 32px; text-align:center;">
+      <h2 style="font-size:36px; font-weight:700; letter-spacing:-0.8px; margin:0;">Ready to modernize with confidence?</h2>
+      <p style="margin:16px 0 0; font-size:18px; color:rgba(30,27,75,0.6); text-wrap:balance;">Join the enterprises that have already transformed their legacy systems with Yumesorai. Start with a free assessment.</p>
+      <div style="display:flex; gap:16px; justify-content:center; margin-top:32px; flex-wrap:wrap;">
+        <a href="About.dc.html#contact" style="border-radius:8px; background:#FF6B6B; padding:14px 30px; font-size:16px; font-weight:600; color:#fff; box-shadow:0 10px 20px rgba(255,107,107,0.25);" style-hover="background:#E85555; color:#fff;">Get Free Assessment</a>
+        <a href="Solutions.dc.html" style="border-radius:8px; background:#fff; border:1px solid rgba(30,27,75,0.15); padding:14px 30px; font-size:16px; font-weight:600; color:#1E1B4B;" style-hover="border-color:rgba(30,27,75,0.3); color:#1E1B4B;">Read Case Studies</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="background:#1E1B4B; color:#fff; border-top:1px solid rgba(30,27,75,0.05);">
+    <div style="max-width:1200px; margin:0 auto; padding:64px 32px 0; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr 1fr; gap:32px;">
+      <div>
+        <div style="font-size:19px; font-weight:700; letter-spacing:-0.4px;">Yumesorai</div>
+        <p style="margin:12px 0 0; font-size:14px; line-height:1.6; color:rgba(255,255,255,0.6);">AI-driven legacy modernization for the enterprises that move the world.</p>
+      </div>
+      <sc-for list="{{ footerCols }}" as="col" hint-placeholder-count="4">
+        <div>
+          <h3 style="font-size:13px; font-weight:600; text-transform:uppercase; letter-spacing:1.5px; color:rgba(255,255,255,0.4); margin:0 0 18px;">{{ col.title }}</h3>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <sc-for list="{{ col.links }}" as="l" hint-placeholder-count="3">
+              <a href="{{ l.href }}" style="font-size:14px; color:rgba(255,255,255,0.6);" style-hover="color:#fff;">{{ l.label }}</a>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="max-width:1200px; margin:48px auto 0; padding:28px 32px; border-top:1px solid rgba(255,255,255,0.1);">
+      <p style="text-align:center; font-size:12px; color:rgba(255,255,255,0.4); margin:0;">© 2026 Yumesorai. All rights reserved.</p>
+    </div>
+  </footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;heroShot&quot;: {&quot;editor&quot;: &quot;enum&quot;, &quot;default&quot;: &quot;transformer&quot;, &quot;options&quot;: [&quot;transformer&quot;, &quot;graph&quot;, &quot;demistifier&quot;], &quot;tsType&quot;: &quot;string&quot;, &quot;section&quot;: &quot;Hero&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const shots = {
+      transformer: { src: "assets/shot-transformer.png", label: "Yumesorai Transformer — AI migration workbench" },
+      graph: { src: "assets/shot-explorer.png", label: "Yumesorai Demistifier — dependency knowledge graph" },
+      demistifier: { src: "assets/shot-demistifier.png", label: "Yumesorai Demistifier — connect a codebase" },
+    };
+    const hero = shots[this.props.heroShot ?? "transformer"] || shots.transformer;
+    return {
+      heroShotSrc: hero.src,
+      heroShotLabel: hero.label,
+      sectors: [
+        { name: "Healthcare", desc: "EHR & Patient Systems", d: "M12 21C7 17 3 13.5 3 9.5 3 6.5 5.5 4 8.5 4c1.5 0 2.7.7 3.5 1.7C12.8 4.7 14 4 15.5 4 18.5 4 21 6.5 21 9.5c0 4-4 7.5-9 11.5z M9 11h2l1-2 1.5 4 1-2h2" },
+        { name: "Airlines", desc: "Reservation & Operations", d: "M10.5 20.5 14 14.5l5.5-5.5c.9-.9.9-2.1 0-3s-2.1-.9-3 0L11 11.5 4 8l-1.5 1.5L8 13l-2.5 3H3l-1 1.5 4 1 1 4L8.5 21l1-3.5z" },
+        { name: "BFSI", desc: "Banking & Financial", d: "M3 21h18 M12 3 21 9H3l9-6z M5 9v9 M9.5 9v9 M14.5 9v9 M19 9v9" },
+      ],
+      metrics: [
+        { value: "1M+", label: "Lines of COBOL code migrated by our team" },
+        { value: "50%", label: "Cheaper than competitors" },
+        { value: "40%", label: "Average cost reduction" },
+        { value: "99.99%", label: "Migration accuracy" },
+      ],
+      whyNow: [
+        { stat: "60%", statLabel: "of data breaches involve legacy systems", title: "Cybersecurity Risk", body: "Legacy systems cannot patch vulnerabilities fast enough for modern threats.", color: "#dc2626", border: "rgba(252,165,165,0.5)", bg: "rgba(254,242,242,0.7)" },
+        { stat: "45%", statLabel: "of COBOL developers retiring by 2030", title: "Skills Gap", body: "Critical expertise is leaving your organization permanently.", color: "#ea580c", border: "rgba(253,186,116,0.5)", bg: "rgba(255,247,237,0.7)" },
+        { stat: "30%", statLabel: "annual increase in legacy system costs", title: "Rising Costs", body: "Maintenance budgets grow every year while ROI shrinks.", color: "#ca8a04", border: "rgba(253,224,71,0.5)", bg: "rgba(254,252,232,0.7)" },
+      ],
+      industries: [
+        { name: "Healthcare", d: "M12 21C7 17 3 13.5 3 9.5 3 6.5 5.5 4 8.5 4c1.5 0 2.7.7 3.5 1.7C12.8 4.7 14 4 15.5 4 18.5 4 21 6.5 21 9.5c0 4-4 7.5-9 11.5z" },
+        { name: "Banking & Finance", d: "M3 21h18 M12 3 21 9H3l9-6z M5 9v9 M9.5 9v9 M14.5 9v9 M19 9v9" },
+        { name: "Airlines & Travel", d: "M10.5 20.5 14 14.5l5.5-5.5c.9-.9.9-2.1 0-3s-2.1-.9-3 0L11 11.5 4 8l-1.5 1.5L8 13l-2.5 3H3l-1 1.5 4 1 1 4L8.5 21l1-3.5z" },
+        { name: "Retail & E-commerce", d: "M4 5h2l2.4 11h9.8L21 8H7 M10 20a1 1 0 1 0 0.01 0 M17 20a1 1 0 1 0 0.01 0" },
+        { name: "Manufacturing", d: "M3 21V11l6 4v-4l6 4V7l6-2v16H3z M7 17h1 M11 17h1 M15 17h1" },
+        { name: "Insurance", d: "M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z M9 12l2 2 4-4" },
+        { name: "Government", d: "M3 21h18 M4 9h16 M12 3l8 6H4l8-6z M6 9v12 M12 9v12 M18 9v12" },
+        { name: "Telecommunications", d: "M6 3h8v18H6z M10 18h.01 M14 8c2 0 4 2 4 4 M14 4c4 0 8 4 8 8" },
+        { name: "Logistics", d: "M21 8 12 3 3 8v8l9 5 9-5V8z M12 13 3 8 M12 13l9-5 M12 13v8" },
+        { name: "Energy & Utilities", d: "M13 2 4 14h6l-1 8 9-12h-6l1-8z" },
+        { name: "Education", d: "M12 4 2 9l10 5 10-5-10-5z M6 11.5V16c0 1.5 2.7 3 6 3s6-1.5 6-3v-4.5 M22 9v5" },
+        { name: "Media & Publishing", d: "M4 4h13v16H4z M17 8h3v12H6 M7 8h7 M7 12h7 M7 16h4" },
+      ],
+      sizes: [
+        { label: "Startups", range: "10-50 employees" },
+        { label: "SMEs", range: "50-500 employees" },
+        { label: "Mid-Market", range: "500-2,500 employees" },
+        { label: "Enterprise", range: "2,500+ employees" },
+      ],
+      products: [
+        { product: "Demistifier", href: "Platform.dc.html#demistifier", title: "Knowledge Graph Explorer", body: "See how every COBOL program connects. Call chains, copybooks, JCL jobs and CICS screens mapped into one navigable graph.", shot: "assets/shot-explorer.png", d: "M9 20 3 17V4l6 3 6-3 6 3v13l-6-3-6 3z M9 7v13 M15 4v13" },
+        { product: "Transformer", href: "Platform.dc.html#transformer", title: "Code Conversion Engine", body: "Automatically convert COBOL to Java with precision. Analyze, transform, and validate your legacy systems instantly.", shot: "assets/shot-transformer.png", d: "M8 6 3 12l5 6 M16 6l5 6-5 6 M13 4l-2 16" },
+        { product: "Code Flux", href: "Platform.dc.html#codeflux", title: "Change & Post-Migration Management", body: "Edit safely in sandbox branches, preview blast radius, route approvals — and keep code healthy after migration.", shot: "assets/shot-codeflux.png", d: "M21 12a9 9 0 1 1-3-6.7 M21 3v5h-5" },
+      ],
+      smeCards: [
+        { stat: "60-70%", label: "Cost Reduction", title: "Budget-Friendly Solutions", body: "Flexible engagement models designed for companies of all sizes. Only pay for what you need, when you need it." },
+        { stat: "6-12", label: "Months to Deploy", title: "Faster Time to Value", body: "Our proven methodology gets your systems modernized in months, not years. Competitive advantage when you need it most." },
+        { stat: "24/7", label: "Available Support", title: "Dedicated Support", body: "Your team gets direct access to engineers and architects. We succeed when your business succeeds." },
+      ],
+      costRows: [
+        { label: "Total Migration Cost", us: "$2-5M", usColor: "#FF6B6B", them: "$5-15M" },
+        { label: "Timeline", us: "6-12 months", usColor: "#047857", them: "3-5 years" },
+        { label: "AI-Powered Automation", us: "✓", usColor: "#059669", them: "✗" },
+        { label: "Migration Accuracy", us: "99.99%", usColor: "#047857", them: "95-98%" },
+        { label: "Post-Migration Support", us: "✓ Included", usColor: "#059669", them: "Extra Cost" },
+      ],
+      valueProps: [
+        { title: "AI-Powered Code Analysis", body: "Our AI understands COBOL, PL/I, and Assembler at a semantic level, mapping business logic automatically with 99.99% accuracy." },
+        { title: "Zero-Downtime Migration", body: "Parallel-run architecture ensures your business never stops. We validate every transaction before cutover." },
+        { title: "Compliance Preserved", body: "Regulatory mappings are maintained throughout modernization. HIPAA, PCI-DSS, SOX — all handled automatically." },
+        { title: "60% Less Risk", body: "AI-driven testing generates comprehensive test suites from production data patterns, catching edge cases humans miss." },
+        { title: "Months, Not Years", body: "What traditionally takes 3-5 years, we deliver in 6-12 months through automated code transformation." },
+        { title: "Knowledge Capture", body: "We extract and document decades of embedded business logic before your retiring workforce takes it with them." },
+      ],
+      security: [
+        { title: "Eliminate Legacy Vulnerabilities", body: "Legacy systems cannot be patched fast enough. Our AI modernization removes the old code entirely, eliminating entire classes of vulnerabilities that attackers exploit.", d: "M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z" },
+        { title: "AI-Powered Security Scanning", body: "Our AI analyzes every line of code during modernization, identifying and fixing security flaws that traditional tools miss. Modern frameworks include security by default.", d: "M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14z M21 21l-5-5" },
+        { title: "Modern Compliance & Encryption", body: "Modernized systems include current encryption standards, automated compliance frameworks, and threat detection. No more fighting to meet NIST, PCI-DSS, or HIPAA requirements.", d: "M5 11h14v10H5z M8 11V7a4 4 0 0 1 8 0v4 M12 15v3" },
+        { title: "Faster Security Patching", body: "Modern cloud-native systems can be patched in minutes, not months. Security updates deploy automatically without business interruption.", d: "M13 2 4 14h6l-1 8 9-12h-6l1-8z" },
+        { title: "Mythos AI Vulnerability Detection", body: "Our Mythos AI model identifies vulnerabilities that have remained dormant for decades but are now exposed to modern threats. Detect and remediate hidden risks before attackers do.", d: "M12 3a5 5 0 0 1 5 5c0 2-1 3-1 5h-8c0-2-1-3-1-5a5 5 0 0 1 5-5z M9.5 17h5 M10.5 20h3" },
+      ],
+      footerCols: [
+        { title: "Solutions", links: [
+          { label: "Healthcare", href: "Solutions.dc.html" }, { label: "Airlines", href: "Solutions.dc.html" }, { label: "Banking", href: "Solutions.dc.html" } ] },
+        { title: "Platform", links: [
+          { label: "How It Works", href: "Platform.dc.html" }, { label: "Security", href: "Platform.dc.html" }, { label: "Integrations", href: "Platform.dc.html" } ] },
+        { title: "Resources", links: [
+          { label: "Case Studies", href: "Solutions.dc.html" }, { label: "Blog", href: "About.dc.html" }, { label: "Whitepapers", href: "About.dc.html" } ] },
+        { title: "Company", links: [
+          { label: "About", href: "About.dc.html" }, { label: "Careers", href: "About.dc.html" }, { label: "Contact", href: "About.dc.html#contact" }, { label: "Privacy", href: "About.dc.html" } ] },
+      ],
+    };
+  }
+}
+</script>
+</body>
+</html>

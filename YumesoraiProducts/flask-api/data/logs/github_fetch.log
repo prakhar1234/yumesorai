@@ -1,0 +1,2 @@
+2026-08-12 02:34:31  ERROR     github_fetch  [list_repo_files:99]  GitHub API error | repo=legacy-bank/core-cobol | status=404 | message=Not Found | url=https://api.github.com/repos/legacy-bank/core-cobol/git/trees/HEAD?recursive=1
+2026-08-12 20:59:31  ERROR     github_fetch  [list_repo_files:99]  GitHub API error | repo=legacy-bank/core-cobol | status=404 | message=Not Found | url=https://api.github.com/repos/legacy-bank/core-cobol/git/trees/HEAD?recursive=1

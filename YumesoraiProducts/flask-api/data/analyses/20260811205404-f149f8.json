@@ -1,0 +1,1979 @@
+{
+  "id": "20260811205404-f149f8",
+  "repo_url": "https://github.com/openmainframeproject/cobol-programming-course",
+  "input_type": "github",
+  "created_at": "2026-08-11T20:54:04.555984+00:00",
+  "node_count": 96,
+  "edge_count": 157,
+  "result": {
+    "nodes": [
+      {
+        "id": "ADDAMT",
+        "label": "ADDAMT",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.27,
+        "dead": false,
+        "loc": 21,
+        "fanIn": 2,
+        "fanOut": 3
+      },
+      {
+        "id": "LOAD",
+        "label": "LOAD",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.4,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 26,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0001J",
+        "label": "CBL0001J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0001",
+        "label": "CBL0001",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 4,
+        "fanOut": 0
+      },
+      {
+        "id": "DATA",
+        "label": "DATA",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.4,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 19,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0002J",
+        "label": "CBL0002J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0002",
+        "label": "CBL0002",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0003J",
+        "label": "CBL0003J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0004J",
+        "label": "CBL0004J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0004",
+        "label": "CBL0004",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0005J",
+        "label": "CBL0005J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0005",
+        "label": "CBL0005",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0006J",
+        "label": "CBL0006J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0006",
+        "label": "CBL0006",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0007J",
+        "label": "CBL0007J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0007",
+        "label": "CBL0007",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0008J",
+        "label": "CBL0008J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0008",
+        "label": "CBL0008",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0009J",
+        "label": "CBL0009J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0009",
+        "label": "CBL0009",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0010J",
+        "label": "CBL0010J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0010",
+        "label": "CBL0010",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0011J",
+        "label": "CBL0011J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0011",
+        "label": "CBL0011",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0012J",
+        "label": "CBL0012J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL0012",
+        "label": "CBL0012",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0013J",
+        "label": "CBL0013J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.16,
+        "dead": false,
+        "loc": 12,
+        "fanIn": 0,
+        "fanOut": 3
+      },
+      {
+        "id": "CBL0013",
+        "label": "CBL0013",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0014J",
+        "label": "CBL0014J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.16,
+        "dead": false,
+        "loc": 12,
+        "fanIn": 0,
+        "fanOut": 3
+      },
+      {
+        "id": "CBL0014",
+        "label": "CBL0014",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0033J",
+        "label": "CBL0033J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.27,
+        "dead": false,
+        "loc": 23,
+        "fanIn": 0,
+        "fanOut": 5
+      },
+      {
+        "id": "CBL0033",
+        "label": "CBL0033",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "HELLO",
+        "label": "HELLO",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL006AJ",
+        "label": "CBL006AJ",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBL006A",
+        "label": "CBL006A",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "COBRUN",
+        "label": "COBRUN",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 17,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "COBEXEC",
+        "label": "COBEXEC",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "COBOL",
+        "label": "COBOL",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "COBOL PROGRAMMING COURSE #2 - LEARNING COBOL/HELLO",
+        "label": "HELLO",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.0,
+        "dead": false,
+        "loc": 4,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "PAYROL00",
+        "label": "PAYROL00",
+        "type": "job",
+        "domain": "PAY",
+        "color": "#60a5fa",
+        "risk": 0.0,
+        "dead": false,
+        "loc": 4,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "PAYROL0X",
+        "label": "PAYROL0X",
+        "type": "job",
+        "domain": "PAY",
+        "color": "#60a5fa",
+        "risk": 0.0,
+        "dead": false,
+        "loc": 4,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "SRCHBINJ",
+        "label": "SRCHBINJ",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "SRCHBIN",
+        "label": "SRCHBIN",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "SRCHSERJ",
+        "label": "SRCHSERJ",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "SRCHSER",
+        "label": "SRCHSER",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "IGYWC",
+        "label": "IGYWC",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.28,
+        "dead": false,
+        "loc": 27,
+        "fanIn": 0,
+        "fanOut": 5
+      },
+      {
+        "id": "IGYCRCTL",
+        "label": "IGYCRCTL",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 4,
+        "fanOut": 0
+      },
+      {
+        "id": "SIGYCOMP",
+        "label": "SIGYCOMP",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 4,
+        "fanOut": 0
+      },
+      {
+        "id": "SCEERUN",
+        "label": "SCEERUN",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 4,
+        "fanOut": 0
+      },
+      {
+        "id": "SCEERUN2",
+        "label": "SCEERUN2",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 4,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL",
+        "label": "CBL",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.2,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 4,
+        "fanOut": 0
+      },
+      {
+        "id": "IGYWCL",
+        "label": "IGYWCL",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.44,
+        "dead": false,
+        "loc": 36,
+        "fanIn": 0,
+        "fanOut": 9
+      },
+      {
+        "id": "IEWBLINK",
+        "label": "IEWBLINK",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "SCEELKEX",
+        "label": "SCEELKEX",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "SCEELKED",
+        "label": "SCEELKED",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "IGYWCLG",
+        "label": "IGYWCLG",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.44,
+        "dead": false,
+        "loc": 44,
+        "fanIn": 0,
+        "fanOut": 9
+      },
+      {
+        "id": "CBL0106",
+        "label": "CBL0106",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.36,
+        "dead": false,
+        "loc": 161,
+        "fanIn": 2,
+        "fanOut": 2
+      },
+      {
+        "id": "PRINT-LINE",
+        "label": "PRINT-LINE",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "ACCT-REC",
+        "label": "ACCT-REC",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "CBL0106C",
+        "label": "CBL0106C",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.27,
+        "dead": false,
+        "loc": 167,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "CBL0106J",
+        "label": "CBL0106J",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CBLDB21",
+        "label": "CBLDB21",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.26,
+        "dead": false,
+        "loc": 107,
+        "fanIn": 0,
+        "fanOut": 3
+      },
+      {
+        "id": "DSNTIAR",
+        "label": "DSNTIAR",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "REPOUT",
+        "label": "REPOUT",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "Z",
+        "label": "Z",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB22",
+        "label": "CBLDB22",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.36,
+        "dead": false,
+        "loc": 157,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "RECIN",
+        "label": "RECIN",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB23",
+        "label": "CBLDB23",
+        "type": "program",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.36,
+        "dead": false,
+        "loc": 156,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "CARDIN",
+        "label": "CARDIN",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB21C",
+        "label": "CBLDB21C",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.01,
+        "dead": false,
+        "loc": 9,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB21R",
+        "label": "CBLDB21R",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.12,
+        "dead": false,
+        "loc": 17,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "IKJEFT01",
+        "label": "IKJEFT01",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.3,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 6,
+        "fanOut": 0
+      },
+      {
+        "id": "SDSNLOAD",
+        "label": "SDSNLOAD",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.25,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 5,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB22C",
+        "label": "CBLDB22C",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.01,
+        "dead": false,
+        "loc": 9,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB22R",
+        "label": "CBLDB22R",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.12,
+        "dead": false,
+        "loc": 20,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "CBLDB23C",
+        "label": "CBLDB23C",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.01,
+        "dead": false,
+        "loc": 9,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "CBLDB23R",
+        "label": "CBLDB23R",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.12,
+        "dead": false,
+        "loc": 20,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "CRETBL",
+        "label": "CRETBL",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.03,
+        "dead": false,
+        "loc": 33,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "DB2SETUP",
+        "label": "DB2SETUP",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.28,
+        "dead": false,
+        "loc": 34,
+        "fanIn": 0,
+        "fanOut": 5
+      },
+      {
+        "id": "IEBCOPY",
+        "label": "IEBCOPY",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "IEFBR14",
+        "label": "IEFBR14",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.1,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "JCL",
+        "label": "JCL",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "DBRMLIB",
+        "label": "DBRMLIB",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 3,
+        "fanOut": 0
+      },
+      {
+        "id": "COBOL PROGRAMMING COURSE #3 - ADVANCED TOPICS/DBRMLIB",
+        "label": "DBRMLIB",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.11,
+        "dead": false,
+        "loc": 8,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "LOADTBL",
+        "label": "LOADTBL",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.07,
+        "dead": false,
+        "loc": 23,
+        "fanIn": 0,
+        "fanOut": 1
+      },
+      {
+        "id": "SELTBL",
+        "label": "SELTBL",
+        "type": "job",
+        "domain": "BAT",
+        "color": "#22d3ee",
+        "risk": 0.01,
+        "dead": false,
+        "loc": 7,
+        "fanIn": 0,
+        "fanOut": 0
+      },
+      {
+        "id": "DB2CBL",
+        "label": "DB2CBL",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.45,
+        "dead": false,
+        "loc": 53,
+        "fanIn": 0,
+        "fanOut": 11
+      },
+      {
+        "id": "SDSNEXIT",
+        "label": "SDSNEXIT",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "DB2JCL",
+        "label": "DB2JCL",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.12,
+        "dead": false,
+        "loc": 15,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "DSNUPROC",
+        "label": "DSNUPROC",
+        "type": "job",
+        "domain": "RPT",
+        "color": "#a78bfa",
+        "risk": 0.12,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 2
+      },
+      {
+        "id": "DSNUTILB",
+        "label": "DSNUTILB",
+        "type": "program",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "SORTLIB",
+        "label": "SORTLIB",
+        "type": "table",
+        "domain": "GEN",
+        "color": "#94a3b8",
+        "risk": 0.05,
+        "dead": false,
+        "loc": 0,
+        "fanIn": 1,
+        "fanOut": 0
+      },
+      {
+        "id": "DEPTPAY",
+        "label": "DEPTPAY",
+        "type": "program",
+        "domain": "PAY",
+        "color": "#60a5fa",
+        "risk": 0.13,
+        "dead": false,
+        "loc": 33,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "EMPPAY",
+        "label": "EMPPAY",
+        "type": "program",
+        "domain": "PAY",
+        "color": "#60a5fa",
+        "risk": 0.15,
+        "dead": false,
+        "loc": 51,
+        "fanIn": 2,
+        "fanOut": 0
+      },
+      {
+        "id": "COBOL PROGRAMMING COURSE #4 - TESTING/DEPTPAY",
+        "label": "DEPTPAY",
+        "type": "job",
+        "domain": "PAY",
+        "color": "#60a5fa",
+        "risk": 0.21,
+        "dead": false,
+        "loc": 14,
+        "fanIn": 0,
+        "fanOut": 4
+      },
+      {
+        "id": "COBOL PROGRAMMING COURSE #4 - TESTING/EMPPAY",
+        "label": "EMPPAY",
+        "type": "job",
+        "domain": "PAY",
+        "color": "#60a5fa",
+        "risk": 0.22,
+        "dead": false,
+        "loc": 16,
+        "fanIn": 0,
+        "fanOut": 4
+      }
+    ],
+    "edges": [
+      {
+        "source": "ADDAMT",
+        "target": "ADDAMT",
+        "type": "job"
+      },
+      {
+        "source": "ADDAMT",
+        "target": "ADDAMT",
+        "type": "data"
+      },
+      {
+        "source": "ADDAMT",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0001J",
+        "target": "CBL0001",
+        "type": "job"
+      },
+      {
+        "source": "CBL0001J",
+        "target": "CBL0001",
+        "type": "data"
+      },
+      {
+        "source": "CBL0001J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0001J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0002J",
+        "target": "CBL0002",
+        "type": "job"
+      },
+      {
+        "source": "CBL0002J",
+        "target": "CBL0002",
+        "type": "data"
+      },
+      {
+        "source": "CBL0002J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0002J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0003J",
+        "target": "CBL0001",
+        "type": "job"
+      },
+      {
+        "source": "CBL0003J",
+        "target": "CBL0001",
+        "type": "data"
+      },
+      {
+        "source": "CBL0003J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0003J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0004J",
+        "target": "CBL0004",
+        "type": "job"
+      },
+      {
+        "source": "CBL0004J",
+        "target": "CBL0004",
+        "type": "data"
+      },
+      {
+        "source": "CBL0004J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0004J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0005J",
+        "target": "CBL0005",
+        "type": "job"
+      },
+      {
+        "source": "CBL0005J",
+        "target": "CBL0005",
+        "type": "data"
+      },
+      {
+        "source": "CBL0005J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0005J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0006J",
+        "target": "CBL0006",
+        "type": "job"
+      },
+      {
+        "source": "CBL0006J",
+        "target": "CBL0006",
+        "type": "data"
+      },
+      {
+        "source": "CBL0006J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0006J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0007J",
+        "target": "CBL0007",
+        "type": "job"
+      },
+      {
+        "source": "CBL0007J",
+        "target": "CBL0007",
+        "type": "data"
+      },
+      {
+        "source": "CBL0007J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0007J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0008J",
+        "target": "CBL0008",
+        "type": "job"
+      },
+      {
+        "source": "CBL0008J",
+        "target": "CBL0008",
+        "type": "data"
+      },
+      {
+        "source": "CBL0008J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0008J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0009J",
+        "target": "CBL0009",
+        "type": "job"
+      },
+      {
+        "source": "CBL0009J",
+        "target": "CBL0009",
+        "type": "data"
+      },
+      {
+        "source": "CBL0009J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0009J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0010J",
+        "target": "CBL0010",
+        "type": "job"
+      },
+      {
+        "source": "CBL0010J",
+        "target": "CBL0010",
+        "type": "data"
+      },
+      {
+        "source": "CBL0010J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0010J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0011J",
+        "target": "CBL0011",
+        "type": "job"
+      },
+      {
+        "source": "CBL0011J",
+        "target": "CBL0011",
+        "type": "data"
+      },
+      {
+        "source": "CBL0011J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0011J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0012J",
+        "target": "CBL0012",
+        "type": "job"
+      },
+      {
+        "source": "CBL0012J",
+        "target": "CBL0012",
+        "type": "data"
+      },
+      {
+        "source": "CBL0012J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0012J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL0013J",
+        "target": "CBL0013",
+        "type": "job"
+      },
+      {
+        "source": "CBL0013J",
+        "target": "CBL0013",
+        "type": "data"
+      },
+      {
+        "source": "CBL0013J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0014J",
+        "target": "CBL0014",
+        "type": "job"
+      },
+      {
+        "source": "CBL0014J",
+        "target": "CBL0014",
+        "type": "data"
+      },
+      {
+        "source": "CBL0014J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0033J",
+        "target": "CBL0033",
+        "type": "job"
+      },
+      {
+        "source": "CBL0033J",
+        "target": "HELLO",
+        "type": "data"
+      },
+      {
+        "source": "CBL0033J",
+        "target": "CBL0033",
+        "type": "data"
+      },
+      {
+        "source": "CBL0033J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0033J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBL006AJ",
+        "target": "CBL006A",
+        "type": "job"
+      },
+      {
+        "source": "CBL006AJ",
+        "target": "CBL006A",
+        "type": "data"
+      },
+      {
+        "source": "CBL006AJ",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL006AJ",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "COBRUN",
+        "target": "COBEXEC",
+        "type": "job"
+      },
+      {
+        "source": "COBRUN",
+        "target": "COBOL",
+        "type": "data"
+      },
+      {
+        "source": "COBRUN",
+        "target": "COBEXEC",
+        "type": "data"
+      },
+      {
+        "source": "COBRUN",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "SRCHBINJ",
+        "target": "SRCHBIN",
+        "type": "job"
+      },
+      {
+        "source": "SRCHBINJ",
+        "target": "SRCHBIN",
+        "type": "data"
+      },
+      {
+        "source": "SRCHBINJ",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "SRCHBINJ",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "SRCHSERJ",
+        "target": "SRCHSER",
+        "type": "job"
+      },
+      {
+        "source": "SRCHSERJ",
+        "target": "SRCHSER",
+        "type": "data"
+      },
+      {
+        "source": "SRCHSERJ",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "SRCHSERJ",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "IGYWC",
+        "target": "IGYCRCTL",
+        "type": "job"
+      },
+      {
+        "source": "IGYWC",
+        "target": "SIGYCOMP",
+        "type": "data"
+      },
+      {
+        "source": "IGYWC",
+        "target": "SCEERUN",
+        "type": "data"
+      },
+      {
+        "source": "IGYWC",
+        "target": "SCEERUN2",
+        "type": "data"
+      },
+      {
+        "source": "IGYWC",
+        "target": "CBL",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "IGYCRCTL",
+        "type": "job"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "IEWBLINK",
+        "type": "job"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "SIGYCOMP",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "SCEERUN",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "SCEERUN2",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "CBL",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "SCEELKEX",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "SCEELKED",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCL",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "IGYCRCTL",
+        "type": "job"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "IEWBLINK",
+        "type": "job"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "SIGYCOMP",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "SCEERUN",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "SCEERUN2",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "CBL",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "SCEELKEX",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "SCEELKED",
+        "type": "data"
+      },
+      {
+        "source": "IGYWCLG",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106",
+        "target": "PRINT-LINE",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106",
+        "target": "ACCT-REC",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106C",
+        "target": "PRINT-LINE",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106C",
+        "target": "ACCT-REC",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106J",
+        "target": "CBL0106",
+        "type": "job"
+      },
+      {
+        "source": "CBL0106J",
+        "target": "CBL0106",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106J",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBL0106J",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB21",
+        "target": "DSNTIAR",
+        "type": "call"
+      },
+      {
+        "source": "CBLDB21",
+        "target": "REPOUT",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB21",
+        "target": "Z",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB22",
+        "target": "DSNTIAR",
+        "type": "call"
+      },
+      {
+        "source": "CBLDB22",
+        "target": "REPOUT",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB22",
+        "target": "RECIN",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB22",
+        "target": "Z",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB23",
+        "target": "DSNTIAR",
+        "type": "call"
+      },
+      {
+        "source": "CBLDB23",
+        "target": "REPOUT",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB23",
+        "target": "CARDIN",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB23",
+        "target": "Z",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB21R",
+        "target": "IKJEFT01",
+        "type": "job"
+      },
+      {
+        "source": "CBLDB21R",
+        "target": "SDSNLOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB22R",
+        "target": "IKJEFT01",
+        "type": "job"
+      },
+      {
+        "source": "CBLDB22R",
+        "target": "SDSNLOAD",
+        "type": "data"
+      },
+      {
+        "source": "CBLDB23R",
+        "target": "IKJEFT01",
+        "type": "job"
+      },
+      {
+        "source": "CBLDB23R",
+        "target": "SDSNLOAD",
+        "type": "data"
+      },
+      {
+        "source": "DB2SETUP",
+        "target": "IEBCOPY",
+        "type": "job"
+      },
+      {
+        "source": "DB2SETUP",
+        "target": "IEFBR14",
+        "type": "job"
+      },
+      {
+        "source": "DB2SETUP",
+        "target": "JCL",
+        "type": "data"
+      },
+      {
+        "source": "DB2SETUP",
+        "target": "CBL",
+        "type": "data"
+      },
+      {
+        "source": "DB2SETUP",
+        "target": "DBRMLIB",
+        "type": "data"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #3 - ADVANCED TOPICS/DBRMLIB",
+        "target": "IEFBR14",
+        "type": "job"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #3 - ADVANCED TOPICS/DBRMLIB",
+        "target": "DBRMLIB",
+        "type": "data"
+      },
+      {
+        "source": "LOADTBL",
+        "target": "DATA",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "IGYCRCTL",
+        "type": "job"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "IEWBLINK",
+        "type": "job"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "IKJEFT01",
+        "type": "job"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "SIGYCOMP",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "SDSNEXIT",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "SDSNLOAD",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "SCEERUN",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "SCEERUN2",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "SCEELKED",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "DB2CBL",
+        "target": "DBRMLIB",
+        "type": "data"
+      },
+      {
+        "source": "DB2JCL",
+        "target": "IKJEFT01",
+        "type": "job"
+      },
+      {
+        "source": "DB2JCL",
+        "target": "SDSNLOAD",
+        "type": "data"
+      },
+      {
+        "source": "DSNUPROC",
+        "target": "DSNUTILB",
+        "type": "job"
+      },
+      {
+        "source": "DSNUPROC",
+        "target": "SORTLIB",
+        "type": "data"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/DEPTPAY",
+        "target": "IKJEFT01",
+        "type": "job"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/DEPTPAY",
+        "target": "DEPTPAY",
+        "type": "job"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/DEPTPAY",
+        "target": "DEPTPAY",
+        "type": "data"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/DEPTPAY",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/EMPPAY",
+        "target": "EMPPAY",
+        "type": "job"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/EMPPAY",
+        "target": "EMPPAY",
+        "type": "data"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/EMPPAY",
+        "target": "LOAD",
+        "type": "data"
+      },
+      {
+        "source": "COBOL PROGRAMMING COURSE #4 - TESTING/EMPPAY",
+        "target": "DATA",
+        "type": "data"
+      }
+    ],
+    "domains": [
+      {
+        "id": "BAT",
+        "name": "Batch/Infra",
+        "color": "#22d3ee"
+      },
+      {
+        "id": "GEN",
+        "name": "General",
+        "color": "#94a3b8"
+      },
+      {
+        "id": "PAY",
+        "name": "Payments",
+        "color": "#60a5fa"
+      },
+      {
+        "id": "RPT",
+        "name": "Reporting",
+        "color": "#a78bfa"
+      }
+    ],
+    "metadata": {
+      "repo": "https://github.com/openmainframeproject/cobol-programming-course",
+      "nodeCount": 96,
+      "edgeCount": 157,
+      "analyzedAt": "2026-08-11T20:54:04.555838+00:00"
+    }
+  }
+}
