@@ -20,7 +20,7 @@ Use the Railway CLI to monitor deployment status:
 railway status
 ```
 
-Poll this every 30 seconds, up to 15 retries. Look for the deployment status to show as **"SUCCESS"** or **"ACTIVE"** (indicating the new build completed and is live).
+Poll this every 30 seconds, up to 15 retries. Look for the deployment status to show as **"Online"** (indicating the build completed and the service is live).
 
 - If the status shows a **build failure** or **crash**, skip directly to the failure workflow (Step 4) — fetch the Railway build/deploy logs immediately.
 - If the deployment is still in progress (building, deploying), keep waiting.
@@ -28,7 +28,7 @@ Poll this every 30 seconds, up to 15 retries. Look for the deployment status to 
 If `railway status` is not available or errors out, fall back to checking logs:
 
 ```bash
-railway logs --num 50
+railway logs --lines 50
 ```
 
 Look for log lines indicating the deployment completed, such as:
@@ -95,13 +95,13 @@ If any route returns a non-200 status code:
    git revert HEAD --no-edit && git push
    ```
 
-2. **Fetch Railway logs** to understand what went wrong. Try:
+2. **Fetch Railway logs** to understand what went wrong:
    ```bash
-   railway logs
+   railway logs --lines 100
    ```
-   Or if a helper script exists:
+   Also fetch build logs to check for build-time errors:
    ```bash
-   node scripts/get-railway-logs.js
+   railway logs --build --lines 50
    ```
 
 3. **Present findings to the user:**
