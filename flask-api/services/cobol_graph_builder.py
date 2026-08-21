@@ -83,6 +83,14 @@ RE_PARAGRAPH = re.compile(
     r"^       ([A-Za-z][A-Za-z0-9_-]*)\s*\.\s*$", re.MULTILINE
 )
 
+# BMS macros: DFHMSD TYPE=...,... defines a mapset; DFHMDI SIZE=... defines a map
+RE_BMS_MAPSET = re.compile(
+    r"^(\S+)\s+DFHMSD\b", re.IGNORECASE | re.MULTILINE
+)
+RE_BMS_MAP = re.compile(
+    r"^(\S+)\s+DFHMDI\b", re.IGNORECASE | re.MULTILINE
+)
+
 # Domain colour palette
 DOMAIN_COLORS = [
     "#4ade80", "#60a5fa", "#f472b6", "#fbbf24",
@@ -172,9 +180,25 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
     performs_by_program: dict[str, set[str]] = defaultdict(set)
     domains_seen: set[str] = set()
 
+    # Reverse lookup: label -> list of node IDs (for disambiguated ID resolution)
+    label_to_ids: dict[str, list[str]] = defaultdict(list)
+    # Source content map: node ID -> cleaned source (for edge validation)
+    source_map: dict[str, str] = {}
+
     def add_node(node_id: str, label: str, ntype: str, domain: str,
                  loc: int = 0, source: str = "") -> None:
-        if node_id not in nodes:
+        if node_id in nodes:
+            existing = nodes[node_id]
+            # Upgrade stub node (loc=0) when real source (loc>0) arrives
+            if existing["loc"] == 0 and loc > 0:
+                existing["loc"] = loc
+                existing["type"] = ntype
+                existing["domain"] = domain
+                existing["color"] = DOMAIN_META.get(domain, ("", "#94a3b8"))[1]
+                domains_seen.add(domain)
+                if source:
+                    source_map[node_id] = source
+        else:
             nodes[node_id] = {
                 "id": node_id,
                 "label": label,
@@ -188,6 +212,9 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
                 "fanOut": 0,
             }
             domains_seen.add(domain)
+            label_to_ids[label].append(node_id)
+            if source:
+                source_map[node_id] = source
 
     def add_edge(source_id: str, target_id: str, etype: str) -> None:
         key = (source_id, target_id, etype)
@@ -212,16 +239,22 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
         # Use path-based id to handle duplicate PROGRAM-IDs across directories
         file_id = prog_id
         if file_id in nodes:
-            # Disambiguate with the first meaningful directory component
-            parts = PurePosixPath(path).parts
-            prefix = parts[0].upper() if parts and len(parts) > 1 else ext.upper()
-            file_id = f"{prefix}/{prog_id}"
-            # Still colliding? use full parent path
-            if file_id in nodes:
-                file_id = f"{PurePosixPath(path).parent}/{prog_id}".upper()
+            existing = nodes[file_id]
+            if existing["loc"] == 0:
+                # Existing node is a stub — upgrade it in place, no disambiguation
+                pass
+            else:
+                # Real collision: two source files with same PROGRAM-ID
+                parts = PurePosixPath(path).parts
+                prefix = parts[0].upper() if parts and len(parts) > 1 else ext.upper()
+                file_id = f"{prefix}/{prog_id}"
+                if file_id in nodes:
+                    file_id = f"{PurePosixPath(path).parent}/{prog_id}".upper()
 
         domain = _guess_domain(prog_id, clean)
         add_node(file_id, prog_id, ftype, domain, loc, clean)
+        # Ensure source_map is populated even if add_node merged into existing
+        source_map[file_id] = clean
 
         if ftype == "job":
             _parse_jcl(file_id, clean, nodes, add_node, add_edge, domains_seen)
@@ -231,39 +264,63 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
                 nodes, add_node, add_edge, paragraphs_by_program,
                 performs_by_program, domains_seen,
             )
+        elif ftype == "screen":
+            _parse_bms(file_id, clean, nodes, add_node, add_edge, domains_seen)
+
+    # ── Pass 1b: Reconcile disambiguated IDs ─────────────────────────
+    # When edges reference a bare label (e.g. "ACCT0020") but the real node
+    # has a disambiguated ID (e.g. "SRC/ACCT0020"), fix the edge targets.
+    for edge in edges:
+        for field in ("source", "target"):
+            ref = edge[field]
+            if ref in nodes:
+                continue
+            # Look up by label — if exactly one real source node matches, remap
+            candidates = label_to_ids.get(ref, [])
+            real = [nid for nid in candidates if nid in nodes and nodes[nid]["loc"] > 0]
+            if len(real) == 1:
+                edge[field] = real[0]
+                logger.debug("Remapped edge %s %s -> %s", field, ref, real[0])
+            elif len(candidates) == 1 and candidates[0] in nodes:
+                edge[field] = candidates[0]
+
+    # Rebuild edge_set after remapping
+    edge_set.clear()
+    deduped: list[dict] = []
+    for edge in edges:
+        key = (edge["source"], edge["target"], edge["type"])
+        if key not in edge_set:
+            edge_set.add(key)
+            deduped.append(edge)
+    edges.clear()
+    edges.extend(deduped)
+
+    # ── Pass 1c: Paragraph reconciliation ──────────────────────────────
+    for file_id, performed in performs_by_program.items():
+        defined = paragraphs_by_program.get(file_id, set())
+        undefined = performed - defined
+        if undefined:
+            logger.warning(
+                "%s: PERFORMs reference undefined paragraphs: %s",
+                file_id, ", ".join(sorted(undefined)),
+            )
 
     # ── Pass 2: Detect dead code ───────────────────────────────────────
-    # A program is "dead" if no other program CALLs it and no JCL references it
     called_programs: set[str] = set()
     for e in edges:
         if e["type"] in ("call", "job"):
             called_programs.add(e["target"])
 
-    for nid, node in nodes.items():
-        if node["type"] == "program" and nid not in called_programs:
-            # The first/main program is not dead
-            pass  # keep dead=False, we mark only truly orphaned ones below
-
-    # Mark dead: programs that are never called AND have no outgoing
-    # edges at all (not even data access).  Programs with source files
-    # are real entry points, not dead code — only mark stub nodes that
-    # were auto-created from references but never had source loaded.
-    source_file_ids = {s["name"] for s in sources}
     program_ids = [nid for nid, n in nodes.items() if n["type"] == "program"]
     for pid in program_ids:
         if pid in called_programs:
             continue
         node = nodes[pid]
-        # If this program came from a real source file, it's a top-level
-        # entry point (driver), not dead code.
+        # Real source files are entry points, not dead code
         if node["loc"] > 0:
             continue
-        # Stub node with no source and nobody calls it
-        has_any_edge = any(
-            e["source"] == pid or e["target"] == pid for e in edges
-        )
-        if not has_any_edge:
-            node["dead"] = True
+        # Stub node with no source and nobody calls it — mark dead
+        node["dead"] = True
 
     # ── Pass 3: Compute fan-in / fan-out and risk ──────────────────────
     for e in edges:
@@ -301,6 +358,7 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
             "edgeCount": len(edges),
             "analyzedAt": datetime.now(timezone.utc).isoformat(),
         },
+        "_source_map": source_map,
     }
 
 
@@ -373,6 +431,28 @@ def _parse_cobol(
                        "TIMES", "AFTER", "BEFORE", "END-PERFORM"):
             continue
         performs_by_program[file_id].add(target)
+
+
+def _parse_bms(
+    file_id: str, source: str,
+    nodes: dict, add_node, add_edge, domains_seen: set,
+) -> None:
+    """Extract mapset/map definitions from a BMS screen file."""
+    domains_seen.add("ONL")
+
+    for m in RE_BMS_MAPSET.finditer(source):
+        mapset_name = m.group(1).upper()
+        if mapset_name in ("*", "PRINT", "SPACE"):
+            continue
+        add_node(mapset_name, mapset_name, "screen", "ONL", 0)
+        add_edge(file_id, mapset_name, "screen")
+
+    for m in RE_BMS_MAP.finditer(source):
+        map_name = m.group(1).upper()
+        if map_name in ("*", "PRINT", "SPACE"):
+            continue
+        add_node(map_name, map_name, "screen", "ONL", 0)
+        add_edge(file_id, map_name, "screen")
 
 
 def _parse_jcl(

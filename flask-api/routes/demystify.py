@@ -10,6 +10,7 @@ from services.storage import save_analysis
 from services.github_files import list_repo_files, fetch_repo_sources
 from services.coverage import compute_coverage
 from services.cobol_graph_builder import build_graph_from_sources
+from services.edge_validation import validate_graph
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -88,6 +89,14 @@ def demystify():
         analysis_id = save_analysis(result, repo_url, input_type)
         result["analysis_id"] = analysis_id
         result["fetch_status"] = fetch_status
+
+        # Edge validation (non-blocking)
+        try:
+            source_map = result.pop("_source_map", None)
+            if source_map:
+                result["validation"] = validate_graph(result, source_map)
+        except Exception as e:
+            logger.warning("Edge validation failed for %s: %s", repo_url, e)
 
         # Attempt coverage calculation for GitHub repos (non-blocking)
         if input_type == "github":
