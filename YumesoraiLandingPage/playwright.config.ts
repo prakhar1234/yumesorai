@@ -10,12 +10,12 @@ export default defineConfig({
   retries: isCI ? 2 : 0,
   workers: isCI ? 1 : undefined,
   reporter: 'html',
-  timeout: 60 * 1000, // 60 second timeout for slower production environments
+  timeout: 60 * 1000,
   use: {
-    baseURL: process.env.TEST_BASE_URL || 'https://www.yumesorai.com',
+    baseURL: process.env.TEST_BASE_URL || 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
-    navigationTimeout: 60 * 1000, // Extended timeout for navigation
+    navigationTimeout: 60 * 1000,
   },
 
   projects: [
