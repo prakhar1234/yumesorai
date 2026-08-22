@@ -114,3 +114,141 @@ and any related artifacts. Identify all programs, copybooks, database tables, \
 batch jobs, and screen definitions. Map all dependencies between them.
 
 Return ONLY the JSON knowledge graph, no other text.{source_section}"""
+
+
+def build_correction_prompt(
+    graph: dict,
+    eval_failures: dict,
+    sources: list[dict],
+    repo_file_manifest: dict,
+) -> str:
+    """Build a prompt for the LLM to fix a graph that failed evaluation.
+
+    Includes the current graph summary, lists each repo file NOT in the graph
+    with its full source code, lists invalid edges, and asks the LLM to return
+    a corrected full graph JSON.
+
+    Args:
+        graph: The current graph dict with ``nodes`` and ``edges``.
+        eval_failures: Output of ``_evaluate_graph()`` with reconciliation,
+            validation, and completeness results.
+        sources: List of source dicts from ``fetch_repo_sources()``.
+        repo_file_manifest: Output of ``list_repo_files()`` with ``files`` list.
+
+    Returns:
+        A user prompt string for the LLM correction loop.
+    """
+    # Current graph summary
+    nodes = graph.get("nodes", [])
+    edges = graph.get("edges", [])
+    node_ids = {n["id"] for n in nodes}
+    node_summary = ", ".join(sorted(n["id"] for n in nodes)[:30])
+    if len(nodes) > 30:
+        node_summary += f" ... ({len(nodes)} total)"
+
+    # Missing files (repo_only from reconciliation)
+    reconciliation = eval_failures.get("reconciliation", {})
+    repo_only = reconciliation.get("repo_only", [])
+
+    # Build source lookup by stem
+    source_by_stem: dict[str, dict] = {}
+    for src in sources:
+        stem = src["name"].upper().split(".")[0]
+        source_by_stem[stem] = src
+
+    missing_file_blocks: list[str] = []
+    for stem in repo_only:
+        src = source_by_stem.get(stem)
+        if src:
+            missing_file_blocks.append(
+                f"--- MISSING FILE: {src['path']} (type: {src['type']}) ---\n"
+                f"{src['content']}\n"
+                f"--- END FILE ---"
+            )
+        else:
+            missing_file_blocks.append(
+                f"--- MISSING FILE: {stem} (source not available) ---"
+            )
+
+    missing_section = ""
+    if missing_file_blocks:
+        missing_section = (
+            "\n\n## Missing Files\n"
+            "The following files exist in the repository but are NOT represented "
+            "in the current graph. You MUST add a node for each of them.\n\n"
+            "**CRITICAL — Node ID rule:** The node `id` for each missing file "
+            "MUST be the EXACT uppercased file stem (filename without extension) "
+            "as shown below. For example, if the file is `error-handling.cbl`, "
+            "the node id MUST be `ERROR-HANDLING` (not `ERRORHANDLING`, not "
+            "`ERRHNDL`, not any other variation). Hyphens, underscores, and "
+            "casing must match the stem exactly (uppercased).\n\n"
+            + "\n\n".join(missing_file_blocks)
+        )
+
+    # Build the required node ID table from the missing stems
+    missing_id_table = ""
+    if repo_only:
+        rows = []
+        for stem in repo_only:
+            src = source_by_stem.get(stem)
+            path = src["path"] if src else "unknown"
+            rows.append(f"  - File: `{path}` → required node id: `{stem}`")
+        missing_id_table = (
+            "\n\n## Required Node IDs (MUST match exactly)\n"
+            + "\n".join(rows)
+        )
+
+    # Full repo manifest for reference
+    repo_files = repo_file_manifest.get("files", [])
+    manifest_lines = [f"  - `{f['name'].upper()}` ({f['path']})" for f in repo_files]
+    manifest_section = (
+        "\n\n## Complete Repo File Manifest\n"
+        "Every file below MUST have a corresponding node in the graph. "
+        "The node `id` MUST be the uppercased stem shown here:\n"
+        + "\n".join(manifest_lines)
+    )
+
+    # Invalid edges
+    validation = eval_failures.get("validation", {})
+    invalid_edges = validation.get("edge_validation", {}).get("invalid_edges", [])
+    invalid_section = ""
+    if invalid_edges:
+        edge_lines = []
+        for ie in invalid_edges[:20]:
+            edge_lines.append(
+                f"  - {ie['source']} --({ie['type']})--> {ie['target']}: {ie['reason']}"
+            )
+        invalid_section = (
+            "\n\n## Invalid Edges\n"
+            "The following edges failed source-code verification. "
+            "Fix or remove them:\n"
+            + "\n".join(edge_lines)
+        )
+
+    # Coverage stats
+    coverage_pct = reconciliation.get("coverage_pct", 0)
+    matched = reconciliation.get("matched_count", 0)
+    total_repo = reconciliation.get("total_repo_files", 0)
+
+    return f"""The following COBOL knowledge graph has been evaluated and FAILED \
+the 100% file coverage gate.
+
+## Current Coverage
+- Files matched: {matched}/{total_repo} ({coverage_pct}%)
+- Files missing from graph: {len(repo_only)}
+- Current graph: {len(nodes)} nodes, {len(edges)} edges
+- Graph nodes: {node_summary}
+{missing_section}{missing_id_table}{manifest_section}{invalid_section}
+
+## Instructions
+Fix the graph so that EVERY file in the repository is represented as a node \
+with correct edges. Return the COMPLETE corrected knowledge graph as JSON \
+(same schema as before — nodes, edges, domains, metadata). Do NOT omit \
+existing correct nodes/edges.
+
+**CRITICAL NODE ID RULE:** Every node `id` MUST be the EXACT uppercased file \
+stem (filename without extension), preserving hyphens and special characters. \
+For example: `db2-handling.cbl` → id `DB2-HANDLING`, `POSUPDT.cbl` → id `POSUPDT`. \
+Do NOT strip hyphens, do NOT abbreviate, do NOT rename.
+
+Return ONLY the JSON knowledge graph, no other text."""

@@ -222,6 +222,10 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
             edge_set.add(key)
             edges.append({"source": source_id, "target": target_id, "type": etype})
 
+    # Maps source file stem (uppercased, no extension) -> node ID
+    # Handles cases where PROGRAM-ID differs from filename
+    file_stem_to_node: dict[str, str] = {}
+
     # ── Pass 1: Parse each source file ─────────────────────────────────
     for src in sources:
         raw = src["content"]
@@ -255,6 +259,9 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
         add_node(file_id, prog_id, ftype, domain, loc, clean)
         # Ensure source_map is populated even if add_node merged into existing
         source_map[file_id] = clean
+        # Track filename stem -> node ID (for reconciliation when PROGRAM-ID != filename)
+        file_stem = name.upper().split(".")[0]
+        file_stem_to_node[file_stem] = file_id
 
         if ftype == "job":
             _parse_jcl(file_id, clean, nodes, add_node, add_edge, domains_seen)
@@ -359,6 +366,7 @@ def build_graph_from_sources(sources: list[dict], repo_url: str) -> dict:
             "analyzedAt": datetime.now(timezone.utc).isoformat(),
         },
         "_source_map": source_map,
+        "_file_stem_map": file_stem_to_node,
     }
 
 

@@ -182,6 +182,61 @@ def check_consistency(graph_data: dict) -> dict:
     }
 
 
+def prune_invalid_edges(graph: dict, validation_result: dict) -> tuple[dict, list]:
+    """Remove invalid edges and resulting orphan nodes from the graph.
+
+    Uses the ``invalid_edges`` list from ``validate_edges()`` output.
+    LLM-only edges that failed validation are removed first. Then any
+    nodes left with zero edges and no source (loc == 0) are pruned.
+
+    Args:
+        graph: Graph dict with ``nodes`` and ``edges``.
+        validation_result: Output of ``validate_graph()``.
+
+    Returns:
+        Tuple of (pruned_graph, removed_edges).
+    """
+    invalid_set = set()
+    for ie in validation_result.get("edge_validation", {}).get("invalid_edges", []):
+        invalid_set.add((ie["source"], ie["target"], ie["type"]))
+
+    kept_edges = []
+    removed_edges = []
+    for edge in graph.get("edges", []):
+        key = (edge["source"], edge["target"], edge["type"])
+        # Only remove edges that are both invalid and LLM-only
+        if key in invalid_set and edge.get("llm_only", False):
+            removed_edges.append(edge)
+        else:
+            kept_edges.append(edge)
+
+    graph["edges"] = kept_edges
+
+    # Remove orphan nodes: no remaining edges and no source file
+    connected: set[str] = set()
+    for edge in kept_edges:
+        connected.add(edge["source"])
+        connected.add(edge["target"])
+
+    pruned_nodes = []
+    for node in graph.get("nodes", []):
+        nid = node["id"]
+        if nid in connected or node.get("loc", 0) > 0:
+            pruned_nodes.append(node)
+        # else: orphan stub node with no edges — drop it
+
+    graph["nodes"] = pruned_nodes
+
+    if removed_edges:
+        logger.info(
+            "Pruned %d invalid LLM-only edges and %d orphan nodes",
+            len(removed_edges),
+            len(graph.get("nodes", [])) - len(pruned_nodes) if False else 0,
+        )
+
+    return graph, removed_edges
+
+
 def validate_graph(graph_data: dict, source_map: dict[str, str] | None = None) -> dict:
     """Run full validation: edge verification + consistency checks.
 

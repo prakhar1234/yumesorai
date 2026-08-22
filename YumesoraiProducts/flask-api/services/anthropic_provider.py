@@ -20,7 +20,7 @@ class AnthropicProvider(LLMProvider):
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY is not configured")
         self.client = anthropic.Anthropic(api_key=api_key)
-        self.model = getattr(config, "ANTHROPIC_MODEL", "claude-sonnet-4-20250514")
+        self.model = getattr(config, "ANTHROPIC_MODEL", "claude-sonnet-4-6")
 
     def analyze(self, system_prompt: str, user_prompt: str) -> dict:
         """Send prompts to the Anthropic API and return structured analysis.
@@ -36,13 +36,17 @@ class AnthropicProvider(LLMProvider):
             RuntimeError: If the API call fails or response cannot be parsed.
         """
         try:
-            message = self.client.messages.create(
+            # Use streaming to avoid SDK timeout on long requests
+            collected = []
+            with self.client.messages.stream(
                 model=self.model,
-                max_tokens=16384,
+                max_tokens=65536,
                 system=system_prompt,
                 messages=[{"role": "user", "content": user_prompt}],
-            )
-            content = message.content[0].text
+            ) as stream:
+                for text in stream.text_stream:
+                    collected.append(text)
+            content = "".join(collected)
             return self._parse_response(content)
         except anthropic.APIError as e:
             raise RuntimeError(f"Anthropic API error: {e}") from e
