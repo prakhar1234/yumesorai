@@ -107,6 +107,9 @@ def demystify():
             except Exception as e:
                 logger.warning("Auto-coverage failed for %s: %s", repo_url, e)
 
+        # Remove internal maps before serializing
+        result.pop("_file_stem_map", None)
+
         return jsonify(result), 200
     except ValueError as e:
         return jsonify({"error": "Configuration error", "message": str(e)}), 400
