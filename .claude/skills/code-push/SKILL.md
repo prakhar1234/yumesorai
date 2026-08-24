@@ -1,6 +1,7 @@
 ---
 name: code-push
 description: Commits changes, runs a local build to verify, pushes to GitHub only if the build passes, then verifies the Railway deployment is healthy. Reverts and diagnoses if anything fails.
+user-invocable: true
 disable-model-invocation: true
 allowed-tools: Bash Read Grep Glob
 ---

@@ -3,6 +3,7 @@ name: product-guide
 description: Explains the functional understanding of the Yumesorai platform — both the marketing Landing Page and the Products app (Demystifier suite). Use when the user asks how a feature works, what a page does, or wants to understand product functionality.
 argument-hint: "[topic]"
 arguments: topic
+user-invocable: true
 disable-model-invocation: true
 allowed-tools: Read Glob Grep
 effort: high

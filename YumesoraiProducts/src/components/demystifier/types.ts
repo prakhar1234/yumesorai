@@ -47,12 +47,12 @@ export interface CoverageData {
 }
 
 export const DOMAINS: Domain[] = [
-  { id: 'ACT', name: 'Accounts', color: '#4ade80', prefix: 'ACCT' },
-  { id: 'PAY', name: 'Payments', color: '#60a5fa', prefix: 'PAY' },
-  { id: 'CUS', name: 'Customer', color: '#f472b6', prefix: 'CUST' },
-  { id: 'BIL', name: 'Billing', color: '#fbbf24', prefix: 'BILL' },
-  { id: 'RPT', name: 'Reporting', color: '#a78bfa', prefix: 'RPT' },
-  { id: 'BAT', name: 'Batch/Infra', color: '#22d3ee', prefix: 'BAT' },
+  { id: 'ACT', name: 'Accounts', color: '#6ee7a0', prefix: 'ACCT' },
+  { id: 'PAY', name: 'Payments', color: '#81b4ff', prefix: 'PAY' },
+  { id: 'CUS', name: 'Customer', color: '#ff8ac5', prefix: 'CUST' },
+  { id: 'BIL', name: 'Billing', color: '#ffd24d', prefix: 'BILL' },
+  { id: 'RPT', name: 'Reporting', color: '#bea4ff', prefix: 'RPT' },
+  { id: 'BAT', name: 'Batch/Infra', color: '#45e8f8', prefix: 'BAT' },
 ];
 
 export const EDGE_TYPES: Record<string, { label: string; color: string }> = {

@@ -307,10 +307,10 @@ export function nodeLayer(type: string): number {
 
 /** Risk to color mapping */
 export function riskColor(risk: number): string {
-  if (risk > 0.75) return '#ef4444';
-  if (risk > 0.5) return '#f97316';
-  if (risk > 0.3) return '#eab308';
-  return '#22c55e';
+  if (risk > 0.75) return '#ff6b6b';
+  if (risk > 0.5) return '#ff9f43';
+  if (risk > 0.3) return '#ffd43b';
+  return '#51cf66';
 }
 
 /** Node radius based on type and connections */
