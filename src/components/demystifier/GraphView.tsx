@@ -475,6 +475,31 @@ export function GraphView({ data, repoLabel, search, onNewAnalysis, coverage }: 
           <span className="px-3 py-1.5 bg-[#111823] border border-[#232c3c] rounded-md text-[10.5px] text-[#7a869a]" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
             {repoLabel} \u00B7 {data.nodes.length} nodes \u00B7 {data.edges.length} edges
           </span>
+          {coverage && (
+            <span
+              className="px-3 py-1.5 bg-[#111823] border rounded-md flex items-center gap-2"
+              style={{
+                fontFamily: "'IBM Plex Mono', monospace",
+                borderColor: coverage.coverage_pct >= 90 ? '#22c55e40' :
+                             coverage.coverage_pct >= 70 ? '#eab30840' :
+                             coverage.coverage_pct >= 50 ? '#f9731640' : '#ef444440',
+              }}
+            >
+              <span
+                className="text-[14px] font-bold"
+                style={{
+                  color: coverage.coverage_pct >= 90 ? '#22c55e' :
+                         coverage.coverage_pct >= 70 ? '#eab308' :
+                         coverage.coverage_pct >= 50 ? '#f97316' : '#ef4444',
+                }}
+              >
+                {coverage.coverage_pct}%
+              </span>
+              <span className="text-[9px] text-[#5b6577]">
+                {coverage.covered_files}/{coverage.total_files} files
+              </span>
+            </span>
+          )}
         </div>
 
         {/* Banner */}

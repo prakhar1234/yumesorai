@@ -1,6 +1,7 @@
 """JSON file-based storage for analyses."""
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import uuid
@@ -15,7 +16,30 @@ def _ensure_dir():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def save_analysis(result: dict, repo_url: str, input_type: str) -> str:
+def compute_content_hash(sources: list[dict]) -> str:
+    """Compute a deterministic SHA-256 hash over sorted source paths + contents."""
+    h = hashlib.sha256()
+    for src in sorted(sources, key=lambda s: s.get("path", "")):
+        h.update(src.get("path", "").encode())
+        h.update(src.get("content", "").encode())
+    return h.hexdigest()
+
+
+def find_by_hash(repo_url: str, content_hash: str) -> Optional[dict]:
+    """Find a saved analysis matching the given repo_url and content_hash."""
+    _ensure_dir()
+    for filepath in DATA_DIR.glob("*.json"):
+        try:
+            with open(filepath) as f:
+                record = json.load(f)
+            if record.get("repo_url") == repo_url and record.get("content_hash") == content_hash:
+                return record
+        except (json.JSONDecodeError, KeyError):
+            continue
+    return None
+
+
+def save_analysis(result: dict, repo_url: str, input_type: str, content_hash: Optional[str] = None) -> str:
     """Save an analysis result to a JSON file. Returns the generated ID."""
     _ensure_dir()
     analysis_id = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S") + "-" + uuid.uuid4().hex[:6]
@@ -30,6 +54,8 @@ def save_analysis(result: dict, repo_url: str, input_type: str) -> str:
         "edge_count": len(edges),
         "result": result,
     }
+    if content_hash:
+        record["content_hash"] = content_hash
     filepath = DATA_DIR / f"{analysis_id}.json"
     with open(filepath, "w") as f:
         json.dump(record, f, indent=2)

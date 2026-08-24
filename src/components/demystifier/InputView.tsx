@@ -65,13 +65,17 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
     return () => clearTimeout(t);
   }, [toast]);
 
-  const defaultRepo = useCallback(() => {
-    if (tab === 'github') return 'github.com/legacy-bank/core-cobol';
-    return 'sftp://mvs-prod/SYS1.COBOL.SRC';
-  }, [tab]);
-
   const shortLabel = (s: string) =>
     s.replace(/^https?:\/\//, '').replace(/^github\.com\//, '').replace(/\.git$/, '');
+
+  const isValidGithubRepo = (input: string): boolean => {
+    const cleaned = input.replace(/^https?:\/\//, '').replace(/\.git$/, '');
+    return /^github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/.test(cleaned);
+  };
+
+  const isValidServerPath = (input: string): boolean => {
+    return input.trim().length > 0 && /^[a-zA-Z]+:\/\//.test(input.trim());
+  };
 
   const fallbackToDemoData = useCallback((lbl: string) => {
     const data = buildDemoData(42);
@@ -83,7 +87,24 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
   }, [onAnalyzeComplete]);
 
   const analyze = useCallback((label?: string) => {
-    const lbl = label || repoInput || defaultRepo();
+    const lbl = label || repoInput.trim();
+
+    // Validate input — sample repos pass a label directly and skip validation
+    if (!label) {
+      if (!lbl) {
+        setToast('Please enter a repository URL');
+        return;
+      }
+      if (tab === 'github' && !isValidGithubRepo(lbl)) {
+        setToast('Enter a valid GitHub repo — e.g. github.com/org/repo');
+        return;
+      }
+      if (tab === 'server' && !isValidServerPath(lbl)) {
+        setToast('Enter a valid server path — e.g. sftp://host/path');
+        return;
+      }
+    }
+
     setAnalyzing(true);
     setProgress(0);
 
@@ -106,19 +127,23 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         return res.json();
       })
-      .then((data: GraphData & { fetch_status?: { source: string; files_fetched: number; error: string | null } }) => {
+      .then((data: GraphData & { fetch_status?: { source: string; files_fetched: number; error: string | null }; cached?: boolean }) => {
         if (timerRef.current) clearInterval(timerRef.current);
         setProgress(100);
         layoutGraph(data);
         buildAdjacency(data);
 
         // Show fetch status to user
-        const fs = data.fetch_status;
-        if (fs) {
-          if (fs.error) {
-            setToast(`Source download failed — analyzed from URL only. Error: ${fs.error}`);
-          } else if (fs.files_fetched > 0) {
-            setToast(`Downloaded ${fs.files_fetched} source files from GitHub for analysis`);
+        if (data.cached) {
+          setToast('Using cached analysis — repo unchanged since last scan');
+        } else {
+          const fs = data.fetch_status;
+          if (fs) {
+            if (fs.error) {
+              setToast(`Source download failed — analyzed from URL only. Error: ${fs.error}`);
+            } else if (fs.files_fetched > 0) {
+              setToast(`Downloaded ${fs.files_fetched} source files from GitHub for analysis`);
+            }
           }
         }
 
@@ -132,7 +157,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         setProgress(100);
         setTimeout(() => fallbackToDemoData(lbl), 300);
       });
-  }, [repoInput, defaultRepo, tab, onAnalyzeComplete, fallbackToDemoData]);
+  }, [repoInput, tab, onAnalyzeComplete, fallbackToDemoData]);
 
   const loadSavedAnalysis = useCallback((id: string, repoUrl: string) => {
     setAnalyzing(true);
@@ -230,8 +255,9 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         {/* Progress bar */}
         {analyzing && (
           <div className="mb-8">
-            <div className="flex justify-between text-[10px] text-[#5b6577] mb-1.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-              <span>
+            <div className="flex justify-between text-[11px] text-[#7a869a] mb-1.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+              <span className="flex items-center gap-1.5">
+                <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#45c4b0] animate-pulse" />
                 {progress < 15 ? 'Connecting to GitHub...' :
                  progress < 35 ? 'Downloading COBOL sources...' :
                  progress < 55 ? 'Analyzing source code...' :

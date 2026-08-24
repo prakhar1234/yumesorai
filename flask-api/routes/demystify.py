@@ -6,7 +6,7 @@ import logging
 
 from services.llm_provider import get_provider
 from services.prompt_builder import build_system_prompt, build_user_prompt
-from services.storage import save_analysis
+from services.storage import save_analysis, compute_content_hash, find_by_hash
 from services.github_files import list_repo_files, fetch_repo_sources
 from services.coverage import compute_coverage
 from services.cobol_graph_builder import build_graph_from_sources
@@ -62,6 +62,29 @@ def demystify():
                 fetch_status["error"] = str(e)
                 logger.warning("Source fetch failed for %s: %s", repo_url, e)
 
+        # Content-hash cache check
+        content_hash = None
+        if sources:
+            content_hash = compute_content_hash(sources)
+            cached = find_by_hash(repo_url, content_hash)
+            if cached:
+                logger.info("Cache hit for %s (hash=%s)", repo_url, content_hash[:12])
+                result = cached["result"]
+                result["analysis_id"] = cached["id"]
+                result["fetch_status"] = fetch_status
+                result["cached"] = True
+
+                # Re-compute coverage for cached results
+                if input_type == "github":
+                    try:
+                        repo_files = list_repo_files(repo_url)
+                        coverage = compute_coverage(result, repo_files)
+                        result["coverage"] = coverage
+                    except Exception as e:
+                        logger.warning("Auto-coverage failed for cached %s: %s", repo_url, e)
+
+                return jsonify(result), 200
+
         # Decide analysis strategy
         result = None
 
@@ -86,7 +109,7 @@ def demystify():
         if result is None:
             return jsonify({"error": "No source files found to analyze"}), 400
 
-        analysis_id = save_analysis(result, repo_url, input_type)
+        analysis_id = save_analysis(result, repo_url, input_type, content_hash=content_hash)
         result["analysis_id"] = analysis_id
         result["fetch_status"] = fetch_status
 
