@@ -126,7 +126,7 @@ def list_repo_files(repo_url: str) -> dict:
     }
 
 
-def fetch_repo_sources(repo_url: str) -> list[dict]:
+def fetch_repo_sources(repo_url: str, on_file_fetched=None) -> list[dict]:
     """Download COBOL source files from a GitHub repository.
 
     Fetches the file tree, then downloads the raw content for each
@@ -227,6 +227,13 @@ def fetch_repo_sources(repo_url: str) -> list[dict]:
             "type": f["type"],
             "content": raw,
         })
+
+        if on_file_fetched:
+            on_file_fetched(
+                downloaded=len(sources),
+                total=len(files),
+                current_file=f["path"],
+            )
 
     # Summary log
     if failed_files:

@@ -1,6 +1,8 @@
 """Routes for the demystify endpoint."""
 
-from flask import Blueprint, jsonify, request
+import json
+
+from flask import Blueprint, Response, jsonify, request, stream_with_context
 
 import logging
 
@@ -132,3 +134,206 @@ def _static_analysis(sources, repo_url, fetch_status):
     result = build_graph_from_sources(sources, repo_url)
     fetch_status["analysis_mode"] = "static"
     return result
+
+
+def _sse_event(event_type, data):
+    """Format a server-sent event."""
+    return f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
+
+
+@demystify_bp.route("/api/demystify/stream", methods=["POST"])
+def demystify_stream():
+    """SSE streaming version of the demystify endpoint.
+
+    Emits progress events as the pipeline executes, then a final result event.
+    """
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "Request body must be valid JSON"}), 400
+
+    repo_url = data.get("repo_url")
+    if not repo_url:
+        return jsonify({"error": "repo_url is required"}), 400
+
+    input_type = data.get("input_type", "github")
+    if input_type not in ("github", "server"):
+        return jsonify({"error": "input_type must be one of: github, server"}), 400
+
+    source_type = data.get("source_type")
+    mode = data.get("mode", "auto")
+
+    def generate():
+        try:
+            # --- Stage: fetch ---
+            sources = None
+            fetch_status = {"source": "url_only", "files_fetched": 0, "error": None}
+
+            if input_type == "github":
+                yield _sse_event("progress", {
+                    "stage": "fetch",
+                    "status": "started",
+                    "message": "Connecting to GitHub...",
+                })
+
+                def on_file_fetched(downloaded, total, current_file):
+                    pass  # per-file events are yielded below via a list
+
+                file_events = []
+
+                def collect_file_event(downloaded, total, current_file):
+                    file_events.append({
+                        "downloaded": downloaded,
+                        "total": total,
+                        "current_file": current_file,
+                    })
+
+                try:
+                    sources = fetch_repo_sources(repo_url, on_file_fetched=collect_file_event)
+                    fetch_status["source"] = "github_api"
+                    fetch_status["files_fetched"] = len(sources) if sources else 0
+                    logger.info("Fetched %d source files from %s", len(sources or []), repo_url)
+                except Exception as e:
+                    fetch_status["error"] = str(e)
+                    logger.warning("Source fetch failed for %s: %s", repo_url, e)
+
+                yield _sse_event("progress", {
+                    "stage": "fetch",
+                    "status": "done",
+                    "message": f"Downloaded {fetch_status['files_fetched']} files"
+                              if not fetch_status["error"]
+                              else f"Fetch failed: {fetch_status['error']}",
+                    "detail": {
+                        "files_fetched": fetch_status["files_fetched"],
+                        "failed": 1 if fetch_status["error"] else 0,
+                        "error": fetch_status["error"],
+                    },
+                })
+
+            # --- Stage: analysis ---
+            yield _sse_event("progress", {
+                "stage": "analysis",
+                "status": "started",
+                "message": "Analyzing source code...",
+                "detail": {"mode": mode},
+            })
+
+            # Keepalive before potentially long LLM call
+            yield ": keepalive\n\n"
+
+            result = None
+            if mode == "static":
+                result = _static_analysis(sources, repo_url, fetch_status)
+            elif mode == "llm":
+                result = _llm_analysis(repo_url, input_type, source_type, sources)
+            else:
+                try:
+                    result = _llm_analysis(repo_url, input_type, source_type, sources)
+                except Exception as e:
+                    logger.warning(
+                        "LLM analysis failed, falling back to static analysis: %s", e
+                    )
+                    result = _static_analysis(sources, repo_url, fetch_status)
+                    if result is None:
+                        raise
+
+            if result is None:
+                yield _sse_event("error", {
+                    "message": "No source files found to analyze",
+                })
+                return
+
+            node_count = len(result.get("nodes", []))
+            edge_count = len(result.get("edges", []))
+
+            yield _sse_event("progress", {
+                "stage": "analysis",
+                "status": "done",
+                "message": f"Built graph: {node_count} nodes, {edge_count} edges",
+                "detail": {"nodes": node_count, "edges": edge_count},
+            })
+
+            # --- Stage: validation ---
+            yield _sse_event("progress", {
+                "stage": "validation",
+                "status": "started",
+                "message": "Validating edges...",
+            })
+
+            try:
+                source_map = result.pop("_source_map", None)
+                if source_map:
+                    result["validation"] = validate_graph(result, source_map)
+                    score = result["validation"].get("score", 0)
+                    yield _sse_event("progress", {
+                        "stage": "validation",
+                        "status": "done",
+                        "message": f"Edge validation score: {score}",
+                        "detail": {"score": score},
+                    })
+                else:
+                    yield _sse_event("progress", {
+                        "stage": "validation",
+                        "status": "done",
+                        "message": "Validation skipped (no source map)",
+                    })
+            except Exception as e:
+                logger.warning("Edge validation failed for %s: %s", repo_url, e)
+                yield _sse_event("progress", {
+                    "stage": "validation",
+                    "status": "done",
+                    "message": "Validation skipped",
+                })
+
+            # --- Stage: coverage ---
+            if input_type == "github":
+                yield _sse_event("progress", {
+                    "stage": "coverage",
+                    "status": "started",
+                    "message": "Computing coverage...",
+                })
+
+                try:
+                    repo_files = list_repo_files(repo_url)
+                    coverage = compute_coverage(result, repo_files)
+                    result["coverage"] = coverage
+                    pct = coverage.get("coverage_pct", 0)
+                    yield _sse_event("progress", {
+                        "stage": "coverage",
+                        "status": "done",
+                        "message": f"Coverage: {pct}%",
+                        "detail": {"coverage_pct": pct},
+                    })
+                except Exception as e:
+                    logger.warning("Auto-coverage failed for %s: %s", repo_url, e)
+                    yield _sse_event("progress", {
+                        "stage": "coverage",
+                        "status": "done",
+                        "message": "Coverage calculation skipped",
+                    })
+
+            # --- Save and emit result ---
+            analysis_id = save_analysis(result, repo_url, input_type)
+            result["analysis_id"] = analysis_id
+            result["fetch_status"] = fetch_status
+
+            # Remove internal maps before serializing
+            result.pop("_file_stem_map", None)
+
+            yield _sse_event("result", result)
+
+        except Exception as e:
+            logger.exception("Stream analysis failed for %s", repo_url)
+            yield _sse_event("error", {
+                "message": "Analysis failed",
+                "detail": str(e),
+            })
+
+    return Response(
+        stream_with_context(generate()),
+        mimetype="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "X-Accel-Buffering": "no",
+            "Connection": "keep-alive",
+        },
+    )

@@ -22,6 +22,26 @@ const FEATURES = [
   { title: 'Risk Heatmap', desc: 'Color-code by complexity, fan-out, and change frequency', icon: '🔥' },
 ];
 
+const STAGE_PERCENTAGES: Record<string, number> = {
+  fetch_started: 5,
+  fetch_done: 25,
+  analysis_started: 30,
+  analysis_done: 60,
+  validation_started: 65,
+  validation_done: 80,
+  coverage_started: 85,
+  coverage_done: 95,
+  complete: 100,
+};
+
+interface ProgressState {
+  stage: string;
+  status: string;
+  message: string;
+  percentage: number;
+  fetchResult: { files_fetched: number; failed: number; error: string | null } | null;
+}
+
 interface AnalysisSummary {
   id: string;
   repo_url: string;
@@ -35,18 +55,43 @@ interface InputViewProps {
   onAnalyzeComplete: (data: GraphData, label: string) => void;
 }
 
+function parseSSEEvents(text: string): Array<{ event: string; data: string }> {
+  const events: Array<{ event: string; data: string }> = [];
+  const blocks = text.split('\n\n');
+  for (const block of blocks) {
+    const trimmed = block.trim();
+    if (!trimmed || trimmed.startsWith(':')) continue;
+    let event = '';
+    let data = '';
+    for (const line of trimmed.split('\n')) {
+      if (line.startsWith('event: ')) event = line.slice(7);
+      else if (line.startsWith('data: ')) data = line.slice(6);
+    }
+    if (event && data) {
+      events.push({ event, data });
+    }
+  }
+  return events;
+}
+
 export function InputView({ onAnalyzeComplete }: InputViewProps) {
   const [tab, setTab] = useState<'github' | 'server'>('github');
   const [repoInput, setRepoInput] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [progressState, setProgressState] = useState<ProgressState>({
+    stage: '',
+    status: '',
+    message: '',
+    percentage: 0,
+    fetchResult: null,
+  });
   const [toast, setToast] = useState<string | null>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<AnalysisSummary[]>([]);
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      abortRef.current?.abort();
     };
   }, []);
 
@@ -82,61 +127,150 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
     onAnalyzeComplete(data, shortLabel(lbl));
   }, [onAnalyzeComplete]);
 
-  const analyze = useCallback((label?: string) => {
-    const lbl = label || repoInput || defaultRepo();
-    setAnalyzing(true);
-    setProgress(0);
-
-    // Start progress animation
+  const fallbackToBlockingFetch = useCallback((lbl: string, inputType: string) => {
+    // Fallback: use the original non-streaming endpoint with a simple timer
     let p = 0;
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = setInterval(() => {
-      p += 1;
-      // Cap at 90% while waiting for the API (slower pace for source download + LLM)
-      setProgress(prev => Math.min(90, prev + 1.5));
+    const timer = setInterval(() => {
+      p = Math.min(90, p + 1.5);
+      setProgressState(prev => ({ ...prev, percentage: p, message: 'Analyzing (non-streaming fallback)...' }));
     }, 300);
 
-    // Call the backend API
     fetch('/api/demystifier', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo_url: lbl, input_type: tab }),
+      body: JSON.stringify({ repo_url: lbl, input_type: inputType }),
     })
       .then(res => {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
         return res.json();
       })
-      .then((data: GraphData & { fetch_status?: { source: string; files_fetched: number; error: string | null } }) => {
-        if (timerRef.current) clearInterval(timerRef.current);
-        setProgress(100);
+      .then((data: GraphData) => {
+        clearInterval(timer);
+        setProgressState(prev => ({ ...prev, percentage: 100, message: 'Complete' }));
         layoutGraph(data);
         buildAdjacency(data);
-
-        // Show fetch status to user
-        const fs = data.fetch_status;
-        if (fs) {
-          if (fs.error) {
-            setToast(`Source download failed — analyzed from URL only. Error: ${fs.error}`);
-          } else if (fs.files_fetched > 0) {
-            setToast(`Downloaded ${fs.files_fetched} source files from GitHub for analysis`);
-          }
-        }
-
         setTimeout(() => {
           setAnalyzing(false);
           onAnalyzeComplete(data, shortLabel(lbl));
         }, 350);
       })
       .catch(() => {
-        if (timerRef.current) clearInterval(timerRef.current);
-        setProgress(100);
+        clearInterval(timer);
+        setProgressState(prev => ({ ...prev, percentage: 100 }));
         setTimeout(() => fallbackToDemoData(lbl), 300);
       });
-  }, [repoInput, defaultRepo, tab, onAnalyzeComplete, fallbackToDemoData]);
+  }, [onAnalyzeComplete, fallbackToDemoData]);
+
+  const analyze = useCallback(async (label?: string) => {
+    const lbl = label || repoInput || defaultRepo();
+    setAnalyzing(true);
+    setProgressState({
+      stage: '',
+      status: '',
+      message: 'Connecting...',
+      percentage: 0,
+      fetchResult: null,
+    });
+
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    try {
+      const response = await fetch('/api/demystifier/stream', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ repo_url: lbl, input_type: tab }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok || !response.body) {
+        // SSE endpoint unavailable, fall back to blocking fetch
+        fallbackToBlockingFetch(lbl, tab);
+        return;
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process complete SSE events (delimited by double newline)
+        const events = parseSSEEvents(buffer);
+        // Keep only unprocessed trailing content
+        const lastDoubleNewline = buffer.lastIndexOf('\n\n');
+        if (lastDoubleNewline !== -1) {
+          buffer = buffer.slice(lastDoubleNewline + 2);
+        }
+
+        for (const evt of events) {
+          if (evt.event === 'progress') {
+            try {
+              const payload = JSON.parse(evt.data);
+              const stageKey = `${payload.stage}_${payload.status}`;
+              const pct = STAGE_PERCENTAGES[stageKey] ?? 0;
+
+              setProgressState(prev => ({
+                stage: payload.stage,
+                status: payload.status,
+                message: payload.message || prev.message,
+                percentage: Math.max(prev.percentage, pct),
+                fetchResult: payload.stage === 'fetch' && payload.status === 'done'
+                  ? payload.detail
+                  : prev.fetchResult,
+              }));
+            } catch {
+              // ignore malformed progress events
+            }
+          } else if (evt.event === 'result') {
+            try {
+              const data: GraphData = JSON.parse(evt.data);
+              setProgressState(prev => ({ ...prev, percentage: 100, message: 'Complete' }));
+              layoutGraph(data);
+              buildAdjacency(data);
+              setTimeout(() => {
+                setAnalyzing(false);
+                onAnalyzeComplete(data, shortLabel(lbl));
+              }, 350);
+              return;
+            } catch {
+              // Result parse failed, fall back to demo
+              setProgressState(prev => ({ ...prev, percentage: 100 }));
+              setTimeout(() => fallbackToDemoData(lbl), 300);
+              return;
+            }
+          } else if (evt.event === 'error') {
+            try {
+              const payload = JSON.parse(evt.data);
+              setToast(payload.message || 'Analysis failed');
+            } catch {
+              setToast('Analysis failed');
+            }
+            setProgressState(prev => ({ ...prev, percentage: 100 }));
+            setTimeout(() => fallbackToDemoData(lbl), 300);
+            return;
+          }
+        }
+      }
+
+      // Stream ended without a result event — fall back
+      setProgressState(prev => ({ ...prev, percentage: 100 }));
+      setTimeout(() => fallbackToDemoData(lbl), 300);
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return;
+      // SSE connection failed entirely — try blocking fetch, then demo data
+      fallbackToBlockingFetch(lbl, tab);
+    }
+  }, [repoInput, defaultRepo, tab, onAnalyzeComplete, fallbackToDemoData, fallbackToBlockingFetch]);
 
   const loadSavedAnalysis = useCallback((id: string, repoUrl: string) => {
     setAnalyzing(true);
-    setProgress(50);
+    setProgressState({ stage: '', status: '', message: 'Loading saved analysis...', percentage: 50, fetchResult: null });
 
     fetch(`/api/demystifier/analyses/${id}`)
       .then(res => {
@@ -147,7 +281,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         const data = record.result;
         layoutGraph(data);
         buildAdjacency(data);
-        setProgress(100);
+        setProgressState(prev => ({ ...prev, percentage: 100 }));
         setTimeout(() => {
           setAnalyzing(false);
           onAnalyzeComplete(data, shortLabel(repoUrl));
@@ -155,7 +289,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
       })
       .catch(() => {
         setAnalyzing(false);
-        setProgress(0);
+        setProgressState({ stage: '', status: '', message: '', percentage: 0, fetchResult: null });
         setToast('Failed to load saved analysis');
       });
   }, [onAnalyzeComplete]);
@@ -231,22 +365,29 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         {analyzing && (
           <div className="mb-8">
             <div className="flex justify-between text-[10px] text-[#5b6577] mb-1.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-              <span>
-                {progress < 15 ? 'Connecting to GitHub...' :
-                 progress < 35 ? 'Downloading COBOL sources...' :
-                 progress < 55 ? 'Analyzing source code...' :
-                 progress < 75 ? 'Building dependency graph...' :
-                 progress < 88 ? 'Computing domains & risk...' :
-                 'Laying out knowledge graph...'}
-              </span>
-              <span>{progress}%</span>
+              <span>{progressState.message || 'Connecting...'}</span>
+              <span>{Math.round(progressState.percentage)}%</span>
             </div>
             <div className="h-1.5 bg-[#111823] rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-[#45c4b0] to-[#3b82f6] rounded-full transition-all duration-150"
-                style={{ width: `${progress}%` }}
+                style={{ width: `${progressState.percentage}%` }}
               />
             </div>
+            {/* Fetch result indicator */}
+            {progressState.fetchResult && (
+              <div className="mt-2 text-[10px] flex items-center gap-1.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                {progressState.fetchResult.error ? (
+                  <span className="text-[#f0c050]">
+                    Source download failed — analyzing from URL only
+                  </span>
+                ) : (
+                  <span className="text-[#45c4b0]">
+                    Downloaded {progressState.fetchResult.files_fetched} source files
+                  </span>
+                )}
+              </div>
+            )}
           </div>
         )}
 
