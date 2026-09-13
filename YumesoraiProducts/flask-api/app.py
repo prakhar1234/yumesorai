@@ -9,6 +9,7 @@ from routes.analyses import analyses_bp
 from routes.dfs_validation import dfs_validation_bp
 from routes.business_review import business_review_bp
 from routes.program_brd import program_brd_bp
+from routes.perf_eval import perf_eval_bp
 from services.log_config import setup_logging
 
 
@@ -29,6 +30,7 @@ def create_app(config=None):
     app.register_blueprint(dfs_validation_bp)
     app.register_blueprint(business_review_bp)
     app.register_blueprint(program_brd_bp)
+    app.register_blueprint(perf_eval_bp)
 
     @app.route("/api/health", methods=["GET"])
     def health_check():

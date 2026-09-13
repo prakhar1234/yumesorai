@@ -8,7 +8,7 @@ interface XformWorkspaceProps {
   onBack: () => void;
 }
 
-type Stage = 'plan' | 'transform' | 'parity';
+type Stage = 'plan' | 'transform' | 'parity' | 'performance';
 
 interface ProgramEntry {
   name: string;
@@ -95,6 +95,105 @@ const COMPLEXITY_COLORS: Record<string, string> = {
   HIGH: '#f97316',
 };
 
+/* ---------- Performance Types & Mock Data ---------- */
+
+interface PerfCategory {
+  name: string;
+  cobol_score: number;
+  modern_score: number;
+  cobol_notes: string;
+  modern_notes: string;
+  recommendation: string;
+}
+
+interface PerfData {
+  summary: string;
+  verdict: 'faster' | 'comparable' | 'slower';
+  categories: PerfCategory[];
+  overall_cobol_score: number;
+  overall_modern_score: number;
+}
+
+const MOCK_PERF_DATA: PerfData = {
+  summary:
+    'The modernized Java code offers significant improvements in maintainability, ' +
+    'parallelism potential, and error resilience. COBOL retains an edge in raw ' +
+    'sequential batch I/O throughput due to its optimized record-level processing. ' +
+    'Overall, the Java implementation is the stronger choice for long-term ' +
+    'operational efficiency and team velocity.',
+  verdict: 'faster',
+  categories: [
+    {
+      name: 'CPU / Compute',
+      cobol_score: 72,
+      modern_score: 85,
+      cobol_notes:
+        'Sequential PERFORM loop with no parallelism. Efficient for single-threaded batch but cannot leverage multi-core.',
+      modern_notes:
+        'Stream-based iteration with potential for parallel streams. JIT compilation optimizes hot paths over time.',
+      recommendation:
+        'Consider converting the billing loop to a parallel stream for large cycle batches to fully exploit multi-core.',
+    },
+    {
+      name: 'Memory Usage',
+      cobol_score: 88,
+      modern_score: 74,
+      cobol_notes:
+        'Fixed WORKING-STORAGE allocation with no dynamic memory. Predictable footprint, zero GC overhead.',
+      modern_notes:
+        'Heap-allocated objects per record with GC pressure. BigDecimal creates intermediate objects during arithmetic.',
+      recommendation:
+        'Profile GC pauses under peak load. Consider primitive accumulators or value types if memory pressure is observed.',
+    },
+    {
+      name: 'I/O & File Handling',
+      cobol_score: 90,
+      modern_score: 70,
+      cobol_notes:
+        'Native VSAM/QSAM record-level I/O with OS-level buffering. Extremely efficient for sequential batch reads.',
+      modern_notes:
+        'JDBC result set fetch over network. Additional serialization/deserialization overhead per row.',
+      recommendation:
+        'Use JDBC fetch-size tuning (e.g., 1000 rows) and connection pooling to narrow the I/O gap.',
+    },
+    {
+      name: 'SQL / DB Efficiency',
+      cobol_score: 65,
+      modern_score: 82,
+      cobol_notes:
+        'Embedded SQL with singleton SELECT inside a loop. Each iteration issues a separate DB call.',
+      modern_notes:
+        'Repository pattern with Spring Data JPA. findByCycleNo fetches all records in one query, reducing round-trips.',
+      recommendation:
+        'The Java approach is already superior here. Consider adding batch insert/update for downstream writes.',
+    },
+    {
+      name: 'Error Resilience',
+      cobol_score: 55,
+      modern_score: 80,
+      cobol_notes:
+        'SQLCODE checking with GO TO error paragraphs. Limited structured error handling, abend on unhandled conditions.',
+      modern_notes:
+        'Try-catch with Spring transactional rollback. Structured exception hierarchy allows granular recovery.',
+      recommendation:
+        'Add circuit-breaker patterns around the rate adapter call for production resilience.',
+    },
+    {
+      name: 'Maintainability',
+      cobol_score: 40,
+      modern_score: 92,
+      cobol_notes:
+        'Flat paragraph structure with implicit control flow. Requires deep domain knowledge to modify safely.',
+      modern_notes:
+        'Clean separation of concerns with dependency injection. Unit-testable services, IDE-supported refactoring.',
+      recommendation:
+        'Ensure comprehensive unit and integration test coverage to preserve the maintainability advantage.',
+    },
+  ],
+  overall_cobol_score: 68,
+  overall_modern_score: 80,
+};
+
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 const sans = { fontFamily: "'IBM Plex Sans', sans-serif" };
 
@@ -109,10 +208,16 @@ export function XformWorkspace({ targetLang, targetDb, onBack }: XformWorkspaceP
   const [modernProgress, setModernProgress] = useState(0);
   const [selectedDataset, setSelectedDataset] = useState<ParityDataset>(PARITY_DATASETS[0]);
 
+  // Performance stage state
+  const [perfLoading, setPerfLoading] = useState(false);
+  const [perfData, setPerfData] = useState<PerfData | null>(null);
+  const [perfError, setPerfError] = useState<string | null>(null);
+
   const stages: { key: Stage; label: string }[] = [
     { key: 'plan', label: 'Plan' },
     { key: 'transform', label: 'Transform' },
     { key: 'parity', label: 'Parity Testing' },
+    { key: 'performance', label: 'Performance' },
   ];
 
   const handleStartTransform = useCallback(() => {
@@ -156,6 +261,42 @@ export function XformWorkspace({ targetLang, targetDb, onBack }: XformWorkspaceP
     setModernProgress(0);
   }, []);
 
+  const handleProceedToPerformance = useCallback(() => {
+    setStage('performance');
+    // Load mock data immediately for the current mock-only flow
+    setPerfData(MOCK_PERF_DATA);
+    setPerfError(null);
+  }, []);
+
+  const handleRunPerfEval = useCallback(async () => {
+    setPerfLoading(true);
+    setPerfError(null);
+    try {
+      const res = await fetch('/api/demystifier/perf-eval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          cobol_source: COBOL_SOURCE,
+          modern_source: JAVA_OUTPUT,
+          target_lang: targetLang === 'java' ? 'Java' : targetLang === 'csharp' ? 'C#' : targetLang === 'python' ? 'Python' : 'Microservices',
+          program_name: selectedProgram.name,
+        }),
+      });
+      if (!res.ok) {
+        throw new Error(`API returned ${res.status}`);
+      }
+      const data: PerfData = await res.json();
+      setPerfData(data);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setPerfError(msg);
+      // Fall back to mock data on failure
+      setPerfData(MOCK_PERF_DATA);
+    } finally {
+      setPerfLoading(false);
+    }
+  }, [targetLang, selectedProgram.name]);
+
   const langLabel = targetLang === 'java' ? 'Java' : targetLang === 'csharp' ? 'C#' : targetLang === 'python' ? 'Python' : 'Microservices';
 
   return (
@@ -177,6 +318,7 @@ export function XformWorkspace({ targetLang, targetDb, onBack }: XformWorkspaceP
                   if (s.key === 'plan') setStage('plan');
                   if (s.key === 'transform' && stage !== 'plan') setStage('transform');
                   if (s.key === 'parity' && transformDone) setStage('parity');
+                  if (s.key === 'performance' && parityDone) setStage('performance');
                 }}
                 className={`px-3 py-1 text-[11px] rounded-md transition-colors ${
                   stage === s.key
@@ -228,6 +370,16 @@ export function XformWorkspace({ targetLang, targetDb, onBack }: XformWorkspaceP
             cobolProgress={cobolProgress}
             modernProgress={modernProgress}
             langLabel={langLabel}
+            onProceedToPerformance={handleProceedToPerformance}
+          />
+        )}
+        {stage === 'performance' && (
+          <PerformanceStage
+            perfData={perfData}
+            perfLoading={perfLoading}
+            perfError={perfError}
+            langLabel={langLabel}
+            onRunLLMAnalysis={handleRunPerfEval}
           />
         )}
       </div>
@@ -430,6 +582,7 @@ function ParityStage({
   cobolProgress,
   modernProgress,
   langLabel,
+  onProceedToPerformance,
 }: {
   datasets: ParityDataset[];
   selectedDataset: ParityDataset;
@@ -440,6 +593,7 @@ function ParityStage({
   cobolProgress: number;
   modernProgress: number;
   langLabel: string;
+  onProceedToPerformance: () => void;
 }) {
   return (
     <div className="max-w-3xl mx-auto">
@@ -541,10 +695,201 @@ function ParityStage({
               <p className="text-[11px] text-[#9fb0c6] mt-3" style={sans}>
                 {(selectedDataset.records - 1).toLocaleString()}/{selectedDataset.records.toLocaleString()} match / 1 to review
               </p>
+
+              {/* Proceed to Performance button */}
+              <div className="mt-5 flex justify-end">
+                <button
+                  onClick={onProceedToPerformance}
+                  className="px-4 py-1.5 text-[11px] font-semibold rounded-lg bg-[#45c4b0] text-[#0a0e14] hover:bg-[#3db3a0] transition-colors"
+                  style={mono}
+                >
+                  Proceed to Performance Evaluation {'\u2192'}
+                </button>
+              </div>
             </div>
           )}
         </div>
       )}
+    </div>
+  );
+}
+
+/* ---------- Performance Stage ---------- */
+
+function ScoreBar({ score, color }: { score: number; color: string }) {
+  return (
+    <div className="flex items-center gap-2 flex-1">
+      <div className="flex-1 bg-[#111823] rounded-full h-2 border border-[#1e2736] overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${score}%`, backgroundColor: color }}
+        />
+      </div>
+      <span className="text-[11px] font-semibold w-8 text-right" style={{ ...mono, color }}>
+        {score}
+      </span>
+    </div>
+  );
+}
+
+function PerformanceStage({
+  perfData,
+  perfLoading,
+  perfError,
+  langLabel,
+  onRunLLMAnalysis,
+}: {
+  perfData: PerfData | null;
+  perfLoading: boolean;
+  perfError: string | null;
+  langLabel: string;
+  onRunLLMAnalysis: () => void;
+}) {
+  if (perfLoading) {
+    return (
+      <div className="max-w-2xl mx-auto mt-16 text-center">
+        <div className="inline-block w-8 h-8 border-2 border-[#45c4b0] border-t-transparent rounded-full animate-spin mb-4" />
+        <h2 className="text-[14px] font-semibold text-[#e6edf7] mb-2" style={mono}>
+          Running Performance Analysis
+        </h2>
+        <p className="text-[11px] text-[#7a869a]" style={sans}>
+          Sending COBOL and {langLabel} code to LLM for static performance evaluation...
+        </p>
+      </div>
+    );
+  }
+
+  if (!perfData) {
+    return (
+      <div className="max-w-2xl mx-auto mt-16 text-center">
+        <p className="text-[11px] text-[#7a869a]" style={sans}>
+          No performance data available.
+        </p>
+      </div>
+    );
+  }
+
+  const verdictConfig = {
+    faster: { label: `${langLabel} is faster overall`, bg: 'bg-[#4ade80]/10', border: 'border-[#4ade80]/30', text: 'text-[#4ade80]' },
+    comparable: { label: 'Roughly comparable', bg: 'bg-[#fbbf24]/10', border: 'border-[#fbbf24]/30', text: 'text-[#fbbf24]' },
+    slower: { label: 'COBOL is faster overall', bg: 'bg-[#f87171]/10', border: 'border-[#f87171]/30', text: 'text-[#f87171]' },
+  };
+  const vc = verdictConfig[perfData.verdict];
+
+  return (
+    <div className="max-w-5xl mx-auto">
+      <h2 className="text-[14px] font-semibold text-[#e6edf7] mb-1" style={mono}>
+        Performance Evaluation
+      </h2>
+      <p className="text-[11px] text-[#7a869a] mb-5" style={sans}>
+        Static analysis comparing COBOL and {langLabel} performance characteristics across six categories.
+      </p>
+
+      {/* Error banner */}
+      {perfError && (
+        <div className="mb-4 px-4 py-3 rounded-lg bg-[#f87171]/10 border border-[#f87171]/30">
+          <p className="text-[11px] text-[#f87171]" style={mono}>
+            LLM analysis failed: {perfError}. Showing mock data instead.
+          </p>
+          <button
+            onClick={onRunLLMAnalysis}
+            className="mt-2 text-[11px] text-[#f87171] underline hover:text-[#fca5a5] transition-colors"
+            style={mono}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      {/* Summary card */}
+      <div className="bg-[#0c1018] border border-[#1e2736] rounded-xl p-5 mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <span className={`text-[11px] font-semibold px-3 py-1 rounded-full border ${vc.bg} ${vc.border} ${vc.text}`} style={mono}>
+              {vc.label}
+            </span>
+          </div>
+          <button
+            onClick={onRunLLMAnalysis}
+            className="px-4 py-1.5 text-[11px] font-semibold rounded-lg border border-[#45c4b0]/30 text-[#45c4b0] hover:bg-[#45c4b0]/10 transition-colors"
+            style={mono}
+          >
+            Run LLM Analysis
+          </button>
+        </div>
+
+        {/* Overall scores side-by-side */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="bg-[#111823] rounded-lg p-4 border border-[#1e2736] text-center">
+            <div className="text-[24px] font-bold text-[#f97316]" style={mono}>
+              {perfData.overall_cobol_score}
+            </div>
+            <div className="text-[10px] text-[#7a869a] mt-1 flex items-center justify-center gap-1.5" style={mono}>
+              <span className="w-2 h-2 rounded-full bg-[#f97316]" />
+              COBOL Overall
+            </div>
+          </div>
+          <div className="bg-[#111823] rounded-lg p-4 border border-[#1e2736] text-center">
+            <div className="text-[24px] font-bold text-[#45c4b0]" style={mono}>
+              {perfData.overall_modern_score}
+            </div>
+            <div className="text-[10px] text-[#7a869a] mt-1 flex items-center justify-center gap-1.5" style={mono}>
+              <span className="w-2 h-2 rounded-full bg-[#45c4b0]" />
+              {langLabel} Overall
+            </div>
+          </div>
+        </div>
+
+        <p className="text-[11px] text-[#9fb0c6] leading-relaxed" style={sans}>
+          {perfData.summary}
+        </p>
+      </div>
+
+      {/* Category cards — 2×3 grid */}
+      <div className="grid grid-cols-2 gap-4">
+        {perfData.categories.map((cat) => (
+          <div
+            key={cat.name}
+            className="bg-[#0c1018] border border-[#1e2736] rounded-xl p-4"
+          >
+            <h3 className="text-[12px] font-semibold text-[#e6edf7] mb-3" style={mono}>
+              {cat.name}
+            </h3>
+
+            {/* Score bars */}
+            <div className="space-y-2 mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#f97316] w-14 shrink-0" style={mono}>COBOL</span>
+                <ScoreBar score={cat.cobol_score} color="#f97316" />
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] text-[#45c4b0] w-14 shrink-0" style={mono}>{langLabel}</span>
+                <ScoreBar score={cat.modern_score} color="#45c4b0" />
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div className="space-y-2 mb-3">
+              <p className="text-[10px] text-[#7a869a] leading-relaxed" style={sans}>
+                <span className="text-[#f97316] font-semibold" style={mono}>COBOL: </span>
+                {cat.cobol_notes}
+              </p>
+              <p className="text-[10px] text-[#7a869a] leading-relaxed" style={sans}>
+                <span className="text-[#45c4b0] font-semibold" style={mono}>{langLabel}: </span>
+                {cat.modern_notes}
+              </p>
+            </div>
+
+            {/* Recommendation */}
+            <div className="pt-2 border-t border-[#1e2736]">
+              <p className="text-[10px] text-[#60a5fa] leading-relaxed" style={sans}>
+                <span className="font-semibold" style={mono}>Rec: </span>
+                {cat.recommendation}
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
