@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { ProductSwitcher } from './ProductSwitcher';
 
 interface TopBarProps {
-  activeProduct: 'demystifier' | 'codeflux' | 'transformer';
+  activeProduct: 'demystifier' | 'codeflux' | 'transformer' | 'business-review';
   onProductChange: (product: string) => void;
   searchValue?: string;
   onSearchChange?: (value: string) => void;

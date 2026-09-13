@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useState } from 'react';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -24,6 +24,17 @@ interface BrdModalProps {
   filePath: string;
 }
 
+interface CodeReference {
+  paragraph: string;
+  lines: string;
+  snippet: string;
+}
+
+interface TraceableItemData {
+  statement: string;
+  code_references: CodeReference[];
+}
+
 // ---------------------------------------------------------------------------
 // Section label formatting
 // ---------------------------------------------------------------------------
@@ -42,7 +53,114 @@ function formatSectionKey(key: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Render a section value (string, array, or object)
+// COBOL syntax highlighting (local copy — same logic as ReviewWorkspace)
+// ---------------------------------------------------------------------------
+function highlightCobolLine(line: string): JSX.Element {
+  const trimmed = line.trimStart();
+
+  if (line.length >= 7 && line[6] === '*') {
+    return <span style={{ color: '#57634f' }}>{line}</span>;
+  }
+  if (trimmed.startsWith('//')) {
+    return <span style={{ color: '#c9a56a' }}>{line}</span>;
+  }
+  if (trimmed.includes('EXEC SQL') || trimmed.includes('END-EXEC') ||
+      trimmed.includes('INSERT INTO') || trimmed.includes('UPDATE ') ||
+      trimmed.includes('SELECT ') || trimmed.includes('DELETE ') ||
+      trimmed.includes('VALUES') || trimmed.includes('WHERE ') ||
+      trimmed.includes('SET ') || trimmed.includes('INTO :') ||
+      trimmed.includes('FROM ')) {
+    return <span style={{ color: '#58b0ff' }}>{line}</span>;
+  }
+  if (trimmed.includes('ANBX') || trimmed.includes("CALL 'ANBX")) {
+    return <span style={{ color: '#d29922' }}>{line}</span>;
+  }
+  if (trimmed.includes('DIVISION') || trimmed.includes('SECTION') ||
+      trimmed.startsWith('COPY ') || trimmed.includes('PROGRAM-ID') ||
+      trimmed.includes('EXEC CICS')) {
+    return <span style={{ color: '#7de0cf' }}>{line}</span>;
+  }
+  return <span style={{ color: '#9fb0c6' }}>{line}</span>;
+}
+
+// ---------------------------------------------------------------------------
+// Type guard for traceable items
+// ---------------------------------------------------------------------------
+function isTraceableItem(item: unknown): item is TraceableItemData {
+  if (typeof item !== 'object' || item === null) return false;
+  const obj = item as Record<string, unknown>;
+  return typeof obj.statement === 'string' && Array.isArray(obj.code_references);
+}
+
+function isTraceableArray(value: unknown): value is TraceableItemData[] {
+  return Array.isArray(value) && value.length > 0 && isTraceableItem(value[0]);
+}
+
+// ---------------------------------------------------------------------------
+// TraceableItem — statement + collapsible code traces
+// ---------------------------------------------------------------------------
+function TraceableItem({ item, index }: { item: TraceableItemData; index: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const hasRefs = item.code_references && item.code_references.length > 0;
+
+  return (
+    <li className="text-[12px] text-[#dbe4f0] leading-relaxed">
+      <div className="flex items-start gap-2">
+        <span className="flex-1">{item.statement}</span>
+        {hasRefs && (
+          <button
+            onClick={() => setExpanded(!expanded)}
+            className="shrink-0 text-[10px] text-[#45c4b0] hover:text-[#7de0cf] bg-[#45c4b010] hover:bg-[#45c4b020] border border-[#45c4b030] rounded px-2 py-0.5 transition-colors mt-0.5"
+            style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+          >
+            {expanded ? '^ Hide' : 'Trace'}
+          </button>
+        )}
+      </div>
+      {expanded && hasRefs && (
+        <div className="ml-0 mt-1 mb-2 space-y-2">
+          {item.code_references.map((cr, j) => (
+            <CodeTraceBlock key={`${index}-${j}`} codeRef={cr} />
+          ))}
+        </div>
+      )}
+    </li>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// CodeTraceBlock — renders a single code reference (paragraph + snippet)
+// ---------------------------------------------------------------------------
+function CodeTraceBlock({ codeRef }: { codeRef: CodeReference }) {
+  return (
+    <div className="mt-2">
+      <div className="flex items-center gap-2 mb-1">
+        <span
+          className="inline-block text-[9px] text-[#d29922] bg-[#d2992215] border border-[#d2992230] rounded px-1.5 py-0.5"
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          {codeRef.paragraph}
+        </span>
+        {codeRef.lines && (
+          <span className="text-[9px] text-[#5b6577]">
+            lines {codeRef.lines}
+          </span>
+        )}
+      </div>
+      <pre
+        className="bg-[#080c12] border border-[#1e2736] rounded p-3 overflow-x-auto text-[11px] leading-[1.6]"
+        style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+      >
+        {codeRef.snippet.split('\n').map((line, i) => (
+          <div key={i}>{highlightCobolLine(line)}</div>
+        ))}
+      </pre>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Render a section value (string, array, or object) — with traceable support
 // ---------------------------------------------------------------------------
 function renderValue(value: unknown): JSX.Element {
   if (typeof value === 'string') {
@@ -53,18 +171,35 @@ function renderValue(value: unknown): JSX.Element {
     );
   }
 
+  // Traceable items array (new structured format)
+  if (isTraceableArray(value)) {
+    return (
+      <ul className="list-disc list-inside space-y-2">
+        {value.map((item, i) => (
+          <TraceableItem key={i} item={item} index={i} />
+        ))}
+      </ul>
+    );
+  }
+
+  // Plain array (backward compatibility)
   if (Array.isArray(value)) {
     return (
       <ul className="list-disc list-inside space-y-1">
         {value.map((item, i) => (
           <li key={i} className="text-[12px] text-[#dbe4f0] leading-relaxed">
-            {typeof item === 'string' ? item : JSON.stringify(item)}
+            {typeof item === 'string'
+              ? item
+              : isTraceableItem(item)
+                ? <TraceableItem item={item} index={i} />
+                : JSON.stringify(item)}
           </li>
         ))}
       </ul>
     );
   }
 
+  // Object (e.g. data_inputs_outputs with inputs/outputs sub-keys)
   if (typeof value === 'object' && value !== null) {
     const obj = value as Record<string, unknown>;
     return (

@@ -15,6 +15,7 @@ export function TransformerClient() {
   const handleProductChange = useCallback((product: string) => {
     if (product === 'demystifier') router.push('/demystifier');
     else if (product === 'codeflux') router.push('/demystifier/codeflux');
+    else if (product === 'business-review') router.push('/demystifier/business-review');
   }, [router]);
 
   const handleConnect = useCallback((lang: string, db: string) => {

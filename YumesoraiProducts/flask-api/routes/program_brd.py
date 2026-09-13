@@ -16,20 +16,46 @@ program_brd_bp = Blueprint("program_brd", __name__)
 SYSTEM_PROMPT = (
     "You are a senior COBOL business analyst. Given the full source code of a COBOL "
     "program, produce a comprehensive Business Requirements Document (BRD) as a JSON "
-    "object. The JSON must have exactly these keys:\n\n"
-    "1. \"purpose\" - A concise summary of what this program does and why it exists.\n"
-    "2. \"business_rules\" - An array of business rules enforced by the program "
-    "(validations, thresholds, conditions, routing logic).\n"
-    "3. \"data_inputs_outputs\" - An object with \"inputs\" and \"outputs\" arrays, each "
-    "entry describing a file, database table, queue, or copybook used.\n"
-    "4. \"processing_logic\" - A step-by-step description of the main processing flow, "
-    "from initialization through termination.\n"
-    "5. \"dependencies\" - An array of external programs, copybooks, vendor modules, "
-    "CICS transactions, or DB2 tables this program depends on.\n"
-    "6. \"error_handling\" - A description of how the program detects and handles errors, "
-    "invalid data, and exceptional conditions.\n"
-    "7. \"downstream_effects\" - A description of what downstream systems, processes, or "
-    "reports are affected by this program's output.\n\n"
+    "object with full code traceability. Every statement you make must be traceable "
+    "back to the actual COBOL source.\n\n"
+    "The JSON must have exactly these keys. Each key's value is an array of "
+    "traceable item objects (except data_inputs_outputs, described below). "
+    "Each traceable item has this shape:\n"
+    "{\n"
+    '  "statement": "English description of the business logic",\n'
+    '  "code_references": [\n'
+    "    {\n"
+    '      "paragraph": "2100-VALIDATE-RECORD",\n'
+    '      "lines": "129-136",\n'
+    '      "snippet": "       2100-VALIDATE-RECORD.\\n'
+    '           MOVE \'Y\' TO WS-VALID-FLAG\\n           ..."\n'
+    "    }\n"
+    "  ]\n"
+    "}\n\n"
+    "Keys:\n"
+    "1. \"purpose\" - An array with one traceable item: the program summary, with "
+    "code_references pointing to the key paragraphs that define the program's purpose "
+    "(e.g. PROGRAM-ID, main SECTION, top-level PERFORM).\n"
+    "2. \"business_rules\" - An array of traceable items, one per business rule "
+    "(validations, thresholds, conditions, routing logic). Each must cite the exact "
+    "COBOL paragraph and lines that implement the rule.\n"
+    "3. \"data_inputs_outputs\" - An object with \"inputs\" and \"outputs\" keys, each an "
+    "array of traceable items describing a file, database table, queue, or copybook, "
+    "with code_references to the relevant FD, SELECT, EXEC SQL, or COPY statements.\n"
+    "4. \"processing_logic\" - An array of traceable items describing each step of the "
+    "main processing flow, from initialization through termination.\n"
+    "5. \"dependencies\" - An array of traceable items, one per external program, "
+    "copybook, vendor module, CICS transaction, or DB2 table dependency.\n"
+    "6. \"error_handling\" - An array of traceable items, one per error-handling "
+    "mechanism (abend handling, error flags, rollback, logging).\n"
+    "7. \"downstream_effects\" - An array of traceable items, one per downstream "
+    "system, process, or report affected by this program's output.\n\n"
+    "Rules for code_references:\n"
+    "- \"paragraph\": The COBOL paragraph or section name (e.g. \"2100-VALIDATE-RECORD\").\n"
+    "- \"lines\": The line range in the source (e.g. \"129-136\").\n"
+    "- \"snippet\": Quote the exact COBOL source lines, preserving original indentation. "
+    "Keep snippets concise (typically 3-10 lines). Use \"...\" to abbreviate long blocks.\n"
+    "- Every traceable item must have at least one code_reference.\n\n"
     "Return ONLY the JSON object, no markdown fences, no commentary."
 )
 
@@ -69,7 +95,7 @@ def program_brd():
             collected = []
             with provider.client.messages.stream(
                 model=provider.model,
-                max_tokens=8192,
+                max_tokens=16384,
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": user_prompt}],
             ) as stream:
