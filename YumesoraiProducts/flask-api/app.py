@@ -1,5 +1,7 @@
 """Flask application factory."""
 
+import os
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 
@@ -27,7 +29,8 @@ def create_app(config=None):
     else:
         app.config.from_object(config)
 
-    CORS(app, origins=["http://localhost:3000", "http://localhost:3001"])
+    allowed = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:3001")
+    CORS(app, origins=[o.strip() for o in allowed.split(",")])
 
     app.register_blueprint(demystify_bp)
     app.register_blueprint(analyses_bp)

@@ -155,6 +155,44 @@ def get_latest_commit_sha(owner: str, repo: str, branch: str = "main") -> str:
     return resp.json()["sha"]
 
 
+def get_latest_commit_info(owner: str, repo: str, branch: str = "main") -> dict:
+    """Get latest commit SHA, timestamp, and message for a branch.
+
+    Uses the same GitHub Commits API as get_latest_commit_sha but returns
+    richer metadata for freshness display.
+
+    Returns:
+        {"sha": str, "date": ISO string, "message": str}
+    """
+    headers = _github_headers()
+    api_url = f"https://api.github.com/repos/{owner}/{repo}/commits/{branch}"
+
+    try:
+        resp = requests.get(api_url, headers=headers, timeout=15)
+        resp.raise_for_status()
+    except requests.HTTPError as e:
+        status = e.response.status_code if e.response is not None else "N/A"
+        gh_logger.error(
+            "Commit info fetch failed | repo=%s/%s | branch=%s | status=%s",
+            owner, repo, branch, status,
+        )
+        raise
+    except (requests.ConnectionError, requests.Timeout) as e:
+        gh_logger.error(
+            "Commit info fetch error | repo=%s/%s | branch=%s | error=%s",
+            owner, repo, branch, e,
+        )
+        raise
+
+    data = resp.json()
+    commit = data.get("commit", {})
+    return {
+        "sha": data["sha"],
+        "date": commit.get("committer", {}).get("date", ""),
+        "message": commit.get("message", ""),
+    }
+
+
 def list_repo_files(repo_url: str, branch: str = "HEAD") -> dict:
     """List COBOL-relevant files in a GitHub repository.
 

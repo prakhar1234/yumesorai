@@ -47,6 +47,7 @@ def demystify():
 
     source_type = data.get("source_type")
     mode = data.get("mode", "auto")
+    branch = data.get("branch", "")
 
     try:
         # Fetch actual source files from GitHub when possible
@@ -54,10 +55,14 @@ def demystify():
         fetch_status = {"source": "url_only", "files_fetched": 0, "error": None}
         if input_type == "github":
             try:
-                sources = fetch_repo_sources(repo_url)
+                fetch_kwargs = {}
+                if branch:
+                    fetch_kwargs["branch"] = branch
+                sources = fetch_repo_sources(repo_url, **fetch_kwargs)
                 fetch_status["source"] = "github_api"
                 fetch_status["files_fetched"] = len(sources) if sources else 0
-                logger.info("Fetched %d source files from %s", len(sources or []), repo_url)
+                fetch_status["branch"] = branch or "HEAD"
+                logger.info("Fetched %d source files from %s@%s", len(sources or []), repo_url, branch or "HEAD")
             except Exception as e:
                 fetch_status["error"] = str(e)
                 logger.warning("Source fetch failed for %s: %s", repo_url, e)
@@ -77,7 +82,8 @@ def demystify():
                 # Re-compute coverage for cached results
                 if input_type == "github":
                     try:
-                        repo_files = list_repo_files(repo_url)
+                        list_kwargs = {"branch": branch} if branch else {}
+                        repo_files = list_repo_files(repo_url, **list_kwargs)
                         coverage = compute_coverage(result, repo_files)
                         result["coverage"] = coverage
                     except Exception as e:
@@ -124,7 +130,8 @@ def demystify():
         # Attempt coverage calculation for GitHub repos (non-blocking)
         if input_type == "github":
             try:
-                repo_files = list_repo_files(repo_url)
+                list_kwargs = {"branch": branch} if branch else {}
+                repo_files = list_repo_files(repo_url, **list_kwargs)
                 coverage = compute_coverage(result, repo_files)
                 result["coverage"] = coverage
             except Exception as e:

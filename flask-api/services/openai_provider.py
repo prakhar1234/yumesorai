@@ -20,7 +20,7 @@ class OpenAIProvider(LLMProvider):
         if not api_key:
             raise ValueError("OPENAI_API_KEY is not configured")
         self.client = openai.OpenAI(api_key=api_key)
-        self.model = getattr(config, "OPENAI_MODEL", "gpt-4o")
+        self.model = getattr(config, "OPENAI_MODEL", "gpt-5.6-sol")
 
     def analyze(self, system_prompt: str, user_prompt: str) -> dict:
         """Send prompts to the OpenAI API and return structured analysis.

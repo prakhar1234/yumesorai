@@ -27,6 +27,10 @@ def compute_coverage(graph_data: dict, repo_files: dict) -> dict:
         node_by_name[label_upper] = node
         node_by_name[id_upper] = node
 
+    # File-stem-to-node mapping handles PROGRAM-ID != filename cases
+    # (e.g. db2-handling.cbl has PROGRAM-ID DB2HNDL → node ID DB2HNDL)
+    file_stem_map: dict[str, str] = graph_data.get("_file_stem_map", {})
+
     # Build a set of normalized file names
     file_names: set[str] = set()
     for f in files:
@@ -37,7 +41,7 @@ def compute_coverage(graph_data: dict, repo_files: dict) -> dict:
     missing_files = []
     for f in files:
         name = f["name"].upper().strip()
-        if name in node_set:
+        if name in node_set or name in file_stem_map:
             covered_files.append(f)
         else:
             missing_files.append({
