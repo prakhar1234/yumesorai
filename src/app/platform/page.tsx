@@ -88,20 +88,6 @@ function PlatformSchema() {
 
 const products = [
   {
-    name: "Demistifier",
-    href: "#demistifier",
-    tagline:
-      "Knowledge graph explorer — map every call chain, copybook, JCL job and CICS screen before you change a line.",
-    icon: "M9 20 3 17V4l6 3 6-3 6 3v13l-6-3-6 3z M9 7v13 M15 4v13",
-  },
-  {
-    name: "Transformer",
-    href: "#transformer",
-    tagline:
-      "COBOL → modern language, cloud-ready. Complexity scoring, reviewable AI plans, and generated unit tests.",
-    icon: "M8 6 3 12l5 6 M16 6l5 6-5 6 M13 4l-2 16",
-  },
-  {
     name: "Code Flux",
     href: "#codeflux",
     tagline:
@@ -114,12 +100,12 @@ const howSteps = [
   {
     num: "01",
     title: "Map",
-    desc: "Demistifier scans your repositories and builds a full knowledge graph of every program, copybook, JCL job, data file and CICS screen.",
+    desc: "Our AI scans your repositories and builds a full knowledge graph of every program, copybook, JCL job, data file and CICS screen.",
   },
   {
     num: "02",
     title: "Plan",
-    desc: "Transformer scores each program by complexity and generates a reviewable, step-by-step conversion plan before any code is touched.",
+    desc: "Each program is scored by complexity and a reviewable, step-by-step conversion plan is generated before any code is touched.",
   },
   {
     num: "03",
@@ -135,58 +121,9 @@ const howSteps = [
 
 const deepDives = [
   {
-    id: "demistifier",
-    bg: "bg-[#FAF9F6]",
-    reverse: false,
-    kicker: "Demistifier",
-    title: "See how every COBOL program connects",
-    body: "Point Demistifier at a repository and it maps the call chains, copybooks, JCL jobs, data files and CICS screens into one navigable knowledge graph — so you can debug across the whole system, not one program at a time.",
-    points: [
-      "Full-system call graph — CALL, PERFORM and dynamic links",
-      "Copybooks, JCL & data access fully mapped",
-      "Impact & path analysis before you change a line",
-      "Risk & dead-code heatmap",
-    ],
-    screenshot: "/images/platform/shot-demistifier.png",
-    label: "Demistifier — knowledge graph explorer",
-    tilt: "rotateY(-9deg) rotateX(3deg)",
-  },
-  {
-    id: "graph",
-    bg: "bg-white",
-    reverse: true,
-    kicker: "Demistifier · Graph view",
-    title: "Every dependency, one navigable graph",
-    body: "Drill into any program to see its calls, data access, and vendor black-boxes. Dashed edges flag code with no source — the risks that surprise migrations are visible on day one.",
-    points: [
-      "CALL / PERFORM edges with direction",
-      "Data and DB access mapped per program",
-      "Vendor black-boxes detected and isolated",
-    ],
-    screenshot: "/images/platform/shot-graph.png",
-    label: "CLAIM055 — dependency graph",
-    tilt: "rotateY(9deg) rotateX(3deg)",
-  },
-  {
-    id: "transformer",
-    bg: "bg-[#FAF9F6]",
-    reverse: false,
-    kicker: "Transformer",
-    title: "COBOL → Java, with a reviewable plan",
-    body: "Transformer scores every program by complexity — lines of code, call depth, embedded SQL, vendor black-boxes — then generates a step-by-step conversion plan you review before any code is written.",
-    points: [
-      "Complexity scoring: LOC, calls, embedded SQL, black-boxes",
-      "Reviewable step-by-step transformation plans",
-      "Code reconciler validates logic coverage after conversion",
-    ],
-    screenshot: "/images/platform/shot-transformer.png",
-    label: "Transformer — migration workbench",
-    tilt: "rotateY(-9deg) rotateX(3deg)",
-  },
-  {
     id: "codeflux",
-    bg: "bg-white",
-    reverse: true,
+    bg: "bg-[#FAF9F6]",
+    reverse: false,
     kicker: "Code Flux",
     title: "Safe change management, before and after cutover",
     body: "Code Flux wraps every change in a sandbox branch, previews the blast radius from the knowledge graph, and routes approvals before merge — so post-cutover maintenance is as safe as pre-cutover migration.",
@@ -197,7 +134,7 @@ const deepDives = [
     ],
     screenshot: "/images/platform/shot-codeflux.png",
     label: "Code Flux — change workflow",
-    tilt: "rotateY(9deg) rotateX(3deg)",
+    tilt: "rotateY(-9deg) rotateX(3deg)",
   },
 ];
 
@@ -249,10 +186,10 @@ export default function PlatformPage() {
               The Platform
             </p>
             <h1 className="text-balance text-4xl font-bold tracking-tight text-indigo-950 sm:text-5xl lg:text-6xl">
-              One AI platform. Three products. Zero downtime.
+              One AI platform. Zero downtime.
             </h1>
             <p className="mx-auto mt-6 max-w-2xl text-balance text-lg text-indigo-950/60 sm:text-xl">
-              Demistifier maps your legacy estate, Transformer converts it, and
+              Our AI maps your legacy estate, converts it to modern languages, and
               Code Flux keeps it healthy after cutover — all driven by AI that
               understands COBOL at a semantic level.
             </p>

@@ -19,7 +19,6 @@ const navLinks = [
     href: "/platform",
     children: [
       { label: "Overview", href: "/platform" },
-      { label: "Demystifier", href: "/demystifier" },
     ],
   },
   { label: "Resources", href: "/resources" },

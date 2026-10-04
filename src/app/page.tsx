@@ -11,22 +11,6 @@ const proofMetrics = [
 
 const products = [
   {
-    name: "Demistifier",
-    href: "/platform#demistifier",
-    title: "Knowledge Graph Explorer",
-    body: "See how every COBOL program connects. Call chains, copybooks, JCL jobs and CICS screens mapped into one navigable graph.",
-    shot: "/images/platform/shot-explorer.png",
-    iconPath: "M9 20 3 17V4l6 3 6-3 6 3v13l-6-3-6 3z M9 7v13 M15 4v13",
-  },
-  {
-    name: "Transformer",
-    href: "/platform#transformer",
-    title: "Code Conversion Engine",
-    body: "Automatically convert COBOL to Java with precision. Analyze, transform, and validate your legacy systems instantly.",
-    shot: "/images/platform/shot-transformer.png",
-    iconPath: "M8 6 3 12l5 6 M16 6l5 6-5 6 M13 4l-2 16",
-  },
-  {
     name: "Code Flux",
     href: "/platform#codeflux",
     title: "Change & Post-Migration Management",
@@ -285,7 +269,7 @@ export default function Home() {
         <HolographicFrame
           src="/images/platform/shot-transformer.png"
           alt="Yumesorai platform"
-          label="Yumesorai Transformer — AI migration workbench"
+          label="Yumesorai — AI migration workbench"
           heroStyle={true}
         />
       </section>

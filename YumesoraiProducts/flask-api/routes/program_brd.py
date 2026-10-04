@@ -7,6 +7,9 @@ import re
 from flask import Blueprint, jsonify, request
 
 from config import Config
+from services.brd_cache import get_cached_brd, save_brd_cache, check_brd_freshness, delete_cached_brd
+from services.code_edits_cache import save_code_edits
+from services.github_files import _parse_github_url
 from services.llm_provider import get_provider
 
 logger = logging.getLogger(__name__)
@@ -60,6 +63,13 @@ SYSTEM_PROMPT = (
 )
 
 
+def _extract_program_id(file_path: str) -> tuple[str, str]:
+    """Extract program_name and program_id from a file path."""
+    program_name = file_path.split("/")[-1] if "/" in file_path else file_path
+    program_id = program_name.replace(".cbl", "").replace(".CBL", "")
+    return program_name, program_id
+
+
 @program_brd_bp.route("/api/program-brd", methods=["POST"])
 def program_brd():
     """Generate a full BRD for an entire COBOL program.
@@ -68,9 +78,11 @@ def program_brd():
         program_content (str): The full COBOL source code.
         file_path (str, optional): The source file name for context.
         repo_url (str, optional): The repository URL for context.
+        commit_sha (str, optional): Current commit SHA for cache freshness.
+        branch (str, optional): Branch name for cache key.
 
     Returns:
-        JSON with a "brd" object containing program_id, program_name, and sections.
+        JSON with a "brd" object, "cached" boolean, and "generated_at" timestamp.
     """
     data = request.get_json(silent=True)
     if data is None:
@@ -82,7 +94,34 @@ def program_brd():
 
     file_path = data.get("file_path", "unknown")
     repo_url = data.get("repo_url", "")
+    commit_sha = data.get("commit_sha", "")
+    branch = data.get("branch", "")
 
+    program_name, program_id = _extract_program_id(file_path)
+
+    # --- Cache lookup ---
+    # Only attempt cache if we have enough info to key on
+    owner, repo = None, None
+    if repo_url and commit_sha and branch:
+        try:
+            owner, repo, _ = _parse_github_url(repo_url)
+        except ValueError:
+            logger.warning("Could not parse repo_url for cache: %s", repo_url)
+
+    if owner and repo and commit_sha and branch:
+        cached = get_cached_brd(owner, repo, branch, program_id)
+        if cached and cached.get("commit_sha") == commit_sha:
+            logger.info(
+                "Serving cached BRD for %s/%s@%s program=%s (sha=%s)",
+                owner, repo, branch, program_id, commit_sha[:8],
+            )
+            return jsonify({
+                "brd": cached["brd"],
+                "cached": True,
+                "generated_at": cached.get("generated_at", ""),
+            })
+
+    # --- Generate via LLM ---
     user_prompt = f"File: {file_path}\n\n```cobol\n{program_content}\n```"
     if repo_url:
         user_prompt = f"Repository: {repo_url}\n{user_prompt}"
@@ -113,16 +152,27 @@ def program_brd():
 
         sections = json.loads(cleaned)
 
-        # Extract program ID from file path
-        program_name = file_path.split("/")[-1] if "/" in file_path else file_path
-        program_id = program_name.replace(".cbl", "").replace(".CBL", "")
+        brd_data = {
+            "program_id": program_id,
+            "program_name": program_name,
+            "sections": sections,
+        }
+
+        # --- Save to cache ---
+        generated_at = ""
+        if owner and repo and commit_sha and branch:
+            save_brd_cache(
+                owner, repo, branch, program_id, commit_sha, file_path, brd_data
+            )
+            # Read back the generated_at from what we just saved
+            fresh = get_cached_brd(owner, repo, branch, program_id)
+            if fresh:
+                generated_at = fresh.get("generated_at", "")
 
         return jsonify({
-            "brd": {
-                "program_id": program_id,
-                "program_name": program_name,
-                "sections": sections,
-            }
+            "brd": brd_data,
+            "cached": False,
+            "generated_at": generated_at,
         })
 
     except json.JSONDecodeError as e:
@@ -132,3 +182,87 @@ def program_brd():
     except Exception as e:
         logger.error("Program BRD error: %s", e, exc_info=True)
         return jsonify({"error": f"BRD generation failed: {str(e)}"}), 500
+
+
+@program_brd_bp.route("/api/program-brd/check-freshness", methods=["POST"])
+def check_freshness():
+    """Check if a cached BRD is stale compared to GitHub's latest commit.
+
+    Expects JSON body:
+        repo_url (str): The repository URL.
+        branch (str): Branch name.
+        file_path (str): The source file path.
+
+    Returns:
+        JSON with freshness info including timestamps.
+    """
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "Request body must be valid JSON"}), 400
+
+    repo_url = data.get("repo_url", "")
+    branch = data.get("branch", "")
+    file_path = data.get("file_path", "")
+
+    if not repo_url or not branch or not file_path:
+        return jsonify({"error": "repo_url, branch, and file_path are required"}), 400
+
+    try:
+        owner, repo, _ = _parse_github_url(repo_url)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    _, program_id = _extract_program_id(file_path)
+
+    try:
+        result = check_brd_freshness(owner, repo, branch, program_id)
+        return jsonify(result)
+    except Exception as e:
+        logger.error("Freshness check error: %s", e, exc_info=True)
+        return jsonify({"error": f"Freshness check failed: {str(e)}"}), 500
+
+
+@program_brd_bp.route("/api/program-brd/save-code", methods=["POST"])
+def save_code():
+    """Save user-edited code to the local disk cache and invalidate the BRD cache.
+
+    Expects JSON body:
+        repo_url (str): The repository URL.
+        branch (str): Branch name.
+        file_path (str): The source file path.
+        content (str): The edited code content.
+
+    Returns:
+        JSON with { saved: true, saved_at: ISO timestamp }.
+    """
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "Request body must be valid JSON"}), 400
+
+    repo_url = data.get("repo_url", "")
+    branch = data.get("branch", "")
+    file_path = data.get("file_path", "")
+    content = data.get("content")
+
+    if not repo_url or not branch or not file_path or content is None:
+        return jsonify({"error": "repo_url, branch, file_path, and content are required"}), 400
+
+    try:
+        owner, repo, _ = _parse_github_url(repo_url)
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    _, program_id = _extract_program_id(file_path)
+    commit_sha = data.get("commit_sha", "")
+
+    try:
+        saved_at = save_code_edits(
+            owner, repo, branch, program_id, file_path, content, commit_sha
+        )
+        # Invalidate the BRD cache so next BRD request regenerates
+        delete_cached_brd(owner, repo, branch, program_id)
+
+        return jsonify({"saved": True, "saved_at": saved_at})
+    except Exception as e:
+        logger.error("Save code error: %s", e, exc_info=True)
+        return jsonify({"error": f"Failed to save code: {str(e)}"}), 500

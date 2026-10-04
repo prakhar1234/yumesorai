@@ -6,6 +6,9 @@ from flask_cors import CORS
 from config import Config
 from routes.demystify import demystify_bp
 from routes.analyses import analyses_bp
+from routes.sources import sources_bp
+from routes.business_review import business_review_bp
+from routes.program_brd import program_brd_bp
 from services.log_config import setup_logging
 
 
@@ -19,10 +22,13 @@ def create_app(config=None):
     else:
         app.config.from_object(config)
 
-    CORS(app, origins=["http://localhost:3000"])
+    CORS(app, origins=["http://localhost:3000", "http://localhost:3001"])
 
     app.register_blueprint(demystify_bp)
     app.register_blueprint(analyses_bp)
+    app.register_blueprint(sources_bp)
+    app.register_blueprint(business_review_bp)
+    app.register_blueprint(program_brd_bp)
 
     @app.route("/api/health", methods=["GET"])
     def health_check():
