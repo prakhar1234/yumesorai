@@ -4,7 +4,7 @@ import { useState, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { TopBar } from './TopBar';
 import { FluxConnectView } from './FluxConnectView';
-import { FluxWorkspace } from './FluxWorkspace';
+import { ReviewWorkspace } from './ReviewWorkspace';
 
 interface SourceFile {
   path: string;
@@ -21,15 +21,16 @@ interface SourcesResult {
   commit_date: string;
 }
 
-export function CodeFluxClient() {
+export function BusinessReviewClient() {
   const router = useRouter();
   const [view, setView] = useState<'connect' | 'workspace'>('connect');
   const [repoUrl, setRepoUrl] = useState('');
-  const [branch, setBranch] = useState('main');
+  const [branch, setBranch] = useState('');
   const sourcesRef = useRef<SourcesResult | null>(null);
 
   const handleProductChange = useCallback((product: string) => {
     if (product === 'demystifier') router.push('/demystifier');
+    else if (product === 'codeflux') router.push('/demystifier/codeflux');
     else if (product === 'transformer') router.push('/demystifier/transformer');
   }, [router]);
 
@@ -43,24 +44,25 @@ export function CodeFluxClient() {
   const handleDisconnect = useCallback(() => {
     setView('connect');
     setRepoUrl('');
-    setBranch('main');
     sourcesRef.current = null;
   }, []);
 
   return (
     <div className="flex flex-col h-screen bg-[#0a0e14]">
       <TopBar
-        activeProduct="codeflux"
+        activeProduct="business-review"
         onProductChange={handleProductChange}
       />
       {view === 'connect' ? (
         <FluxConnectView onConnect={handleConnect} />
       ) : (
-        <FluxWorkspace
+        <ReviewWorkspace
           repoUrl={repoUrl}
+          initialSources={sourcesRef.current?.sources || []}
+          initialCached={sourcesRef.current?.cached || false}
+          commitSha={sourcesRef.current?.commit_sha || ''}
+          commitDate={sourcesRef.current?.commit_date || ''}
           branch={branch}
-          initialSources={sourcesRef.current!.sources}
-          initialCached={sourcesRef.current!.cached}
           onDisconnect={handleDisconnect}
         />
       )}

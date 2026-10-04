@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 
 // ---------------------------------------------------------------------------
-// File tree data
+// Types
 // ---------------------------------------------------------------------------
 interface FileEntry {
   name: string;
   path: string;
   loc: number;
-  type: 'cbl' | 'cpy' | 'jcl';
+  type: string;
 }
 
 interface FolderEntry {
@@ -17,379 +17,49 @@ interface FolderEntry {
   children: FileEntry[];
 }
 
-const FILE_TREE: FolderEntry[] = [
-  {
-    name: 'src/programs',
-    children: [
-      { name: 'BILL0030.cbl', path: 'src/programs/BILL0030.cbl', loc: 2340, type: 'cbl' },
-      { name: 'BILL0040.cbl', path: 'src/programs/BILL0040.cbl', loc: 1120, type: 'cbl' },
-      { name: 'PAY0100.cbl', path: 'src/programs/PAY0100.cbl', loc: 1180, type: 'cbl' },
-      { name: 'CUST0200.cbl', path: 'src/programs/CUST0200.cbl', loc: 860, type: 'cbl' },
-    ],
-  },
-  {
-    name: 'src/copybooks',
-    children: [
-      { name: 'BILLREC.cpy', path: 'src/copybooks/BILLREC.cpy', loc: 96, type: 'cpy' },
-      { name: 'CUSTACCT.cpy', path: 'src/copybooks/CUSTACCT.cpy', loc: 74, type: 'cpy' },
-    ],
-  },
-  {
-    name: 'jcl',
-    children: [
-      { name: 'BILLCYCL.jcl', path: 'jcl/BILLCYCL.jcl', loc: 64, type: 'jcl' },
-    ],
-  },
-];
+interface SourceFile {
+  path: string;
+  name: string;
+  ext: string;
+  type: string;
+  content: string;
+}
 
 // ---------------------------------------------------------------------------
-// Mock COBOL source for each file
+// Build file tree from source files
 // ---------------------------------------------------------------------------
-const FILE_CONTENTS: Record<string, string> = {
-  'src/programs/BILL0030.cbl': `      *================================================================*
-      * BILL0030 - BILLING CYCLE PROCESSOR
-      * Processes monthly billing records, validates amounts,
-      * and generates customer invoices.
-      *================================================================*
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID.    BILL0030.
-       AUTHOR.        LEGACY-BANK BILLING TEAM.
-       DATE-WRITTEN.  1998-03-15.
+function buildFileTree(sources: SourceFile[]): FolderEntry[] {
+  const folders = new Map<string, FileEntry[]>();
 
-       ENVIRONMENT DIVISION.
-       CONFIGURATION SECTION.
-       SOURCE-COMPUTER.  IBM-ZOS.
-       OBJECT-COMPUTER.  IBM-ZOS.
+  for (const src of sources) {
+    const lastSlash = src.path.lastIndexOf('/');
+    const dir = lastSlash >= 0 ? src.path.substring(0, lastSlash) : '.';
 
-       INPUT-OUTPUT SECTION.
-       FILE-CONTROL.
-           SELECT BILL-INPUT  ASSIGN TO BILLIN
-               ORGANIZATION IS SEQUENTIAL
-               FILE STATUS IS WS-FILE-STATUS.
-           SELECT BILL-OUTPUT ASSIGN TO BILLOUT
-               ORGANIZATION IS SEQUENTIAL
-               FILE STATUS IS WS-FILE-STATUS.
+    if (!folders.has(dir)) {
+      folders.set(dir, []);
+    }
 
-       DATA DIVISION.
-       FILE SECTION.
-       FD  BILL-INPUT
-           RECORDING MODE IS F
-           BLOCK CONTAINS 0 RECORDS.
-       01  BILL-INPUT-REC             PIC X(200).
+    const ext = src.ext.toLowerCase();
+    const fileType = ext === '.cpy' ? 'cpy'
+      : ext === '.jcl' ? 'jcl'
+      : ext === '.bms' ? 'bms'
+      : 'cbl';
 
-       FD  BILL-OUTPUT
-           RECORDING MODE IS F
-           BLOCK CONTAINS 0 RECORDS.
-       01  BILL-OUTPUT-REC            PIC X(300).
+    folders.get(dir)!.push({
+      name: src.path.split('/').pop() || src.name,
+      path: src.path,
+      loc: src.content.split('\n').length,
+      type: fileType,
+    });
+  }
 
-       WORKING-STORAGE SECTION.
-       01  WS-FILE-STATUS             PIC XX.
-       01  WS-EOF-FLAG                PIC X VALUE 'N'.
-           88 WS-EOF                  VALUE 'Y'.
-       01  WS-RECORD-COUNT            PIC 9(8) VALUE 0.
-       01  WS-ERROR-COUNT             PIC 9(6) VALUE 0.
-
-       COPY BILLREC.
-       COPY CUSTACCT.
-
-       01  WS-BILL-AMOUNT             PIC S9(9)V99 COMP-3.
-       01  WS-TAX-AMOUNT              PIC S9(7)V99 COMP-3.
-       01  WS-TOTAL-AMOUNT            PIC S9(9)V99 COMP-3.
-       01  WS-CURRENT-DATE.
-           05 WS-CURR-YEAR            PIC 9(4).
-           05 WS-CURR-MONTH           PIC 9(2).
-           05 WS-CURR-DAY             PIC 9(2).
-
-       PROCEDURE DIVISION.
-       0000-MAIN.
-           PERFORM 1000-INITIALIZE
-           PERFORM 2000-PROCESS UNTIL WS-EOF
-           PERFORM 9000-TERMINATE
-           STOP RUN.
-
-       1000-INITIALIZE.
-           OPEN INPUT  BILL-INPUT
-           OPEN OUTPUT BILL-OUTPUT
-           MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-DATE
-           READ BILL-INPUT INTO WS-BILL-RECORD
-               AT END SET WS-EOF TO TRUE
-           END-READ.
-
-       2000-PROCESS.
-           ADD 1 TO WS-RECORD-COUNT
-           PERFORM 2100-VALIDATE-RECORD
-           IF WS-VALID-FLAG = 'Y'
-               PERFORM 2200-CALCULATE-AMOUNTS
-               PERFORM 2300-WRITE-OUTPUT
-           ELSE
-               ADD 1 TO WS-ERROR-COUNT
-               PERFORM 2900-LOG-ERROR
-           END-IF
-           READ BILL-INPUT INTO WS-BILL-RECORD
-               AT END SET WS-EOF TO TRUE
-           END-READ.
-
-       2100-VALIDATE-RECORD.
-           MOVE 'Y' TO WS-VALID-FLAG
-           IF WS-BILL-ACCT-NO = SPACES OR LOW-VALUES
-               MOVE 'N' TO WS-VALID-FLAG
-           END-IF
-           IF WS-BILL-AMOUNT < 0
-               MOVE 'N' TO WS-VALID-FLAG
-           END-IF.
-
-       2200-CALCULATE-AMOUNTS.
-           MOVE WS-BILL-BASE-AMT TO WS-BILL-AMOUNT
-           COMPUTE WS-TAX-AMOUNT =
-               WS-BILL-AMOUNT * 0.085
-           COMPUTE WS-TOTAL-AMOUNT =
-               WS-BILL-AMOUNT + WS-TAX-AMOUNT.
-
-       2300-WRITE-OUTPUT.
-           MOVE WS-BILL-ACCT-NO   TO WS-OUT-ACCT
-           MOVE WS-TOTAL-AMOUNT   TO WS-OUT-TOTAL
-           MOVE WS-CURRENT-DATE   TO WS-OUT-DATE
-           WRITE BILL-OUTPUT-REC FROM WS-OUTPUT-RECORD.
-
-       2900-LOG-ERROR.
-           DISPLAY 'ERR: INVALID RECORD #' WS-RECORD-COUNT
-               ' ACCT=' WS-BILL-ACCT-NO.
-
-      *================================================================*
-      * ANBX-AUDIT - Vendor audit logging call
-      *================================================================*
-       3000-AUDIT-LOG.
-           CALL 'ANBXAUDT' USING WS-BILL-ACCT-NO
-                                  WS-TOTAL-AMOUNT
-                                  WS-CURRENT-DATE.
-
-           EXEC SQL
-               INSERT INTO BILL_AUDIT
-               (ACCT_NO, AMOUNT, PROCESS_DATE)
-               VALUES
-               (:WS-BILL-ACCT-NO,
-                :WS-TOTAL-AMOUNT,
-                :WS-CURRENT-DATE)
-           END-EXEC.
-
-       9000-TERMINATE.
-           CLOSE BILL-INPUT
-           CLOSE BILL-OUTPUT
-           DISPLAY 'BILL0030 COMPLETE: '
-               WS-RECORD-COUNT ' RECORDS, '
-               WS-ERROR-COUNT  ' ERRORS'.`,
-
-  'src/programs/BILL0040.cbl': `      *================================================================*
-      * BILL0040 - BILLING ADJUSTMENT PROCESSOR
-      * Handles credit/debit adjustments to customer bills.
-      *================================================================*
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID.    BILL0040.
-
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       COPY BILLREC.
-
-       01  WS-ADJ-TYPE                PIC X(2).
-           88  WS-CREDIT              VALUE 'CR'.
-           88  WS-DEBIT               VALUE 'DB'.
-       01  WS-ADJ-AMOUNT              PIC S9(9)V99 COMP-3.
-       01  WS-NEW-BALANCE             PIC S9(9)V99 COMP-3.
-
-       PROCEDURE DIVISION.
-       0000-MAIN.
-           PERFORM 1000-INIT
-           PERFORM 2000-PROCESS-ADJUSTMENTS
-           PERFORM 9000-CLEANUP
-           STOP RUN.
-
-       1000-INIT.
-           DISPLAY 'BILL0040 ADJUSTMENT START'.
-
-       2000-PROCESS-ADJUSTMENTS.
-           EVALUATE TRUE
-               WHEN WS-CREDIT
-                   SUBTRACT WS-ADJ-AMOUNT FROM WS-NEW-BALANCE
-               WHEN WS-DEBIT
-                   ADD WS-ADJ-AMOUNT TO WS-NEW-BALANCE
-           END-EVALUATE.
-
-       9000-CLEANUP.
-           DISPLAY 'BILL0040 ADJUSTMENT COMPLETE'.`,
-
-  'src/programs/PAY0100.cbl': `      *================================================================*
-      * PAY0100 - PAYMENT PROCESSING MODULE
-      * Receives and applies customer payments to accounts.
-      *================================================================*
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID.    PAY0100.
-
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       COPY CUSTACCT.
-
-       01  WS-PAY-AMOUNT              PIC S9(9)V99 COMP-3.
-       01  WS-ACCT-BALANCE            PIC S9(9)V99 COMP-3.
-       01  WS-PAY-METHOD              PIC X(4).
-           88  WS-ACH                 VALUE 'ACH '.
-           88  WS-WIRE                VALUE 'WIRE'.
-           88  WS-CHECK               VALUE 'CHK '.
-
-       PROCEDURE DIVISION.
-       0000-MAIN.
-           PERFORM 1000-INIT
-           PERFORM 2000-APPLY-PAYMENT
-           PERFORM 3000-UPDATE-ACCOUNT
-           STOP RUN.
-
-       1000-INIT.
-           DISPLAY 'PAY0100 PAYMENT PROCESSING START'.
-
-       2000-APPLY-PAYMENT.
-           SUBTRACT WS-PAY-AMOUNT FROM WS-ACCT-BALANCE
-           IF WS-ACCT-BALANCE < 0
-               DISPLAY 'OVERPAYMENT DETECTED'
-               PERFORM 2100-HANDLE-OVERPAYMENT
-           END-IF.
-
-       2100-HANDLE-OVERPAYMENT.
-           MOVE 0 TO WS-ACCT-BALANCE
-           DISPLAY 'CREDIT MEMO GENERATED'.
-
-       3000-UPDATE-ACCOUNT.
-           EXEC SQL
-               UPDATE CUSTOMER_ACCOUNTS
-               SET BALANCE = :WS-ACCT-BALANCE,
-                   LAST_PAY_DATE = CURRENT DATE
-               WHERE ACCT_NO = :WS-CUST-ACCT-NO
-           END-EXEC.`,
-
-  'src/programs/CUST0200.cbl': `      *================================================================*
-      * CUST0200 - CUSTOMER MASTER FILE MAINTENANCE
-      * CRUD operations on customer records via CICS.
-      *================================================================*
-       IDENTIFICATION DIVISION.
-       PROGRAM-ID.    CUST0200.
-
-       DATA DIVISION.
-       WORKING-STORAGE SECTION.
-       COPY CUSTACCT.
-
-       01  WS-CICS-RESP              PIC S9(8) COMP.
-       01  WS-ACTION                  PIC X(1).
-           88  WS-ADD                 VALUE 'A'.
-           88  WS-UPDATE              VALUE 'U'.
-           88  WS-DELETE              VALUE 'D'.
-           88  WS-INQUIRY             VALUE 'I'.
-
-       PROCEDURE DIVISION.
-       0000-MAIN.
-           EVALUATE TRUE
-               WHEN WS-ADD
-                   PERFORM 1000-ADD-CUSTOMER
-               WHEN WS-UPDATE
-                   PERFORM 2000-UPDATE-CUSTOMER
-               WHEN WS-DELETE
-                   PERFORM 3000-DELETE-CUSTOMER
-               WHEN WS-INQUIRY
-                   PERFORM 4000-INQUIRY-CUSTOMER
-           END-EVALUATE
-           EXEC CICS RETURN END-EXEC.
-
-       1000-ADD-CUSTOMER.
-           EXEC SQL
-               INSERT INTO CUSTOMER_MASTER
-               (ACCT_NO, NAME, ADDR, STATUS)
-               VALUES
-               (:WS-CUST-ACCT-NO,
-                :WS-CUST-NAME,
-                :WS-CUST-ADDR,
-                'ACTIVE')
-           END-EXEC.
-
-       2000-UPDATE-CUSTOMER.
-           EXEC SQL
-               UPDATE CUSTOMER_MASTER
-               SET NAME = :WS-CUST-NAME,
-                   ADDR = :WS-CUST-ADDR
-               WHERE ACCT_NO = :WS-CUST-ACCT-NO
-           END-EXEC.
-
-       3000-DELETE-CUSTOMER.
-           EXEC SQL
-               UPDATE CUSTOMER_MASTER
-               SET STATUS = 'CLOSED'
-               WHERE ACCT_NO = :WS-CUST-ACCT-NO
-           END-EXEC.
-
-       4000-INQUIRY-CUSTOMER.
-           EXEC SQL
-               SELECT NAME, ADDR, STATUS
-               INTO :WS-CUST-NAME,
-                    :WS-CUST-ADDR,
-                    :WS-CUST-STATUS
-               FROM CUSTOMER_MASTER
-               WHERE ACCT_NO = :WS-CUST-ACCT-NO
-           END-EXEC.`,
-
-  'src/copybooks/BILLREC.cpy': `      *================================================================*
-      * BILLREC - Billing Record Copybook
-      * Standard layout for billing transaction records.
-      *================================================================*
-       01  WS-BILL-RECORD.
-           05  WS-BILL-ACCT-NO        PIC X(10).
-           05  WS-BILL-CUST-NAME      PIC X(30).
-           05  WS-BILL-BASE-AMT       PIC S9(9)V99 COMP-3.
-           05  WS-BILL-TAX-AMT        PIC S9(7)V99 COMP-3.
-           05  WS-BILL-TOTAL          PIC S9(9)V99 COMP-3.
-           05  WS-BILL-DATE           PIC X(10).
-           05  WS-BILL-STATUS         PIC X(2).
-               88  WS-BILL-OPEN       VALUE 'OP'.
-               88  WS-BILL-CLOSED     VALUE 'CL'.
-               88  WS-BILL-PENDING    VALUE 'PN'.
-           05  WS-VALID-FLAG          PIC X(1).
-       01  WS-OUTPUT-RECORD.
-           05  WS-OUT-ACCT            PIC X(10).
-           05  WS-OUT-TOTAL           PIC S9(9)V99.
-           05  WS-OUT-DATE            PIC X(10).`,
-
-  'src/copybooks/CUSTACCT.cpy': `      *================================================================*
-      * CUSTACCT - Customer Account Copybook
-      * Standard layout for customer account records.
-      *================================================================*
-       01  WS-CUST-RECORD.
-           05  WS-CUST-ACCT-NO        PIC X(10).
-           05  WS-CUST-NAME           PIC X(30).
-           05  WS-CUST-ADDR           PIC X(60).
-           05  WS-CUST-STATUS         PIC X(8).
-           05  WS-CUST-BALANCE        PIC S9(9)V99 COMP-3.
-           05  WS-CUST-LAST-PAY       PIC X(10).
-           05  WS-CUST-TYPE           PIC X(2).
-               88  WS-CUST-RETAIL     VALUE 'RT'.
-               88  WS-CUST-COMMERCIAL VALUE 'CM'.`,
-
-  'jcl/BILLCYCL.jcl': `//BILLCYCL JOB (BILLING),'BILL CYCLE',
-//         CLASS=A,MSGCLASS=X,
-//         NOTIFY=&SYSUID
-//*================================================================*
-//* BILLCYCL - Monthly Billing Cycle JCL
-//* Runs BILL0030 and BILL0040 in sequence.
-//*================================================================*
-//STEP010  EXEC PGM=BILL0030,REGION=0M
-//STEPLIB  DD DSN=PROD.BILLING.LOADLIB,DISP=SHR
-//BILLIN   DD DSN=PROD.BILLING.INPUT,DISP=SHR
-//BILLOUT  DD DSN=PROD.BILLING.OUTPUT,
-//            DISP=(NEW,CATLG,DELETE),
-//            SPACE=(CYL,(50,10),RLSE),
-//            DCB=(RECFM=FB,LRECL=300,BLKSIZE=0)
-//SYSOUT   DD SYSOUT=*
-//*
-//STEP020  EXEC PGM=BILL0040,REGION=0M,
-//         COND=(0,NE,STEP010)
-//STEPLIB  DD DSN=PROD.BILLING.LOADLIB,DISP=SHR
-//ADJIN    DD DSN=PROD.BILLING.ADJUSTMENTS,DISP=SHR
-//SYSOUT   DD SYSOUT=*`,
-};
+  return Array.from(folders.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([name, children]) => ({
+      name,
+      children: children.sort((a, b) => a.name.localeCompare(b.name)),
+    }));
+}
 
 // ---------------------------------------------------------------------------
 // Impact analysis mock data
@@ -456,13 +126,29 @@ type ApprovalStatus = 'draft' | 'review' | 'approved' | 'rejected';
 
 interface FluxWorkspaceProps {
   repoUrl: string;
+  branch: string;
+  initialSources: SourceFile[];
+  initialCached: boolean;
   onDisconnect: () => void;
 }
 
-export function FluxWorkspace({ repoUrl, onDisconnect }: FluxWorkspaceProps) {
-  const [selectedFile, setSelectedFile] = useState<string>('src/programs/BILL0030.cbl');
+export function FluxWorkspace({ repoUrl, branch, initialSources, initialCached, onDisconnect }: FluxWorkspaceProps) {
+  // Derived data from pre-fetched sources
+  const fileTree = useMemo(() => buildFileTree(initialSources), [initialSources]);
+  const fileContents = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const src of initialSources) {
+      map[src.path] = src.content;
+    }
+    return map;
+  }, [initialSources]);
+
+  // UI state
+  const [selectedFile, setSelectedFile] = useState<string>(
+    () => initialSources.length > 0 ? initialSources[0].path : ''
+  );
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(
-    new Set(FILE_TREE.map(f => f.name))
+    () => new Set(buildFileTree(initialSources).map(f => f.name))
   );
   const [changeDescription, setChangeDescription] = useState('');
   const [showImpact, setShowImpact] = useState(false);
@@ -506,9 +192,9 @@ export function FluxWorkspace({ repoUrl, onDisconnect }: FluxWorkspaceProps) {
     setApprovalStatus('draft');
   }, []);
 
-  const content = FILE_CONTENTS[selectedFile] || '      * File content not available';
+  const content = fileContents[selectedFile] || '      * File content not available';
   const lines = content.split('\n');
-  const fileEntry = FILE_TREE.flatMap(f => f.children).find(f => f.path === selectedFile);
+  const fileEntry = fileTree.flatMap(f => f.children).find(f => f.path === selectedFile);
 
   return (
     <div className="flex-1 flex overflow-hidden">
@@ -537,11 +223,29 @@ export function FluxWorkspace({ repoUrl, onDisconnect }: FluxWorkspaceProps) {
           >
             {repoUrl.replace(/^https?:\/\//, '').replace(/^github\.com\//, '')}
           </p>
+          <div className="flex items-center gap-2 mt-1">
+            <span
+              className="text-[10px] text-[#5b6577]"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              {branch}
+            </span>
+            <span
+              className={`text-[9px] px-1.5 py-0.5 rounded ${
+                initialCached
+                  ? 'bg-[#45c4b020] text-[#45c4b0]'
+                  : 'bg-[#60a5fa20] text-[#60a5fa]'
+              }`}
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              {initialCached ? 'Cached' : 'Fresh'}
+            </span>
+          </div>
         </div>
 
         {/* File tree */}
         <div className="flex-1 overflow-y-auto py-2">
-          {FILE_TREE.map(folder => (
+          {fileTree.map(folder => (
             <div key={folder.name}>
               <button
                 onClick={() => toggleFolder(folder.name)}

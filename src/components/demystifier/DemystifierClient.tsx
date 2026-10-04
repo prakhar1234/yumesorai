@@ -18,6 +18,7 @@ export function DemystifierClient() {
   const handleProductChange = useCallback((product: string) => {
     if (product === 'codeflux') router.push('/demystifier/codeflux');
     else if (product === 'transformer') router.push('/demystifier/transformer');
+    else if (product === 'business-review') router.push('/demystifier/business-review');
   }, [router]);
 
   const handleAnalyzeComplete = useCallback((data: GraphData & { coverage?: CoverageData }, label: string) => {

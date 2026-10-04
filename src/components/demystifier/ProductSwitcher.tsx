@@ -6,6 +6,7 @@ const PRODUCTS = [
   { id: 'demystifier', label: 'Demistifier', desc: 'COBOL knowledge graph · impact analysis', icon: '◎' },
   { id: 'codeflux', label: 'Code Flux', desc: 'Change workflow · impact preview · approvals', icon: '⇌' },
   { id: 'transformer', label: 'Transformer', desc: 'COBOL → modern language · cloud-ready', icon: '⟿' },
+  { id: 'business-review', label: 'Business Review', desc: 'Highlight code · business logic summary', icon: '▤' },
 ];
 
 interface ProductSwitcherProps {

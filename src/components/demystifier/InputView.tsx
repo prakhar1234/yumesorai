@@ -22,6 +22,11 @@ const FEATURES = [
   { title: 'Risk Heatmap', desc: 'Color-code by complexity, fan-out, and change frequency', icon: '🔥' },
 ];
 
+interface BranchInfo {
+  name: string;
+  default: boolean;
+}
+
 interface AnalysisSummary {
   id: string;
   repo_url: string;
@@ -40,9 +45,20 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
   const [repoInput, setRepoInput] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [scanSourceCached, setScanSourceCached] = useState<boolean | null>(null);
+  const [scanDetail, setScanDetail] = useState('');
   const [toast, setToast] = useState<string | null>(null);
   const [recentAnalyses, setRecentAnalyses] = useState<AnalysisSummary[]>([]);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Branch selection (GitHub tab only)
+  const [selectedBranch, setSelectedBranch] = useState('');
+  const [branches, setBranches] = useState<BranchInfo[]>([]);
+  const [loadingBranches, setLoadingBranches] = useState(false);
+  const [branchError, setBranchError] = useState<string | null>(null);
+  const [branchDropdownOpen, setBranchDropdownOpen] = useState(false);
+  const branchFetchRef = useRef(0);
+  const branchDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     return () => {
@@ -57,6 +73,78 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
       .then((data: AnalysisSummary[]) => setRecentAnalyses(data))
       .catch(() => {});
   }, []);
+
+  // Close branch dropdown on outside click
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (branchDropdownRef.current && !branchDropdownRef.current.contains(e.target as Node)) {
+        setBranchDropdownOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Fetch branches when GitHub repo URL looks valid (debounced)
+  useEffect(() => {
+    if (tab !== 'github') {
+      setBranches([]);
+      setSelectedBranch('');
+      setBranchError(null);
+      return;
+    }
+
+    const url = repoInput.trim();
+    const cleaned = url.replace(/^https?:\/\//, '').replace(/\.git$/, '');
+    if (!/^github\.com\/[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+/.test(cleaned)) {
+      setBranches([]);
+      setSelectedBranch('');
+      setBranchError(null);
+      return;
+    }
+
+    const id = ++branchFetchRef.current;
+    const timer = setTimeout(async () => {
+      setLoadingBranches(true);
+      setBranchError(null);
+
+      try {
+        const resp = await fetch('/api/demystifier/branches', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repo_url: url }),
+        });
+
+        if (id !== branchFetchRef.current) return;
+
+        if (!resp.ok) {
+          const err = await resp.json().catch(() => ({ error: 'Failed to fetch branches' }));
+          throw new Error(err.error || `HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        if (id !== branchFetchRef.current) return;
+
+        const fetched: BranchInfo[] = data.branches || [];
+        setBranches(fetched);
+
+        const defaultBranch = fetched.find(b => b.default);
+        setSelectedBranch(defaultBranch ? defaultBranch.name : fetched[0]?.name || '');
+        setBranchError(null);
+      } catch (e) {
+        if (id !== branchFetchRef.current) return;
+        setBranches([]);
+        setSelectedBranch('');
+        setBranchError(e instanceof Error ? e.message : 'Unknown error');
+      } finally {
+        if (id === branchFetchRef.current) {
+          setLoadingBranches(false);
+        }
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [repoInput, tab]);
 
   // Auto-dismiss toast
   useEffect(() => {
@@ -86,7 +174,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
     onAnalyzeComplete(data, shortLabel(lbl));
   }, [onAnalyzeComplete]);
 
-  const analyze = useCallback((label?: string) => {
+  const analyze = useCallback(async (label?: string) => {
     const lbl = label || repoInput.trim();
 
     // Validate input — sample repos pass a label directly and skip validation
@@ -107,6 +195,8 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
 
     setAnalyzing(true);
     setProgress(0);
+    setScanSourceCached(null);
+    setScanDetail('');
 
     // Start progress animation
     let p = 0;
@@ -117,11 +207,43 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
       setProgress(prev => Math.min(90, prev + 1.5));
     }, 300);
 
+    const branch = tab === 'github' && selectedBranch ? selectedBranch : undefined;
+
+    // Pre-check: are sources cached locally? (fast, disk-only)
+    if (tab === 'github') {
+      try {
+        const checkResp = await fetch('/api/demystifier/sources/check-cache', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ repo_url: lbl, branch: branch || 'main' }),
+        });
+        if (checkResp.ok) {
+          const checkData = await checkResp.json();
+          const hasSrcCache = checkData.has_cache === true;
+          setScanSourceCached(hasSrcCache);
+          if (hasSrcCache) {
+            const fileCount = checkData.file_count ?? 0;
+            const fetchedAt = checkData.fetched_at
+              ? new Date(checkData.fetched_at).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+                + ', ' + new Date(checkData.fetched_at).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+              : '';
+            setScanDetail(
+              `${fileCount} source files cached` + (fetchedAt ? ` · fetched ${fetchedAt}` : '') + ' · ~5-15s'
+            );
+          } else {
+            setScanDetail('First scan — downloading sources + AI analysis · ~30-90s');
+          }
+        }
+      } catch {
+        // Pre-check failure is non-fatal
+      }
+    }
+
     // Call the backend API
     fetch('/api/demystifier', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ repo_url: lbl, input_type: tab }),
+      body: JSON.stringify({ repo_url: lbl, input_type: tab, ...(branch && { branch }) }),
     })
       .then(res => {
         if (!res.ok) throw new Error(`API error: ${res.status}`);
@@ -157,7 +279,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         setProgress(100);
         setTimeout(() => fallbackToDemoData(lbl), 300);
       });
-  }, [repoInput, tab, onAnalyzeComplete, fallbackToDemoData]);
+  }, [repoInput, tab, selectedBranch, onAnalyzeComplete, fallbackToDemoData]);
 
   const loadSavedAnalysis = useCallback((id: string, repoUrl: string) => {
     setAnalyzing(true);
@@ -216,7 +338,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
           {TABS.map(t => (
             <button
               key={t.id}
-              onClick={() => { setTab(t.id); setRepoInput(''); }}
+              onClick={() => { setTab(t.id); setRepoInput(''); setBranches([]); setSelectedBranch(''); setBranchError(null); }}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-xs font-medium transition-colors ${
                 tab === t.id
                   ? 'bg-[#182233] text-[#e6edf7]'
@@ -231,7 +353,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         </div>
 
         {/* Input */}
-        <div className="flex gap-2 mb-6">
+        <div className="flex gap-2 mb-2">
           <input
             type="text"
             value={repoInput}
@@ -242,6 +364,75 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
             style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             onKeyDown={e => e.key === 'Enter' && !analyzing && analyze()}
           />
+
+          {/* Branch dropdown (GitHub tab only) */}
+          {tab === 'github' && (
+            <div className="relative" ref={branchDropdownRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!analyzing && branches.length > 0) setBranchDropdownOpen(prev => !prev);
+                }}
+                disabled={analyzing || branches.length === 0}
+                className={`flex items-center gap-2 h-full px-3 py-3 bg-[#111823] border rounded-lg text-[12px] transition-colors disabled:opacity-40 ${
+                  branchDropdownOpen ? 'border-[#3b82f6]' : 'border-[#232c3c]'
+                } ${branches.length > 0 ? 'hover:border-[#3b82f6]' : ''}`}
+                style={{ fontFamily: "'IBM Plex Mono', monospace", minWidth: '150px' }}
+              >
+                {loadingBranches ? (
+                  <span className="flex items-center gap-2 text-[#5b6577]">
+                    <span className="inline-block w-3 h-3 border border-[#5b6577] border-t-transparent rounded-full animate-spin" />
+                    Loading...
+                  </span>
+                ) : branchError ? (
+                  <span className="text-[#ef4444] truncate">No branches</span>
+                ) : selectedBranch ? (
+                  <span className="text-[#dbe4f0] truncate">{selectedBranch}</span>
+                ) : (
+                  <span className="text-[#4a5568]">Branch</span>
+                )}
+                <svg
+                  className={`w-3 h-3 shrink-0 text-[#5b6577] transition-transform ${branchDropdownOpen ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {branchDropdownOpen && branches.length > 0 && (
+                <div
+                  className="absolute right-0 top-full mt-1 w-56 max-h-60 overflow-y-auto bg-[#111823] border border-[#232c3c] rounded-lg shadow-xl z-50"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                >
+                  {branches.map(b => (
+                    <button
+                      key={b.name}
+                      onClick={() => {
+                        setSelectedBranch(b.name);
+                        setBranchDropdownOpen(false);
+                      }}
+                      className={`flex items-center justify-between w-full px-3 py-2 text-left text-[12px] transition-colors ${
+                        selectedBranch === b.name
+                          ? 'bg-[#182233] text-[#e6edf7]'
+                          : 'text-[#9fb0c6] hover:bg-[#182233]'
+                      }`}
+                    >
+                      <span className="truncate">{b.name}</span>
+                      {b.default && (
+                        <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#45c4b020] text-[#45c4b0] ml-2 shrink-0">
+                          default
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             onClick={() => analyze()}
             disabled={analyzing}
@@ -252,18 +443,39 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
           </button>
         </div>
 
+        {/* Branch fetch hint */}
+        {tab === 'github' && branchError && !analyzing && (
+          <p
+            className="text-[10px] text-[#7a869a] mb-4"
+            style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+          >
+            Could not load branches — will default to <span className="text-[#9fb0c6]">main</span>
+          </p>
+        )}
+        {tab === 'github' && !branchError && !loadingBranches && selectedBranch && !analyzing && (
+          <div className="mb-4" />
+        )}
+        {tab !== 'github' && <div className="mb-4" />}
+
         {/* Progress bar */}
         {analyzing && (
           <div className="mb-8">
             <div className="flex justify-between text-[11px] text-[#7a869a] mb-1.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
               <span className="flex items-center gap-1.5">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#45c4b0] animate-pulse" />
-                {progress < 15 ? 'Connecting to GitHub...' :
-                 progress < 35 ? 'Downloading COBOL sources...' :
-                 progress < 55 ? 'Analyzing source code...' :
-                 progress < 75 ? 'Building dependency graph...' :
-                 progress < 88 ? 'Computing domains & risk...' :
-                 'Laying out knowledge graph...'}
+                {scanSourceCached === true
+                  ? (progress < 15 ? 'Loading cached sources...' :
+                     progress < 40 ? 'Checking analysis cache...' :
+                     progress < 60 ? 'Analyzing source code...' :
+                     progress < 80 ? 'Building dependency graph...' :
+                     progress < 90 ? 'Computing domains & risk...' :
+                     'Laying out knowledge graph...')
+                  : (progress < 15 ? 'Connecting to GitHub...' :
+                     progress < 35 ? 'Downloading COBOL sources...' :
+                     progress < 55 ? 'Analyzing source code...' :
+                     progress < 75 ? 'Building dependency graph...' :
+                     progress < 88 ? 'Computing domains & risk...' :
+                     'Laying out knowledge graph...')}
               </span>
               <span>{progress}%</span>
             </div>
@@ -273,6 +485,26 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
                 style={{ width: `${progress}%` }}
               />
             </div>
+            {scanDetail && (
+              <div className="flex items-center gap-2 mt-2">
+                <span
+                  className={`text-[9px] px-1.5 py-0.5 rounded ${
+                    scanSourceCached
+                      ? 'text-[#45c4b0] bg-[#45c4b018]'
+                      : 'text-[#58b0ff] bg-[#58b0ff18]'
+                  }`}
+                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                >
+                  {scanSourceCached ? 'Cached' : 'Fresh'}
+                </span>
+                <span
+                  className="text-[10px] text-[#5b6577]"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                >
+                  {scanDetail}
+                </span>
+              </div>
+            )}
           </div>
         )}
 
