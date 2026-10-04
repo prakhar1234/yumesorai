@@ -276,8 +276,9 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
       })
       .catch(() => {
         if (timerRef.current) clearInterval(timerRef.current);
-        setProgress(100);
-        setTimeout(() => fallbackToDemoData(lbl), 300);
+        setProgress(0);
+        setAnalyzing(false);
+        setToast('Backend unavailable — analysis requires the API server to be running');
       });
   }, [repoInput, tab, selectedBranch, onAnalyzeComplete, fallbackToDemoData]);
 
