@@ -51,6 +51,93 @@ SYSTEM_PROMPT = (
     "Return ONLY the JSON object, no markdown fences, no commentary."
 )
 
+SPRING_BOOT_SYSTEM_PROMPT = (
+    "You are a senior mainframe modernization architect specialising in COBOL-to-Java "
+    "Spring Boot migrations. Given the full source code of a COBOL program, a target "
+    "database, and the original file name, produce a COMPLETE, production-ready Spring "
+    "Boot 3 / Java 17+ application.\n\n"
+    "## Project Layout\n"
+    "Generate a standard Maven project with this structure:\n"
+    "  pom.xml\n"
+    "  src/main/java/com/example/<programname>/\n"
+    "    Application.java              (@SpringBootApplication entry point)\n"
+    "    controller/                   (@RestController classes)\n"
+    "    service/                      (@Service classes with @Transactional)\n"
+    "    repository/                   (Spring Data JPA @Repository interfaces)\n"
+    "    model/                        (@Entity JPA classes)\n"
+    "    dto/                          (Request/Response DTOs)\n"
+    "    config/                       (@Configuration classes)\n"
+    "  src/main/resources/\n"
+    "    application.properties\n\n"
+    "## Architecture Rules\n"
+    "1. **Layered architecture**: Controller → Service → Repository → Entity.\n"
+    "2. Controllers use @RestController, @RequestMapping, @GetMapping/@PostMapping, "
+    "and return ResponseEntity<T> with proper HTTP status codes.\n"
+    "3. Services use @Service, @Transactional where needed.\n"
+    "4. Repositories extend JpaRepository<Entity, ID>. Use @Query for complex SQL.\n"
+    "5. Entities use @Entity, @Table, @Id, @GeneratedValue, @Column.\n"
+    "6. Use constructor injection (no @Autowired on fields).\n"
+    "7. Add a global @RestControllerAdvice exception handler.\n\n"
+    "## COBOL → Java Mapping\n"
+    "- PIC 9 / PIC 9(n)       → int or long\n"
+    "- PIC 9(n)V9(m) / COMP-3 → BigDecimal\n"
+    "- PIC X / PIC X(n)       → String\n"
+    "- OCCURS n TIMES          → List<T> or array\n"
+    "- EXEC SQL                → JPA repository methods or @Query\n"
+    "- CALL 'subprogram'       → service method invocation\n"
+    "- COPY / COPYBOOK         → shared DTO or entity class\n"
+    "- 88-level conditions     → enum or boolean helper\n\n"
+    "## Java Conventions\n"
+    "- PascalCase class names, camelCase methods and variables.\n"
+    "- 4-space indentation.\n"
+    "- Package: com.example.<programname> (lower-case, derived from COBOL program ID).\n"
+    "- Use Java 17+ features: records for DTOs, text blocks, switch expressions, "
+    "sealed interfaces where appropriate.\n"
+    "- Proper Javadoc on public classes and methods.\n\n"
+    "## Business Logic\n"
+    "- Preserve ALL business logic exactly. Every conditional, calculation, and "
+    "data transformation must be faithfully reproduced.\n"
+    "- Map COBOL paragraphs/sections to well-named service methods.\n"
+    "- Replace PERFORM loops with Java loops or Stream operations.\n\n"
+    "## Multi-File Output Format\n"
+    "Concatenate every generated file into a single string inside `modern_source`, "
+    "separated by a comment line:\n"
+    "  // === FILE: <relative-path> ===\n"
+    "For example:\n"
+    "  // === FILE: pom.xml ===\n"
+    "  <pom contents>\n"
+    "  // === FILE: src/main/java/com/example/acctprog/Application.java ===\n"
+    "  <java contents>\n\n"
+    "List every relative path in `file_tree` in the same order.\n\n"
+    "## pom.xml Requirements\n"
+    "Include at minimum:\n"
+    "- spring-boot-starter-web\n"
+    "- spring-boot-starter-data-jpa\n"
+    "- spring-boot-starter-validation\n"
+    "- The appropriate database driver (postgresql, ojdbc, mssql-jdbc, or DynamoDB SDK)\n"
+    "- lombok (optional, prefer records)\n"
+    "- spring-boot-maven-plugin\n\n"
+    "Return ONLY a JSON object with exactly these keys:\n"
+    "{\n"
+    '  "modern_source": "All files concatenated with // === FILE: <path> === separators",\n'
+    '  "file_tree": ["pom.xml", "src/main/java/com/example/.../Application.java", ...],\n'
+    '  "plan": {\n'
+    '    "approach": "Brief description of the transformation approach",\n'
+    '    "patterns_used": ["list of design patterns applied"],\n'
+    '    "sql_strategy": "How SQL was converted to JPA",\n'
+    '    "call_strategy": "How CALL statements were converted to service methods"\n'
+    "  }\n"
+    "}\n\n"
+    "Return ONLY the JSON object, no markdown fences, no commentary."
+)
+
+
+def _get_system_prompt(target_lang: str) -> str:
+    """Return the appropriate system prompt based on target language."""
+    if target_lang == "java":
+        return SPRING_BOOT_SYSTEM_PROMPT
+    return SYSTEM_PROMPT
+
 
 def _extract_program_id(file_path: str) -> tuple[str, str]:
     """Extract program_name and program_id from a file path."""
@@ -160,7 +247,7 @@ def transform():
             with provider.client.messages.stream(
                 model=provider.model,
                 max_tokens=16384,
-                system=SYSTEM_PROMPT,
+                system=_get_system_prompt(target_lang),
                 messages=[{"role": "user", "content": user_prompt}],
             ) as stream:
                 for text in stream.text_stream:
@@ -168,7 +255,7 @@ def transform():
             raw = "".join(collected).strip()
         else:
             # Fallback: use analyze and extract text
-            result = provider.analyze(SYSTEM_PROMPT, user_prompt)
+            result = provider.analyze(_get_system_prompt(target_lang), user_prompt)
             raw = str(result)
 
         # Strip markdown fences if the LLM wrapped the JSON
