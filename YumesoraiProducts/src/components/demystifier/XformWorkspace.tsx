@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 
 interface SourceFile {
   path: string;
@@ -157,6 +157,49 @@ interface ProgramTransformResult {
 
 const mono = { fontFamily: "'IBM Plex Mono', monospace" };
 const sans = { fontFamily: "'IBM Plex Sans', sans-serif" };
+
+/* ---------- Multi-file parsing ---------- */
+
+interface ParsedFile {
+  path: string;
+  filename: string;
+  content: string;
+}
+
+function parseModernFiles(source: string): ParsedFile[] {
+  const separator = /^\/\/ === FILE: (.+?) ===$/gm;
+  const matches: { path: string; index: number; fullMatchEnd: number }[] = [];
+  let match: RegExpExecArray | null;
+
+  while ((match = separator.exec(source)) !== null) {
+    matches.push({
+      path: match[1].trim(),
+      index: match.index,
+      fullMatchEnd: match.index + match[0].length,
+    });
+  }
+
+  if (matches.length === 0) {
+    return [{ path: 'output', filename: 'output', content: source }];
+  }
+
+  const files: ParsedFile[] = [];
+  for (let i = 0; i < matches.length; i++) {
+    const start = matches[i].fullMatchEnd;
+    const end = i + 1 < matches.length ? matches[i + 1].index : source.length;
+    const raw = source.substring(start, end).replace(/^\n/, '').replace(/\n+$/, '');
+    const path = matches[i].path;
+    const filename = path.includes('/') ? path.split('/').pop()! : path;
+    files.push({ path, filename, content: raw });
+  }
+
+  return files;
+}
+
+function reassembleModernSource(files: ParsedFile[]): string {
+  if (files.length === 1 && files[0].path === 'output') return files[0].content;
+  return files.map(f => `// === FILE: ${f.path} ===\n${f.content}`).join('\n\n');
+}
 
 /* ---------- Syntax highlighting (matches CodeFlux) ---------- */
 
@@ -1051,6 +1094,27 @@ function TransformStage({
   const activeResult = results[activeTab] || null;
   const activeProgram = programs.find(p => p.path === activeTab);
 
+  const [activeFileIndex, setActiveFileIndex] = useState(0);
+
+  // Reset file index when program tab changes
+  useEffect(() => {
+    setActiveFileIndex(0);
+  }, [activeTab]);
+
+  const parsedFiles = useMemo(
+    () => activeResult ? parseModernFiles(activeResult.editedModernSource) : [],
+    [activeResult?.editedModernSource]
+  );
+  const activeFile = parsedFiles[activeFileIndex] || parsedFiles[0];
+  const isMultiFile = parsedFiles.length > 1;
+
+  const handleFileEdit = useCallback((newContent: string) => {
+    const updated = parsedFiles.map((f, i) =>
+      i === activeFileIndex ? { ...f, content: newContent } : f
+    );
+    onModernCodeEdit(reassembleModernSource(updated));
+  }, [parsedFiles, activeFileIndex, onModernCodeEdit]);
+
   // While batch is running, show progress card (centered with padding)
   if (batchTransforming) {
     return (
@@ -1115,7 +1179,8 @@ function TransformStage({
 
   const cobolLines = activeResult.cobolSource.split('\n');
   const cobolLoc = cobolLines.length;
-  const modernLines = activeResult.editedModernSource.split('\n');
+  const modernContent = activeFile ? activeFile.content : activeResult.editedModernSource;
+  const modernLines = modernContent.split('\n');
   const modernLoc = modernLines.length;
 
   const indicatorColors = {
@@ -1207,17 +1272,51 @@ function TransformStage({
         {/* RIGHT: Modern Output (editable, CodeFlux-style) */}
         <div className="flex-1 flex flex-col min-w-0">
           {/* File tab bar */}
-          <div className="flex items-center justify-between h-9 px-3 bg-[#0c1018] border-b border-[#1e2736] shrink-0">
-            <div className="flex items-center min-w-0">
-              <span className="w-2 h-2 rounded-full bg-[#45c4b0] mr-2 shrink-0" />
-              <span className="text-[11px] text-[#9fb0c6] truncate" style={mono}>
-                {langLabel} Output
-              </span>
-              <span className="text-[10px] text-[#5b6577] ml-3 shrink-0" style={mono}>
-                {modernLoc.toLocaleString()} LOC
-              </span>
-            </div>
-            <span className="text-[9px] text-[#5b6577] shrink-0 ml-2" style={mono}>editable</span>
+          <div className="flex items-center justify-between bg-[#0c1018] border-b border-[#1e2736] shrink-0" style={{ minHeight: 36 }}>
+            {isMultiFile ? (
+              <>
+                <div className="flex items-center min-w-0 overflow-x-auto gap-0 flex-1" style={{ scrollbarWidth: 'none' }}>
+                  <span className="w-2 h-2 rounded-full bg-[#45c4b0] mx-2 shrink-0" />
+                  {parsedFiles.map((f, i) => (
+                    <button
+                      key={f.path}
+                      title={f.path}
+                      onClick={() => setActiveFileIndex(i)}
+                      className={`px-3 py-2 text-[11px] border-b-2 transition-colors whitespace-nowrap shrink-0 ${
+                        i === activeFileIndex
+                          ? 'text-[#e6edf7] border-[#45c4b0] bg-[#0a0e14]'
+                          : 'text-[#7a869a] border-transparent hover:text-[#9fb0c6] hover:bg-[#111823]'
+                      }`}
+                      style={mono}
+                    >
+                      {f.filename}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 px-3 shrink-0">
+                  <span className="text-[10px] text-[#5b6577]" style={mono}>
+                    {modernLoc.toLocaleString()} LOC
+                  </span>
+                  <span className="text-[9px] text-[#5b6577] bg-[#111823] px-1.5 py-0.5 rounded" style={mono}>
+                    {parsedFiles.length} files
+                  </span>
+                  <span className="text-[9px] text-[#5b6577]" style={mono}>editable</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="flex items-center min-w-0 px-3">
+                  <span className="w-2 h-2 rounded-full bg-[#45c4b0] mr-2 shrink-0" />
+                  <span className="text-[11px] text-[#9fb0c6] truncate" style={mono}>
+                    {langLabel} Output
+                  </span>
+                  <span className="text-[10px] text-[#5b6577] ml-3 shrink-0" style={mono}>
+                    {modernLoc.toLocaleString()} LOC
+                  </span>
+                </div>
+                <span className="text-[9px] text-[#5b6577] shrink-0 px-3" style={mono}>editable</span>
+              </>
+            )}
           </div>
           {/* Editable code with line numbers */}
           <div className="flex-1 flex min-h-0 overflow-hidden bg-[#0a0e14]">
@@ -1237,8 +1336,8 @@ function TransformStage({
             </div>
             {/* Textarea */}
             <textarea
-              value={activeResult.editedModernSource}
-              onChange={e => onModernCodeEdit(e.target.value)}
+              value={modernContent}
+              onChange={e => isMultiFile ? handleFileEdit(e.target.value) : onModernCodeEdit(e.target.value)}
               className="flex-1 bg-transparent text-[12px] text-[#9fb0c6] leading-[1.6] resize-none focus:outline-none p-0 m-0 border-none"
               style={{ ...mono, tabSize: 4 }}
               spellCheck={false}
@@ -1269,15 +1368,26 @@ function TransformStage({
             </span>
             {activeResult.fileTree.length > 0 ? (
               <div className="text-[11px] text-[#9fb0c6] leading-relaxed" style={mono}>
-                {activeResult.fileTree.map((line, i) => (
-                  <div key={i} className="whitespace-pre hover:bg-[#111823] px-1 -mx-1 rounded">
-                    {line.includes('/') || line.includes('\\') ? (
-                      <span className="text-[#60a5fa]">{line}</span>
-                    ) : (
-                      <span>{line}</span>
-                    )}
-                  </div>
-                ))}
+                {activeResult.fileTree.map((line, i) => {
+                  const fileIdx = parsedFiles.findIndex(f => f.path === line);
+                  const isClickable = fileIdx >= 0;
+                  const isActiveFile = fileIdx === activeFileIndex;
+                  return (
+                    <div
+                      key={i}
+                      className={`whitespace-pre px-1 -mx-1 rounded ${
+                        isActiveFile ? 'bg-[#45c4b0]/10' : 'hover:bg-[#111823]'
+                      } ${isClickable ? 'cursor-pointer' : ''}`}
+                      onClick={() => { if (isClickable) setActiveFileIndex(fileIdx); }}
+                    >
+                      {line.includes('/') || line.includes('\\') ? (
+                        <span className={isActiveFile ? 'text-[#45c4b0]' : 'text-[#60a5fa]'}>{line}</span>
+                      ) : (
+                        <span>{line}</span>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-[10px] text-[#3a4456]" style={mono}>No file tree available</p>
