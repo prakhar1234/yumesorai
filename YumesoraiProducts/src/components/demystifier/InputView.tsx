@@ -38,9 +38,11 @@ interface AnalysisSummary {
 
 interface InputViewProps {
   onAnalyzeComplete: (data: GraphData, label: string) => void;
+  onStartBackgroundScan?: (repoUrl: string, branch: string, inputType: string) => void;
+  backgroundProgress?: { progress: number; label: string } | null;
 }
 
-export function InputView({ onAnalyzeComplete }: InputViewProps) {
+export function InputView({ onAnalyzeComplete, onStartBackgroundScan, backgroundProgress }: InputViewProps) {
   const [tab, setTab] = useState<'github' | 'server'>('github');
   const [repoInput, setRepoInput] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
@@ -193,6 +195,14 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
       }
     }
 
+    const branch = tab === 'github' && selectedBranch ? selectedBranch : undefined;
+
+    // Delegate to background task if available
+    if (onStartBackgroundScan) {
+      onStartBackgroundScan(lbl, branch || 'main', tab);
+      return;
+    }
+
     setAnalyzing(true);
     setProgress(0);
     setScanSourceCached(null);
@@ -206,8 +216,6 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
       // Cap at 90% while waiting for the API (slower pace for source download + LLM)
       setProgress(prev => Math.min(90, prev + 1.5));
     }, 300);
-
-    const branch = tab === 'github' && selectedBranch ? selectedBranch : undefined;
 
     // Pre-check: are sources cached locally? (fast, disk-only)
     if (tab === 'github') {
@@ -280,7 +288,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         setAnalyzing(false);
         setToast('Backend unavailable — analysis requires the API server to be running');
       });
-  }, [repoInput, tab, selectedBranch, onAnalyzeComplete, fallbackToDemoData]);
+  }, [repoInput, tab, selectedBranch, onAnalyzeComplete, fallbackToDemoData, onStartBackgroundScan]);
 
   const loadSavedAnalysis = useCallback((id: string, repoUrl: string) => {
     setAnalyzing(true);
@@ -436,11 +444,11 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
 
           <button
             onClick={() => analyze()}
-            disabled={analyzing}
+            disabled={analyzing || !!backgroundProgress}
             className="px-6 py-3 bg-[#45c4b0] hover:bg-[#3aad9c] text-[#0a0e14] font-semibold text-sm rounded-lg transition-colors disabled:opacity-50"
             style={{ fontFamily: "'IBM Plex Mono', monospace" }}
           >
-            {analyzing ? 'Scanning...' : 'Scan'}
+            {analyzing || backgroundProgress ? 'Scanning...' : 'Scan'}
           </button>
         </div>
 
@@ -458,35 +466,37 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         )}
         {tab !== 'github' && <div className="mb-4" />}
 
-        {/* Progress bar */}
-        {analyzing && (
+        {/* Progress bar — background task progress or inline progress */}
+        {(analyzing || backgroundProgress) && (
           <div className="mb-8">
             <div className="flex justify-between text-[11px] text-[#7a869a] mb-1.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
               <span className="flex items-center gap-1.5">
                 <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#45c4b0] animate-pulse" />
-                {scanSourceCached === true
-                  ? (progress < 15 ? 'Loading cached sources...' :
-                     progress < 40 ? 'Checking analysis cache...' :
-                     progress < 60 ? 'Analyzing source code...' :
-                     progress < 80 ? 'Building dependency graph...' :
-                     progress < 90 ? 'Computing domains & risk...' :
-                     'Laying out knowledge graph...')
-                  : (progress < 15 ? 'Connecting to GitHub...' :
-                     progress < 35 ? 'Downloading COBOL sources...' :
-                     progress < 55 ? 'Analyzing source code...' :
-                     progress < 75 ? 'Building dependency graph...' :
-                     progress < 88 ? 'Computing domains & risk...' :
-                     'Laying out knowledge graph...')}
+                {backgroundProgress
+                  ? backgroundProgress.label
+                  : scanSourceCached === true
+                    ? (progress < 15 ? 'Loading cached sources...' :
+                       progress < 40 ? 'Checking analysis cache...' :
+                       progress < 60 ? 'Analyzing source code...' :
+                       progress < 80 ? 'Building dependency graph...' :
+                       progress < 90 ? 'Computing domains & risk...' :
+                       'Laying out knowledge graph...')
+                    : (progress < 15 ? 'Connecting to GitHub...' :
+                       progress < 35 ? 'Downloading COBOL sources...' :
+                       progress < 55 ? 'Analyzing source code...' :
+                       progress < 75 ? 'Building dependency graph...' :
+                       progress < 88 ? 'Computing domains & risk...' :
+                       'Laying out knowledge graph...')}
               </span>
-              <span>{progress}%</span>
+              <span>{backgroundProgress ? Math.round(backgroundProgress.progress) : progress}%</span>
             </div>
             <div className="h-1.5 bg-[#111823] rounded-full overflow-hidden">
               <div
                 className="h-full bg-gradient-to-r from-[#45c4b0] to-[#3b82f6] rounded-full transition-all duration-150"
-                style={{ width: `${progress}%` }}
+                style={{ width: `${backgroundProgress ? backgroundProgress.progress : progress}%` }}
               />
             </div>
-            {scanDetail && (
+            {!backgroundProgress && scanDetail && (
               <div className="flex items-center gap-2 mt-2">
                 <span
                   className={`text-[9px] px-1.5 py-0.5 rounded ${
@@ -510,7 +520,7 @@ export function InputView({ onAnalyzeComplete }: InputViewProps) {
         )}
 
         {/* Sample repos + Recent analyses + Features */}
-        {!analyzing && (
+        {!analyzing && !backgroundProgress && (
           <>
             <div className="mb-6">
               <p className="text-[10.5px] text-[#5b6577] mb-2 uppercase tracking-wider" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>

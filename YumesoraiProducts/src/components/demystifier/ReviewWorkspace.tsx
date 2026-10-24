@@ -171,6 +171,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
   const [highlightedLines, setHighlightedLines] = useState<{ start: number; end: number } | null>(null);
   const [activeLineRange, setActiveLineRange] = useState<string | null>(null);
   const lineRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+  const brdNavSwitchRef = useRef(false);
 
   const toggleFolder = useCallback((name: string) => {
     setExpandedFolders(prev => {
@@ -199,14 +200,17 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
 
     setSelectedText(text);
 
-    // Position the floating button near the end of the selection
+    // Position the floating button near the end of the selection.
+    // Use the scrollable container's rect + scrollTop so the button
+    // lands at the right content offset even when scrolled.
     const range = selection.getRangeAt(0);
     const rect = range.getBoundingClientRect();
-    const codeRect = codeRef.current?.getBoundingClientRect();
-    if (codeRect) {
+    const container = codeRef.current?.parentElement;
+    const containerRect = container?.getBoundingClientRect();
+    if (containerRect && container) {
       setReviewButtonPos({
-        top: rect.bottom - codeRect.top + 4,
-        left: rect.right - codeRect.left - 40,
+        top: rect.bottom - containerRect.top + container.scrollTop + 4,
+        left: rect.right - containerRect.left - 40,
       });
     }
   }, []);
@@ -231,15 +235,24 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
     if (!match) return;
     const start = parseInt(match[1], 10);
     const end = match[2] ? parseInt(match[2], 10) : start;
+
+    // Switch to the BRD's file if viewing a different one
+    if (brdFilePath && selectedFile !== brdFilePath) {
+      brdNavSwitchRef.current = true;
+      setSelectedFile(brdFilePath);
+    }
+
     setHighlightedLines({ start, end });
     setActiveLineRange(linesStr);
 
-    // Scroll to the start line
+    // Scroll to the start line (use double-rAF to allow file switch render)
     requestAnimationFrame(() => {
-      const el = lineRefs.current.get(start);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      requestAnimationFrame(() => {
+        const el = lineRefs.current.get(start);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      });
     });
 
     // Auto-clear after 8 seconds
@@ -255,14 +268,27 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
     }, 8000);
 
     return () => clearTimeout(timerId);
-  }, []);
+  }, [brdFilePath, selectedFile]);
 
   // Clear highlights and exit edit mode when selected file changes
+  // (skip clear if the switch was triggered by a BRD line-reference click)
   useEffect(() => {
+    if (brdNavSwitchRef.current) {
+      brdNavSwitchRef.current = false;
+      setEditMode(false);
+      return;
+    }
     setHighlightedLines(null);
     setActiveLineRange(null);
     setEditMode(false);
   }, [selectedFile]);
+
+  // Overlay review cards (stacked on the editor)
+  const [overlayReviews, setOverlayReviews] = useState<ReviewEntry[]>([]);
+
+  const dismissOverlayReview = useCallback((id: number) => {
+    setOverlayReviews(prev => prev.filter(r => r.id !== id));
+  }, []);
 
   const handleReview = useCallback(async () => {
     if (!selectedText) return;
@@ -291,13 +317,17 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
 
       const data = await resp.json();
 
-      setReviews(prev => [{
+      const entry: ReviewEntry = {
         id: nextId.current++,
         snippet,
         filePath: selectedFile,
         summary: data.summary || 'No summary returned.',
         timestamp: new Date(),
-      }, ...prev]);
+      };
+
+      // Add to both the overlay stack and the side panel history
+      setOverlayReviews(prev => [entry, ...prev]);
+      setReviews(prev => [entry, ...prev]);
 
       setSelectedText('');
       window.getSelection()?.removeAllRanges();
@@ -646,7 +676,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
       </div>
 
       {/* Center - Code Viewer with text selection */}
-      <div className="flex-1 flex flex-col min-w-0">
+      <div className="flex-1 flex flex-col min-w-0 relative">
         <div className="flex items-center h-9 px-3 bg-[#0c1018] border-b border-[#1e2736]">
           <span
             className="text-[11px] text-[#9fb0c6]"
@@ -696,6 +726,21 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                 <span className="text-[10px] text-[#5b6577]" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                   Select code to review
                 </span>
+                {fileEntry?.type === 'cbl' && (
+                  <button
+                    onClick={() => handleGenerateBrd(selectedFile)}
+                    disabled={brdLoading}
+                    className={`text-[10px] px-2.5 py-0.5 rounded transition-colors ${
+                      rightPanelMode === 'brd' && brdFilePath === selectedFile
+                        ? 'text-[#0a0e14] bg-[#45c4b0] hover:bg-[#3aad9c]'
+                        : 'text-[#45c4b0] border border-[#45c4b0] hover:bg-[#45c4b010]'
+                    } ${brdLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                    title={rightPanelMode === 'brd' && brdFilePath === selectedFile ? 'Close BRD panel' : 'Generate Business Requirements Document'}
+                  >
+                    {brdLoading && brdFilePath === selectedFile ? 'Generating...' : 'BRD'}
+                  </button>
+                )}
                 <button
                   onClick={handleEnterEditMode}
                   className="text-[10px] text-[#7a869a] hover:text-[#e6edf7] px-2 py-0.5 border border-[#1e2736] rounded hover:border-[#3a4250] transition-colors"
@@ -738,9 +783,12 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                           if (el) lineRefs.current.set(lineNum, el);
                           else lineRefs.current.delete(lineNum);
                         }}
-                        className={`flex hover:bg-[#111823] ${
-                          isHighlighted ? 'bg-[#45c4b018] border-l-2 border-[#45c4b0]' : ''
+                        className={`flex ${
+                          isHighlighted
+                            ? 'border-l-[3px] border-[#45c4b0]'
+                            : 'hover:bg-[#111823]'
                         }`}
+                        style={isHighlighted ? { backgroundColor: 'rgba(69, 196, 176, 0.15)' } : undefined}
                       >
                         <span
                           className="inline-block w-12 text-right pr-4 select-none shrink-0"
@@ -760,7 +808,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                 <button
                   data-review-button
                   onClick={handleReview}
-                  className="absolute z-10 px-3 py-1.5 bg-[#45c4b0] hover:bg-[#3aad9c] text-[#0a0e14] font-semibold text-[11px] rounded-md shadow-lg transition-colors"
+                  className="absolute z-30 px-3 py-1.5 bg-[#45c4b0] hover:bg-[#3aad9c] text-[#0a0e14] font-semibold text-[11px] rounded-md shadow-lg transition-colors"
                   style={{
                     top: reviewButtonPos.top,
                     left: Math.max(0, reviewButtonPos.left),
@@ -773,6 +821,63 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
             </>
           )}
         </div>
+
+        {/* Overlay review cards — stacked on the editor */}
+        {(overlayReviews.length > 0 || loading) && (
+          <div className="absolute bottom-10 right-4 z-40 flex flex-col-reverse gap-2 max-h-[60%] overflow-y-auto" style={{ width: 340 }}>
+            {loading && (
+              <div
+                className="rounded-lg border border-[#232c3c] shadow-xl p-3"
+                style={{ backgroundColor: '#111823', fontFamily: "'IBM Plex Mono', monospace" }}
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-3 h-3 border-2 border-[#45c4b0] border-t-transparent rounded-full animate-spin" />
+                  <span className="text-[11px] text-[#7a869a]">Analyzing...</span>
+                </div>
+                <pre className="text-[10px] text-[#5b6577] whitespace-pre-wrap break-all max-h-12 overflow-hidden">
+                  {selectedText.slice(0, 150)}{selectedText.length > 150 ? '...' : ''}
+                </pre>
+              </div>
+            )}
+            {overlayReviews.map((review, i) => (
+              <div
+                key={review.id}
+                className="rounded-lg border border-[#232c3c] shadow-xl"
+                style={{
+                  backgroundColor: '#111823',
+                  fontFamily: "'IBM Plex Mono', monospace",
+                  opacity: Math.max(0.5, 1 - i * 0.15),
+                }}
+              >
+                <div className="flex items-center justify-between px-3 pt-2.5 pb-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-[9px] text-[#5b6577] truncate">{review.filePath.split('/').pop()}</span>
+                    <span className="text-[8px] text-[#3a4250]">{review.timestamp.toLocaleTimeString()}</span>
+                  </div>
+                  <button
+                    onClick={() => dismissOverlayReview(review.id)}
+                    className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-1 shrink-0"
+                  >
+                    &times;
+                  </button>
+                </div>
+                <div className="px-3 pb-1">
+                  <div className="bg-[#0a0e14] border border-[#1e2736] rounded p-1.5 mb-1.5">
+                    <pre className="text-[9px] text-[#7a869a] whitespace-pre-wrap break-all max-h-10 overflow-hidden">
+                      {review.snippet.slice(0, 120)}{review.snippet.length > 120 ? '...' : ''}
+                    </pre>
+                  </div>
+                </div>
+                <div className="px-3 pb-2.5">
+                  <span className="text-[8px] text-[#45c4b0] uppercase tracking-wider block mb-1">Business Logic</span>
+                  <p className="text-[10px] text-[#dbe4f0] leading-relaxed whitespace-pre-wrap max-h-24 overflow-y-auto">
+                    {review.summary}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Bottom hint bar */}
         <div className="border-t border-[#1e2736] bg-[#0c1018] px-3 py-2">

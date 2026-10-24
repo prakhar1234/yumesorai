@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ProductSwitcher } from './ProductSwitcher';
+import { TaskTray } from './background-tasks/TaskTray';
 
 interface TopBarProps {
   activeProduct: 'demystifier' | 'codeflux' | 'transformer' | 'business-review';
@@ -39,8 +40,9 @@ export function TopBar({ activeProduct, onProductChange, searchValue, onSearchCh
         </div>
       )}
 
-      {/* Right: Role Toggle + User */}
+      {/* Right: Task Tray + Role Toggle + User */}
       <div className="flex items-center gap-4">
+        <TaskTray />
         <div className="flex rounded-md overflow-hidden border border-[#232c3c]">
           <button
             onClick={() => setRole('dev')}

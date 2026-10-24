@@ -134,7 +134,7 @@ def program_brd():
             collected = []
             with provider.client.messages.stream(
                 model=provider.model,
-                max_tokens=16384,
+                max_tokens=65536,
                 system=SYSTEM_PROMPT,
                 messages=[{"role": "user", "content": user_prompt}],
             ) as stream:

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { BackgroundTaskProvider } from '@/components/demystifier/background-tasks/BackgroundTaskContext';
 
 export const metadata: Metadata = {
   title: 'Demystifier Platform | Yumesorai',
@@ -12,7 +13,9 @@ export default function DemystifierLayout({
 }) {
   return (
     <div className="demystifier-root min-h-screen bg-[#0a0e14] text-[#dbe4f0]" style={{ fontFamily: "'IBM Plex Sans', sans-serif" }}>
-      {children}
+      <BackgroundTaskProvider>
+        {children}
+      </BackgroundTaskProvider>
     </div>
   );
 }

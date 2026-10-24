@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 120000);
+    const timeout = setTimeout(() => controller.abort(), 300000);
 
     try {
       const response = await fetch(`${FLASK_API_URL}/api/program-brd`, {
