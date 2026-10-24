@@ -20,6 +20,9 @@ interface GraphViewProps {
   search: string;
   onNewAnalysis: () => void;
   coverage?: CoverageData | null;
+  onSwitchToArchitecture?: () => void;
+  sources?: Record<string, string>;
+  onViewSource?: (nodeId: string) => void;
 }
 
 type ColorMode = 'domain' | 'risk';
@@ -27,7 +30,7 @@ type ViewMode = '2d' | '3d';
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
-export function GraphView({ data, repoLabel, search, onNewAnalysis, coverage }: GraphViewProps) {
+export function GraphView({ data, repoLabel, search, onNewAnalysis, coverage, onSwitchToArchitecture, sources, onViewSource }: GraphViewProps) {
   const svgRef = useRef<SVGSVGElement>(null);
   const gRef = useRef<SVGGElement | null>(null);
 
@@ -475,6 +478,22 @@ export function GraphView({ data, repoLabel, search, onNewAnalysis, coverage }: 
           <span className="px-3 py-1.5 bg-[#111823] border border-[#232c3c] rounded-md text-[10.5px] text-[#7a869a]" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
             {repoLabel} \u00B7 {data.nodes.length} nodes \u00B7 {data.edges.length} edges
           </span>
+          {/* Graph / Architecture toggle */}
+          {onSwitchToArchitecture && (
+            <div className="flex rounded-md overflow-hidden border border-[#232c3c]" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+              <button
+                className="px-3 py-1.5 text-[10px] font-medium transition-colors bg-[#1e2d42] text-[#60a5fa]"
+              >
+                Graph
+              </button>
+              <button
+                onClick={onSwitchToArchitecture}
+                className="px-3 py-1.5 text-[10px] font-medium transition-colors bg-[#111823] text-[#5b6577] hover:text-[#7a869a]"
+              >
+                Architecture
+              </button>
+            </div>
+          )}
           {coverage && (
             <span
               className="px-3 py-1.5 bg-[#111823] border rounded-md flex items-center gap-2"
@@ -585,6 +604,7 @@ export function GraphView({ data, repoLabel, search, onNewAnalysis, coverage }: 
           onImpact={handleImpact}
           onPathTrace={handlePathTrace}
           onSelectNode={(id) => setSelected(id)}
+          onViewSource={sources?.[selected] || sources?.[byId[selected]?.label.toUpperCase()] ? () => onViewSource?.(selected!) : undefined}
         />
       )}
     </div>

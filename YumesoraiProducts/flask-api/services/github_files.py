@@ -24,6 +24,49 @@ COBOL_EXTENSIONS: dict[str, str] = {
     ".bms": "screen",
 }
 
+# Name suffixes for extensionless files (common in AS/400 and mainframe repos)
+_EXTENSIONLESS_SUFFIXES: dict[str, str] = {
+    "-COB": "program",
+    "-COBOL": "program",
+    "-PGM": "program",
+    "-MAINPROG": "program",
+    "-SUBPROG": "program",
+    "-MAP": "screen",
+    "-DSPF": "screen",
+    "-DCLGEN": "copybook",
+    "-FORMAT": "screen",
+}
+
+# Directory names that indicate COBOL content (for extensionless files)
+_COBOL_DIRS = {"COB-PROG", "CICS", "COBOL", "CBL", "JCL", "BMS"}
+
+
+def _classify_extensionless(path: str) -> str | None:
+    """Classify an extensionless file by name suffix or parent directory.
+
+    Returns a node type string ("program", "copybook", "screen", "job")
+    or None if the file doesn't look like COBOL.
+    """
+    p = PurePosixPath(path)
+    name = p.name.upper()
+
+    # Skip obvious non-source files
+    if name in ("README", "LINKS", "LICENSE", ".GITIGNORE"):
+        return None
+
+    # Check name suffix patterns
+    for suffix, node_type in _EXTENSIONLESS_SUFFIXES.items():
+        if name.endswith(suffix):
+            return node_type
+
+    # Check if the file sits under a COBOL-related directory
+    dir_parts = {part.upper() for part in p.parts[:-1]}
+    if dir_parts & _COBOL_DIRS:
+        # Files inside COBOL directories default to "program"
+        return "program"
+
+    return None
+
 # Maximum total source size to send to the LLM (characters).
 # Keeps the prompt within reasonable token limits.
 MAX_SOURCE_CHARS = 300_000
@@ -245,16 +288,28 @@ def list_repo_files(repo_url: str, branch: str = "HEAD") -> dict:
         if item.get("type") != "blob":
             continue
         path = item["path"]
-        ext = PurePosixPath(path).suffix.lower()
-        if ext not in COBOL_EXTENSIONS:
-            continue
-        name = PurePosixPath(path).stem.upper()
-        files.append({
-            "path": path,
-            "name": name,
-            "ext": ext,
-            "type": COBOL_EXTENSIONS[ext],
-        })
+        p = PurePosixPath(path)
+        ext = p.suffix.lower()
+
+        if ext in COBOL_EXTENSIONS:
+            name = p.stem.upper()
+            files.append({
+                "path": path,
+                "name": name,
+                "ext": ext,
+                "type": COBOL_EXTENSIONS[ext],
+            })
+        elif not ext:
+            # Extensionless file — try to classify by name or directory
+            node_type = _classify_extensionless(path)
+            if node_type is not None:
+                name = p.name.upper()
+                files.append({
+                    "path": path,
+                    "name": name,
+                    "ext": "",
+                    "type": node_type,
+                })
 
     return {
         "files": files,

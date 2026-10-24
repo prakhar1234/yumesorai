@@ -70,3 +70,35 @@ export const NODE_TYPES: Record<string, { label: string; glyph: string }> = {
   job: { label: 'JCL job', glyph: '\u25A0' },
   screen: { label: 'CICS screen', glyph: '\u25AD' },
 };
+
+export type ArchLayer = 'frontend' | 'backend' | 'scheduler';
+
+export const ARCH_LAYERS: Record<ArchLayer, {
+  label: string;
+  color: string;
+  bgColor: string;
+  icon: string;
+  description: string;
+}> = {
+  frontend: {
+    label: 'Frontend',
+    color: '#f472b6',
+    bgColor: '#f472b612',
+    icon: '\u25AD',
+    description: 'CICS screens & online programs',
+  },
+  backend: {
+    label: 'Backend',
+    color: '#60a5fa',
+    bgColor: '#60a5fa12',
+    icon: '\u25CF',
+    description: 'Programs, copybooks & data stores',
+  },
+  scheduler: {
+    label: 'Scheduler',
+    color: '#a78bfa',
+    bgColor: '#a78bfa12',
+    icon: '\u25A0',
+    description: 'JCL jobs & batch infrastructure',
+  },
+};

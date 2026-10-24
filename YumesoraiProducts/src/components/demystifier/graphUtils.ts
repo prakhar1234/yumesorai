@@ -1,4 +1,4 @@
-import { DOMAINS, type GraphData, type GraphNode, type GraphEdge } from './types';
+import { DOMAINS, type GraphData, type GraphNode, type GraphEdge, type ArchLayer } from './types';
 
 /** Seeded PRNG matching the prototype */
 function rng(seed: number) {
@@ -319,4 +319,78 @@ export function nodeRadius(node: GraphNode): number {
   if (node.type === 'job' || node.type === 'screen') return 8;
   if (node.type === 'table') return 7;
   return 6;
+}
+
+/** Classify a node into an architecture layer */
+export function classifyLayer(node: GraphNode): ArchLayer {
+  if (node.type === 'screen' || node.domain === 'ONL') return 'frontend';
+  if (node.type === 'job' || node.domain === 'BAT') return 'scheduler';
+  return 'backend';
+}
+
+/** Group all nodes by architecture layer */
+export function groupNodesByLayer(data: GraphData): Record<ArchLayer, GraphNode[]> {
+  const groups: Record<ArchLayer, GraphNode[]> = { frontend: [], backend: [], scheduler: [] };
+  data.nodes.forEach(n => {
+    groups[classifyLayer(n)].push(n);
+  });
+  return groups;
+}
+
+/** Aggregate cross-layer edges */
+export interface InterZoneEdge {
+  sourceLayer: ArchLayer;
+  targetLayer: ArchLayer;
+  edgeType: string;
+  count: number;
+}
+
+export function computeInterZoneEdges(data: GraphData): InterZoneEdge[] {
+  const byId: Record<string, GraphNode> = {};
+  data.nodes.forEach(n => { byId[n.id] = n; });
+
+  const counts: Record<string, InterZoneEdge> = {};
+  data.edges.forEach(e => {
+    const src = byId[e.source];
+    const tgt = byId[e.target];
+    if (!src || !tgt) return;
+    const sLayer = classifyLayer(src);
+    const tLayer = classifyLayer(tgt);
+    if (sLayer === tLayer) return;
+    const key = `${sLayer}>${tLayer}>${e.type}`;
+    if (!counts[key]) {
+      counts[key] = { sourceLayer: sLayer, targetLayer: tLayer, edgeType: e.type, count: 0 };
+    }
+    counts[key].count++;
+  });
+  return Object.values(counts);
+}
+
+/** Aggregate stats per layer */
+export interface LayerMetrics {
+  nodeCount: number;
+  totalLoc: number;
+  avgRisk: number;
+  deadCount: number;
+  byType: Record<string, number>;
+}
+
+export function computeLayerMetrics(nodes: GraphNode[]): LayerMetrics {
+  const byType: Record<string, number> = {};
+  let totalLoc = 0;
+  let totalRisk = 0;
+  let deadCount = 0;
+  nodes.forEach(n => {
+    byType[n.type] = (byType[n.type] || 0) + 1;
+    totalLoc += n.loc;
+    totalRisk += n.risk;
+    if (n.dead) deadCount++;
+  });
+  return {
+    nodeCount: nodes.length,
+    totalLoc,
+    avgRisk: nodes.length > 0 ? totalRisk / nodes.length : 0,
+    deadCount,
+    byType,
+  };
 }

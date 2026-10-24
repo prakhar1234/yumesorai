@@ -12,9 +12,10 @@ interface DetailPanelProps {
   onImpact: () => void;
   onPathTrace: () => void;
   onSelectNode: (id: string) => void;
+  onViewSource?: () => void;
 }
 
-export function DetailPanel({ node, data, colorMode, onClose, onImpact, onPathTrace, onSelectNode }: DetailPanelProps) {
+export function DetailPanel({ node, data, colorMode, onClose, onImpact, onPathTrace, onSelectNode, onViewSource }: DetailPanelProps) {
   const domain = DOMAINS.find(d => d.id === node.domain);
   const nodeType = NODE_TYPES[node.type];
 
@@ -110,7 +111,7 @@ export function DetailPanel({ node, data, colorMode, onClose, onImpact, onPathTr
       </div>
 
       {/* Actions */}
-      <div className="p-4 border-b border-[#1e2736] flex gap-2">
+      <div className="p-4 border-b border-[#1e2736] flex gap-2 flex-wrap">
         <button
           onClick={onImpact}
           className="flex-1 px-2 py-1.5 bg-[#111823] border border-[#232c3c] rounded text-[10px] text-[#9fb0c6] hover:bg-[#182233] transition-colors"
@@ -125,6 +126,15 @@ export function DetailPanel({ node, data, colorMode, onClose, onImpact, onPathTr
         >
           Path from here
         </button>
+        {onViewSource && (
+          <button
+            onClick={onViewSource}
+            className="w-full px-2 py-1.5 bg-[#0f1a28] border border-[#1a3050] rounded text-[10px] text-[#60a5fa] hover:bg-[#142238] transition-colors"
+            style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+          >
+            View Source
+          </button>
+        )}
       </div>
 
       {/* Connections */}
