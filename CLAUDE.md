@@ -11,7 +11,7 @@ The codebase is split into two standalone Next.js applications:
 | **Landing Page** | `YumesoraiLandingPage/` | 3000 | Marketing website, contact forms, assessments, ROI calculator |
 | **Products** | `YumesoraiProducts/` | 3001 (Next.js) + 5050 (Flask) | Demystifier product suite (knowledge graph, CodeFlux, Transformer) |
 
-The original `src/` directory is retained as a reference but is not actively developed.
+Product code lives exclusively in `YumesoraiProducts/`. The root `src/` demystifier directories and `flask-api/` are **symlinks** pointing into `YumesoraiProducts/`. The root Dockerfiles use explicit `COPY` overlays from `YumesoraiProducts/` since Docker doesn't follow symlinks.
 
 ## Tech Stack
 

@@ -19,6 +19,11 @@ RUN npm ci --legacy-peer-deps
 # Copy source
 COPY . .
 
+# Overlay active product code from YumesoraiProducts (single source of truth)
+COPY YumesoraiProducts/src/components/demystifier/ ./src/components/demystifier/
+COPY YumesoraiProducts/src/app/demystifier/ ./src/app/demystifier/
+COPY YumesoraiProducts/src/app/api/demystifier/ ./src/app/api/demystifier/
+
 # Add build timestamp to ensure fresh build on each deployment
 RUN echo "Build timestamp: $(date -u +'%Y-%m-%dT%H:%M:%SZ')" > /tmp/build-info.txt
 
