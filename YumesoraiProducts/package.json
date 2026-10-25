@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start --port 3001",
     "lint": "next lint",
-    "dev:flask": "cd flask-api && python -m flask --app app:create_app run --port 5050 --reload",
+    "dev:flask": "cd flask-api && python3 -m flask --app app:create_app run --port 5050 --reload",
     "test": "vitest",
     "test:agent": "ts-node agent-systems/testing-agent/cli.ts"
   },
