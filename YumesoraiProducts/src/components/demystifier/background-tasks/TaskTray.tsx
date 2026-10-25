@@ -10,6 +10,7 @@ const PRODUCT_ROUTES: Record<ProductId, string> = {
   codeflux: '/demystifier/codeflux',
   transformer: '/demystifier/transformer',
   'business-review': '/demystifier/business-review',
+  rad: '/demystifier/rad',
 };
 
 const PRODUCT_LABELS: Record<ProductId, string> = {
@@ -17,6 +18,7 @@ const PRODUCT_LABELS: Record<ProductId, string> = {
   codeflux: 'Code Flux',
   transformer: 'Transformer',
   'business-review': 'Business Review',
+  rad: 'RAD',
 };
 
 function formatElapsed(ms: number): string {

@@ -7,6 +7,7 @@ const PRODUCTS = [
   { id: 'codeflux', label: 'Code Flux', desc: 'Change workflow · impact preview · approvals', icon: '⇌' },
   { id: 'transformer', label: 'Transformer', desc: 'COBOL → modern language · cloud-ready', icon: '⟿' },
   { id: 'business-review', label: 'Business Review', desc: 'Highlight code · business logic summary', icon: '▤' },
+  { id: 'rad', label: 'RAD', desc: 'Rapid app development · scaffold · deploy', icon: '⚡' },
 ];
 
 interface ProductSwitcherProps {

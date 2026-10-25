@@ -1,6 +1,6 @@
 import type { GraphData, CoverageData } from '../types';
 
-export type ProductId = 'demystifier' | 'codeflux' | 'transformer' | 'business-review';
+export type ProductId = 'demystifier' | 'codeflux' | 'transformer' | 'business-review' | 'rad';
 
 export type TaskType = 'demystifier-scan' | 'codeflux-analysis' | 'transformer-run' | 'business-review-brd';
 

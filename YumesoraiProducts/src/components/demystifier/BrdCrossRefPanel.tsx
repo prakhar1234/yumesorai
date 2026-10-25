@@ -223,7 +223,7 @@ export function BrdCrossRefPanel({
   const fileMismatch = selectedFile !== filePath;
 
   return (
-    <div className="w-[360px] border-l border-[#1e2736] bg-[#0c1018] flex flex-col">
+    <div className="flex-1 min-h-0 flex flex-col">
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#1e2736]">
         <div className="min-w-0">

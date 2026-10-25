@@ -5,6 +5,225 @@ import { BrdModal, BrdData } from './BrdModal';
 import { BrdCrossRefPanel } from './BrdCrossRefPanel';
 
 // ---------------------------------------------------------------------------
+// Types (shared by ReviewCard and ReviewWorkspace)
+// ---------------------------------------------------------------------------
+interface ReviewEntry {
+  id: number;
+  snippet: string;
+  filePath: string;
+  summary: string;
+  timestamp: Date;
+  startLine: number;
+  endLine: number;
+}
+
+// ---------------------------------------------------------------------------
+// Parse summary text for line references and render as clickable chips
+// Matches patterns like: PARAGRAPH-NAME:123-456, lines 10-20, line 42
+// ---------------------------------------------------------------------------
+function renderSummaryWithRefs(
+  text: string,
+  onNavigate: ((start: number, end: number) => void) | undefined,
+): JSX.Element {
+  if (!onNavigate) return <>{text}</>;
+
+  // Match: WORD:digits-digits, WORD:digits, lines digits-digits, line digits
+  // Also handles en-dash (–) and parenthesized forms like (lines 42-43)
+  const refPattern = /([A-Z][A-Z0-9_-]{2,}):(\d+)(?:\s*[-–]\s*(\d+))?|(?:lines?\s+)(\d+)(?:\s*[-–]\s*(\d+))?/gi;
+
+  const parts: JSX.Element[] = [];
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = refPattern.exec(text)) !== null) {
+    // Add text before this match
+    if (match.index > lastIndex) {
+      parts.push(<span key={`t${lastIndex}`}>{text.slice(lastIndex, match.index)}</span>);
+    }
+
+    let startLine: number;
+    let endLine: number;
+    let label: string;
+
+    if (match[1]) {
+      // PARAGRAPH:start-end format
+      startLine = parseInt(match[2], 10);
+      endLine = match[3] ? parseInt(match[3], 10) : startLine;
+      label = `${match[1]}:${match[2]}${match[3] ? `-${match[3]}` : ''}`;
+    } else {
+      // "lines X-Y" or "line X" format
+      startLine = parseInt(match[4], 10);
+      endLine = match[5] ? parseInt(match[5], 10) : startLine;
+      label = match[0];
+    }
+
+    parts.push(
+      <button
+        key={`r${match.index}`}
+        onClick={() => onNavigate(startLine, endLine)}
+        className="inline-flex items-center text-[10px] rounded px-1 py-0.5 mx-0.5 transition-colors"
+        style={{
+          fontFamily: "'IBM Plex Mono', monospace",
+          color: '#d29922',
+          backgroundColor: '#d2992215',
+          border: '1px solid #d2992230',
+        }}
+        title={`Jump to line${endLine !== startLine ? 's' : ''} ${startLine}${endLine !== startLine ? `-${endLine}` : ''}`}
+      >
+        {label}
+      </button>
+    );
+
+    lastIndex = match.index + match[0].length;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(<span key={`t${lastIndex}`}>{text.slice(lastIndex)}</span>);
+  }
+
+  return <>{parts}</>;
+}
+
+// ---------------------------------------------------------------------------
+// Review Card (expandable + downloadable)
+// ---------------------------------------------------------------------------
+function ReviewCard({ review, onDismiss, onHighlightLines, onRegenerate }: {
+  review: ReviewEntry;
+  onDismiss?: (id: number) => void;
+  onHighlightLines?: (startLine: number, endLine: number) => void;
+  onRegenerate?: (review: ReviewEntry) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+
+  const handleDownload = useCallback(() => {
+    const text = [
+      `Business Review`,
+      `File: ${review.filePath}`,
+      `Date: ${review.timestamp.toLocaleString()}`,
+      ``,
+      `--- Selected Code ---`,
+      review.snippet,
+      ``,
+      `--- Business Logic ---`,
+      review.summary,
+    ].join('\n');
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `review_${review.filePath.split('/').pop()?.replace(/\./g, '_') || 'snippet'}_${review.id}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [review]);
+
+  return (
+    <div className="px-3 py-3 border-b border-[#1e2736]">
+      {/* Header */}
+      <div className="flex items-center gap-2 mb-2">
+        <button
+          onClick={() => setExpanded(!expanded)}
+          className="text-[10px] text-[#5b6577] hover:text-[#9fb0c6] transition-colors"
+        >
+          {expanded ? '▾' : '▸'}
+        </button>
+        <span className="text-[10px] text-[#5b6577] truncate" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+          {review.filePath.split('/').pop()}
+        </span>
+        {review.startLine > 0 && onHighlightLines && (
+          <button
+            onClick={() => onHighlightLines(review.startLine, review.endLine)}
+            className="text-[9px] text-[#d29922] hover:text-[#e6b84d] bg-[#d2992215] px-1.5 py-0.5 rounded transition-colors"
+            style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            title="Jump to lines"
+          >
+            L{review.startLine}{review.endLine !== review.startLine ? `-${review.endLine}` : ''}
+          </button>
+        )}
+        <span className="text-[9px] text-[#3a4250]">
+          {review.timestamp.toLocaleTimeString()}
+        </span>
+        <div className="ml-auto flex items-center gap-1.5 shrink-0">
+          {onRegenerate && (
+            <button
+              onClick={() => onRegenerate(review)}
+              className="text-[9px] text-[#5b6577] hover:text-[#45c4b0] transition-colors px-1"
+              title="Regenerate review"
+            >
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 8a6 6 0 0 1 10.3-4.2M14 2v4h-4M14 8a6 6 0 0 1-10.3 4.2M2 14v-4h4" />
+              </svg>
+            </button>
+          )}
+          <button
+            onClick={handleDownload}
+            className="text-[9px] text-[#5b6577] hover:text-[#9fb0c6] transition-colors px-1"
+            title="Download review"
+          >
+            <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M8 2v8m0 0l-3-3m3 3l3-3M3 12h10" />
+            </svg>
+          </button>
+          {onDismiss && (
+            <button
+              onClick={() => onDismiss(review.id)}
+              className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-0.5"
+            >
+              &times;
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Snippet */}
+      <div className="bg-[#111823] border border-[#232c3c] rounded-md p-2 mb-2">
+        <pre
+          className={`text-[10px] text-[#7a869a] whitespace-pre-wrap break-all ${expanded ? 'max-h-none' : 'max-h-12 overflow-hidden'}`}
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          {expanded ? review.snippet : review.snippet.slice(0, 150)}{!expanded && review.snippet.length > 150 ? '...' : ''}
+        </pre>
+      </div>
+
+      {/* Summary */}
+      <div className="bg-[#0a0e14] border border-[#1e2736] rounded-md p-2.5">
+        <span
+          className="text-[10px] text-[#45c4b0] uppercase tracking-wider block mb-1.5"
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          Business Logic
+        </span>
+        <div className={`text-[11px] text-[#dbe4f0] leading-relaxed whitespace-pre-wrap ${expanded ? '' : 'line-clamp-4'}`}>
+          {renderSummaryWithRefs(review.summary, onHighlightLines)}
+        </div>
+      </div>
+
+      {/* Expand toggle */}
+      {(!expanded && (review.snippet.length > 150 || review.summary.length > 200)) && (
+        <button
+          onClick={() => setExpanded(true)}
+          className="mt-1.5 text-[9px] text-[#5b6577] hover:text-[#9fb0c6] transition-colors"
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          Show more
+        </button>
+      )}
+      {expanded && (
+        <button
+          onClick={() => setExpanded(false)}
+          className="mt-1.5 text-[9px] text-[#5b6577] hover:text-[#9fb0c6] transition-colors"
+          style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+        >
+          Show less
+        </button>
+      )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
 interface FileEntry {
@@ -94,17 +313,6 @@ function highlightCobolLine(line: string): JSX.Element {
   return <span style={{ color: '#9fb0c6' }}>{line}</span>;
 }
 
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-interface ReviewEntry {
-  id: number;
-  snippet: string;
-  filePath: string;
-  summary: string;
-  timestamp: Date;
-}
-
 interface ReviewWorkspaceProps {
   repoUrl: string;
   initialSources: SourceFile[];
@@ -137,6 +345,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
     new Set(fileTree.map(f => f.name))
   );
   const [selectedText, setSelectedText] = useState('');
+  const [selectedLineRange, setSelectedLineRange] = useState<{ start: number; end: number } | null>(null);
   const [reviewButtonPos, setReviewButtonPos] = useState<{ top: number; left: number } | null>(null);
   const [reviews, setReviews] = useState<ReviewEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -166,6 +375,12 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
   const [saving, setSaving] = useState(false);
   const [saveConfirmation, setSaveConfirmation] = useState(false);
 
+  // Search state
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchMatchIndex, setSearchMatchIndex] = useState(0);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
   // Cross-reference state
   const [rightPanelMode, setRightPanelMode] = useState<'reviews' | 'brd'>('reviews');
   const [highlightedLines, setHighlightedLines] = useState<{ start: number; end: number } | null>(null);
@@ -187,6 +402,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
     const selection = window.getSelection();
     if (!selection || selection.isCollapsed || !selection.toString().trim()) {
       setSelectedText('');
+      setSelectedLineRange(null);
       setReviewButtonPos(null);
       return;
     }
@@ -194,16 +410,35 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
     const text = selection.toString().trim();
     if (text.length < 5) {
       setSelectedText('');
+      setSelectedLineRange(null);
       setReviewButtonPos(null);
       return;
     }
 
     setSelectedText(text);
 
-    // Position the floating button near the end of the selection.
-    // Use the scrollable container's rect + scrollTop so the button
-    // lands at the right content offset even when scrolled.
+    // Extract actual line numbers from the DOM using data-line attributes
     const range = selection.getRangeAt(0);
+    const findLineNum = (node: Node | null): number | null => {
+      let el = node instanceof HTMLElement ? node : node?.parentElement;
+      while (el) {
+        const attr = el.getAttribute('data-line');
+        if (attr) return parseInt(attr, 10);
+        el = el.parentElement;
+      }
+      return null;
+    };
+    const anchorLine = findLineNum(selection.anchorNode);
+    const focusLine = findLineNum(selection.focusNode);
+    if (anchorLine && focusLine) {
+      const start = Math.min(anchorLine, focusLine);
+      const end = Math.max(anchorLine, focusLine);
+      setSelectedLineRange({ start, end });
+    } else {
+      setSelectedLineRange(null);
+    }
+
+    // Position the floating button near the end of the selection.
     const rect = range.getBoundingClientRect();
     const container = codeRef.current?.parentElement;
     const containerRect = container?.getBoundingClientRect();
@@ -228,6 +463,24 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
     document.addEventListener('click', handleClick);
     return () => document.removeEventListener('click', handleClick);
   }, []);
+
+  // Ctrl+F / Cmd+F to open search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'f') {
+        e.preventDefault();
+        setSearchOpen(true);
+        setTimeout(() => searchInputRef.current?.focus(), 0);
+      }
+      if (e.key === 'Escape' && searchOpen) {
+        setSearchOpen(false);
+        setSearchQuery('');
+        setSearchMatchIndex(0);
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen]);
 
   // Navigate to lines from a BRD cross-reference chip
   const handleNavigateToLines = useCallback((linesStr: string) => {
@@ -299,6 +552,13 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
 
     const snippet = selectedText;
 
+    // Use the DOM-derived line range (accurate), fall back to counting snippet lines
+    const startLine = selectedLineRange?.start ?? 1;
+    const endLine = selectedLineRange?.end ?? (startLine + snippet.split('\n').length - 1);
+
+    // Highlight the selected lines immediately
+    setHighlightedLines({ start: startLine, end: endLine });
+
     try {
       const resp = await fetch('/api/demystifier/business-review', {
         method: 'POST',
@@ -307,6 +567,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
           snippet,
           file_path: selectedFile,
           repo_url: repoUrl,
+          start_line: startLine,
         }),
       });
 
@@ -323,6 +584,8 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
         filePath: selectedFile,
         summary: data.summary || 'No summary returned.',
         timestamp: new Date(),
+        startLine,
+        endLine,
       };
 
       // Add to both the overlay stack and the side panel history
@@ -330,13 +593,54 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
       setReviews(prev => [entry, ...prev]);
 
       setSelectedText('');
+      setSelectedLineRange(null);
       window.getSelection()?.removeAllRanges();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
-  }, [selectedText, selectedFile, repoUrl]);
+  }, [selectedText, selectedFile, repoUrl, selectedLineRange]);
+
+  const handleRegenerate = useCallback(async (oldReview: ReviewEntry) => {
+    setLoading(true);
+    setError(null);
+
+    setHighlightedLines({ start: oldReview.startLine, end: oldReview.endLine });
+
+    try {
+      const resp = await fetch('/api/demystifier/business-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          snippet: oldReview.snippet,
+          file_path: oldReview.filePath,
+          repo_url: repoUrl,
+          start_line: oldReview.startLine,
+        }),
+      });
+
+      if (!resp.ok) {
+        const err = await resp.json().catch(() => ({ error: 'Analysis failed' }));
+        throw new Error(err.error || `HTTP ${resp.status}`);
+      }
+
+      const data = await resp.json();
+
+      const updated: ReviewEntry = {
+        ...oldReview,
+        summary: data.summary || 'No summary returned.',
+        timestamp: new Date(),
+      };
+
+      setReviews(prev => prev.map(r => r.id === oldReview.id ? updated : r));
+      setOverlayReviews(prev => prev.map(r => r.id === oldReview.id ? updated : r));
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Unknown error');
+    } finally {
+      setLoading(false);
+    }
+  }, [repoUrl]);
 
   const handleGenerateBrd = useCallback(async (filePath: string) => {
     // Toggle off if already open for the same file
@@ -535,6 +839,32 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
   const lines = content.split('\n');
   const fileEntry = fileTree.flatMap(f => f.children).find(f => f.path === selectedFile);
 
+  // Compute search matches (line numbers that contain the query)
+  const searchMatches = useMemo(() => {
+    if (!searchQuery) return [];
+    const q = searchQuery.toLowerCase();
+    const matches: number[] = [];
+    lines.forEach((line, i) => {
+      if (line.toLowerCase().includes(q)) matches.push(i + 1);
+    });
+    return matches;
+  }, [searchQuery, lines]);
+
+  // Scroll to the current match when it changes
+  useEffect(() => {
+    if (searchMatches.length > 0) {
+      const lineNum = searchMatches[searchMatchIndex];
+      const el = lineRefs.current.get(lineNum);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [searchMatchIndex, searchMatches]);
+
+  // Extract PROGRAM-ID from COBOL source
+  const programName = useMemo(() => {
+    const match = content.match(/PROGRAM-ID\.\s+([A-Za-z0-9_-]+)/i);
+    return match ? match[1] : null;
+  }, [content]);
+
   // Empty state: no sources loaded
   if (initialSources.length === 0) {
     return (
@@ -684,9 +1014,17 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
           >
             {selectedFile}
           </span>
+          {programName && (
+            <span
+              className="text-[10px] text-[#45c4b0] ml-3 px-1.5 py-0.5 bg-[#45c4b010] border border-[#45c4b025] rounded"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              {programName}
+            </span>
+          )}
           {fileEntry && (
             <span
-              className="text-[10px] text-[#5b6577] ml-3"
+              className="text-[10px] text-[#5b6577] ml-2"
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
               {fileEntry.loc.toLocaleString()} LOC
@@ -753,6 +1091,69 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
           </div>
         </div>
 
+        {/* Search bar */}
+        {searchOpen && (
+          <div className="flex items-center gap-2 h-8 px-3 bg-[#111823] border-b border-[#1e2736]">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="#5b6577" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="7" cy="7" r="4.5" />
+              <path d="M10.5 10.5L14 14" />
+            </svg>
+            <input
+              ref={searchInputRef}
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setSearchMatchIndex(0); }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault();
+                  if (searchMatches.length > 0) {
+                    setSearchMatchIndex(prev => (e.shiftKey ? (prev - 1 + searchMatches.length) % searchMatches.length : (prev + 1) % searchMatches.length));
+                  }
+                }
+                if (e.key === 'Escape') {
+                  setSearchOpen(false);
+                  setSearchQuery('');
+                  setSearchMatchIndex(0);
+                }
+              }}
+              placeholder="Search in file..."
+              className="flex-1 bg-transparent text-[11px] text-[#e6edf7] outline-none placeholder-[#3a4250]"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+              autoFocus
+            />
+            {searchQuery && (
+              <span className="text-[10px] text-[#5b6577] shrink-0" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                {searchMatches.length > 0
+                  ? `${searchMatchIndex + 1} / ${searchMatches.length}`
+                  : 'No results'}
+              </span>
+            )}
+            {searchMatches.length > 1 && (
+              <>
+                <button
+                  onClick={() => setSearchMatchIndex(prev => (prev - 1 + searchMatches.length) % searchMatches.length)}
+                  className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-0.5"
+                  title="Previous match (Shift+Enter)"
+                >
+                  &#x25B2;
+                </button>
+                <button
+                  onClick={() => setSearchMatchIndex(prev => (prev + 1) % searchMatches.length)}
+                  className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-0.5"
+                  title="Next match (Enter)"
+                >
+                  &#x25BC;
+                </button>
+              </>
+            )}
+            <button
+              onClick={() => { setSearchOpen(false); setSearchQuery(''); setSearchMatchIndex(0); }}
+              className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-1"
+            >
+              &times;
+            </button>
+          </div>
+        )}
+
         <div className="flex-1 overflow-auto bg-[#0a0e14] relative">
           {editMode ? (
             <textarea
@@ -776,9 +1177,12 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                     const isHighlighted = highlightedLines
                       ? lineNum >= highlightedLines.start && lineNum <= highlightedLines.end
                       : false;
+                    const isSearchMatch = searchQuery && searchMatches.includes(lineNum);
+                    const isCurrentMatch = isSearchMatch && searchMatches[searchMatchIndex] === lineNum;
                     return (
                       <div
                         key={i}
+                        data-line={lineNum}
                         ref={(el) => {
                           if (el) lineRefs.current.set(lineNum, el);
                           else lineRefs.current.delete(lineNum);
@@ -786,13 +1190,23 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                         className={`flex ${
                           isHighlighted
                             ? 'border-l-[3px] border-[#45c4b0]'
-                            : 'hover:bg-[#111823]'
+                            : isCurrentMatch
+                              ? 'border-l-[3px] border-[#d29922]'
+                              : 'hover:bg-[#111823]'
                         }`}
-                        style={isHighlighted ? { backgroundColor: 'rgba(69, 196, 176, 0.15)' } : undefined}
+                        style={
+                          isCurrentMatch
+                            ? { backgroundColor: 'rgba(210, 153, 34, 0.2)' }
+                            : isSearchMatch
+                              ? { backgroundColor: 'rgba(210, 153, 34, 0.08)' }
+                              : isHighlighted
+                                ? { backgroundColor: 'rgba(69, 196, 176, 0.15)' }
+                                : undefined
+                        }
                       >
                         <span
                           className="inline-block w-12 text-right pr-4 select-none shrink-0"
-                          style={{ color: isHighlighted ? '#45c4b0' : '#3a4250' }}
+                          style={{ color: isCurrentMatch ? '#d29922' : isHighlighted ? '#45c4b0' : '#3a4250' }}
                         >
                           {lineNum}
                         </span>
@@ -854,12 +1268,23 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                     <span className="text-[9px] text-[#5b6577] truncate">{review.filePath.split('/').pop()}</span>
                     <span className="text-[8px] text-[#3a4250]">{review.timestamp.toLocaleTimeString()}</span>
                   </div>
-                  <button
-                    onClick={() => dismissOverlayReview(review.id)}
-                    className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-1 shrink-0"
-                  >
-                    &times;
-                  </button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={() => handleRegenerate(review)}
+                      className="text-[#5b6577] hover:text-[#45c4b0] transition-colors px-1"
+                      title="Regenerate review"
+                    >
+                      <svg width="11" height="11" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M2 8a6 6 0 0 1 10.3-4.2M14 2v4h-4M14 8a6 6 0 0 1-10.3 4.2M2 14v-4h4" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => dismissOverlayReview(review.id)}
+                      className="text-[#5b6577] hover:text-[#e6edf7] transition-colors text-[14px] leading-none px-1"
+                    >
+                      &times;
+                    </button>
+                  </div>
                 </div>
                 <div className="px-3 pb-1">
                   <div className="bg-[#0a0e14] border border-[#1e2736] rounded p-1.5 mb-1.5">
@@ -870,9 +1295,15 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
                 </div>
                 <div className="px-3 pb-2.5">
                   <span className="text-[8px] text-[#45c4b0] uppercase tracking-wider block mb-1">Business Logic</span>
-                  <p className="text-[10px] text-[#dbe4f0] leading-relaxed whitespace-pre-wrap max-h-24 overflow-y-auto">
-                    {review.summary}
-                  </p>
+                  <div className="text-[10px] text-[#dbe4f0] leading-relaxed whitespace-pre-wrap max-h-24 overflow-y-auto">
+                    {renderSummaryWithRefs(review.summary, (start, end) => {
+                      setHighlightedLines({ start, end });
+                      requestAnimationFrame(() => {
+                        const el = lineRefs.current.get(start);
+                        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                      });
+                    })}
+                  </div>
                 </div>
               </div>
             ))}
@@ -950,7 +1381,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
             </div>
           </div>
         ) : brdData ? (
-          <div className="flex flex-col" style={{ width: 360 }}>
+          <div className="w-[360px] border-l border-[#1e2736] bg-[#0c1018] flex flex-col min-h-0 overflow-hidden">
             <div className={`px-3 py-1 border-b border-[#1e2736] flex items-center gap-2 ${
               brdCached ? 'bg-[#45c4b010]' : 'bg-[#58b0ff08]'
             }`}>
@@ -1043,7 +1474,7 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
           </div>
         )
       ) : (
-        // Reviews Panel (original)
+        // Reviews Panel
         <div className="w-[360px] border-l border-[#1e2736] bg-[#0c1018] flex flex-col">
           <div className="flex items-center justify-between px-3 py-2.5 border-b border-[#1e2736]">
             <span
@@ -1052,12 +1483,47 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
             >
               Business Review
             </span>
-            <span
-              className="text-[10px] text-[#5b6577]"
-              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
-            >
-              {reviews.length} review{reviews.length !== 1 ? 's' : ''}
-            </span>
+            <div className="flex items-center gap-2">
+              {reviews.length > 0 && (
+                <button
+                  onClick={() => {
+                    const text = reviews.map(r => [
+                      `File: ${r.filePath}`,
+                      `Date: ${r.timestamp.toLocaleString()}`,
+                      ``,
+                      `--- Selected Code ---`,
+                      r.snippet,
+                      ``,
+                      `--- Business Logic ---`,
+                      r.summary,
+                      ``,
+                      `${'='.repeat(60)}`,
+                      ``,
+                    ].join('\n')).join('\n');
+                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `business_reviews_${new Date().toISOString().split('T')[0]}.txt`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                  }}
+                  className="text-[9px] text-[#5b6577] hover:text-[#9fb0c6] border border-[#1e2736] hover:border-[#3a4250] px-1.5 py-0.5 rounded transition-colors"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                  title="Download all reviews"
+                >
+                  Export All
+                </button>
+              )}
+              <span
+                className="text-[10px] text-[#5b6577]"
+                style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+              >
+                {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+              </span>
+            </div>
           </div>
 
           <div className="flex-1 overflow-y-auto">
@@ -1091,34 +1557,21 @@ export function ReviewWorkspace({ repoUrl, initialSources, initialCached, commit
 
             {/* Review history */}
             {reviews.map(review => (
-              <div key={review.id} className="px-3 py-3 border-b border-[#1e2736]">
-                {/* Snippet preview */}
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] text-[#5b6577]" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-                    {review.filePath.split('/').pop()}
-                  </span>
-                  <span className="text-[9px] text-[#3a4250]">
-                    {review.timestamp.toLocaleTimeString()}
-                  </span>
-                </div>
-                <div className="bg-[#111823] border border-[#232c3c] rounded-md p-2 mb-2">
-                  <pre className="text-[10px] text-[#7a869a] whitespace-pre-wrap break-all max-h-20 overflow-y-auto" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
-                    {review.snippet.slice(0, 300)}{review.snippet.length > 300 ? '...' : ''}
-                  </pre>
-                </div>
-                {/* Summary */}
-                <div className="bg-[#0a0e14] border border-[#1e2736] rounded-md p-2.5">
-                  <span
-                    className="text-[10px] text-[#45c4b0] uppercase tracking-wider block mb-1.5"
-                    style={{ fontFamily: "'IBM Plex Mono', monospace" }}
-                  >
-                    Business Logic
-                  </span>
-                  <p className="text-[11px] text-[#dbe4f0] leading-relaxed whitespace-pre-wrap">
-                    {review.summary}
-                  </p>
-                </div>
-              </div>
+              <ReviewCard
+                key={review.id}
+                review={review}
+                onRegenerate={handleRegenerate}
+                onHighlightLines={(start, end) => {
+                  if (review.filePath !== selectedFile) {
+                    setSelectedFile(review.filePath);
+                  }
+                  setHighlightedLines({ start, end });
+                  requestAnimationFrame(() => {
+                    const el = lineRefs.current.get(start);
+                    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                  });
+                }}
+              />
             ))}
 
             {/* Empty state */}

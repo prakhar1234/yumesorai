@@ -32,6 +32,7 @@ export function BusinessReviewClient() {
     if (product === 'demystifier') router.push('/demystifier');
     else if (product === 'codeflux') router.push('/demystifier/codeflux');
     else if (product === 'transformer') router.push('/demystifier/transformer');
+    else if (product === 'rad') router.push('/demystifier/rad');
   }, [router]);
 
   const handleConnect = useCallback((url: string, branchName: string, result: SourcesResult) => {

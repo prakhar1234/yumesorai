@@ -54,6 +54,7 @@ export function DemystifierClient() {
     if (product === 'codeflux') router.push('/demystifier/codeflux');
     else if (product === 'transformer') router.push('/demystifier/transformer');
     else if (product === 'business-review') router.push('/demystifier/business-review');
+    else if (product === 'rad') router.push('/demystifier/rad');
   }, [router]);
 
   const handleAnalyzeComplete = useCallback((data: GraphData & { coverage?: CoverageData }, label: string) => {

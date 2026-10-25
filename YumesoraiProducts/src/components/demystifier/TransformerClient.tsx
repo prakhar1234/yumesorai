@@ -28,6 +28,7 @@ export function TransformerClient() {
     if (product === 'demystifier') router.push('/demystifier');
     else if (product === 'codeflux') router.push('/demystifier/codeflux');
     else if (product === 'business-review') router.push('/demystifier/business-review');
+    else if (product === 'rad') router.push('/demystifier/rad');
   }, [router]);
 
   const handleConnect = useCallback((

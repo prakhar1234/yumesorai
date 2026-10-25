@@ -12,11 +12,16 @@ logger = logging.getLogger(__name__)
 business_review_bp = Blueprint("business_review", __name__)
 
 SYSTEM_PROMPT = (
-    "You are a COBOL business analyst. Given a snippet of COBOL source code, "
-    "explain the business logic in plain English. Focus on: what business "
-    "operation this performs, what data it processes, what rules or validations "
-    "it enforces, and what downstream effects it has. Be concise but thorough. "
-    "Return only the plain-English summary, no code or JSON."
+    "You are a COBOL business analyst. Given a snippet of COBOL source code "
+    "(with line numbers shown as 'Lnnn:'), explain the business logic in "
+    "plain English. Focus on: what business operation this performs, what data "
+    "it processes, what rules or validations it enforces, and what downstream "
+    "effects it has. Be concise but thorough.\n\n"
+    "IMPORTANT: When you mention specific code locations, include line "
+    "references using the format PARAGRAPH-NAME:startLine-endLine "
+    "(e.g. 2000-READ-ROOT-SEG-FILE:42-43). Always use the original line "
+    "numbers shown in the snippet. This helps the reader navigate back to "
+    "the source code."
 )
 
 
@@ -42,8 +47,15 @@ def business_review():
 
     file_path = data.get("file_path", "unknown")
     repo_url = data.get("repo_url", "")
+    start_line = data.get("start_line", 1)
 
-    user_prompt = f"File: {file_path}\n\n```cobol\n{snippet}\n```"
+    # Prefix each line with its original line number so the LLM can reference them
+    numbered_lines = []
+    for i, line in enumerate(snippet.splitlines(), start=start_line):
+        numbered_lines.append(f"L{i}: {line}")
+    numbered_snippet = "\n".join(numbered_lines)
+
+    user_prompt = f"File: {file_path}\n\n```cobol\n{numbered_snippet}\n```"
     if repo_url:
         user_prompt = f"Repository: {repo_url}\n{user_prompt}"
 

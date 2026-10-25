@@ -31,6 +31,8 @@ export function CodeFluxClient() {
   const handleProductChange = useCallback((product: string) => {
     if (product === 'demystifier') router.push('/demystifier');
     else if (product === 'transformer') router.push('/demystifier/transformer');
+    else if (product === 'business-review') router.push('/demystifier/business-review');
+    else if (product === 'rad') router.push('/demystifier/rad');
   }, [router]);
 
   const handleConnect = useCallback((url: string, branchName: string, result: SourcesResult) => {

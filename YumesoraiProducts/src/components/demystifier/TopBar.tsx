@@ -5,7 +5,7 @@ import { ProductSwitcher } from './ProductSwitcher';
 import { TaskTray } from './background-tasks/TaskTray';
 
 interface TopBarProps {
-  activeProduct: 'demystifier' | 'codeflux' | 'transformer' | 'business-review';
+  activeProduct: 'demystifier' | 'codeflux' | 'transformer' | 'business-review' | 'rad';
   onProductChange: (product: string) => void;
   searchValue?: string;
   onSearchChange?: (value: string) => void;
